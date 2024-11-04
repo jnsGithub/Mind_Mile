@@ -1,13 +1,20 @@
 import 'dart:async';
 
+import 'package:drag_and_drop_lists/drag_and_drop_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:mind_mile/global.dart';
+import 'package:mind_mile/model/todoList.dart';
+import 'package:mind_mile/model/todoListGroup.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class TodoListController extends GetxController {
+class TodoListController extends GetxController with SingleGetTickerProviderMixin{
   TextEditingController addController = TextEditingController();
+
+  late SlidableController slidableController ;
+  RxBool isEdit = false.obs;
 
   RxInt cupertinoTabBarIValue = 0.obs;
   int cupertinoTabBarIValueGetter() => cupertinoTabBarIValue.value;
@@ -15,15 +22,79 @@ class TodoListController extends GetxController {
 
   RxInt selectTap = 0.obs;
   PageController pageController = PageController();
-
+  @override
+  onInit(){
+    super.onInit();
+    slidableController = SlidableController(this);
+  }
   ScrollController scrollController = ScrollController();
   Rx<PointerMoveEvent> details = PointerMoveEvent().obs;
   Rx<PointerDownEvent> offset = PointerDownEvent().obs;
 
   bool isScrolling = false;
 
+  RxList<DragAndDropList> contents = <DragAndDropList>[].obs;
 
-  List<String> testText = [
+  List<TodoListGroup> todoListGroup = [
+    TodoListGroup(
+    documentId: '1',
+    title: '당신의 첫 목표는?',
+    color: 0xff32A8EB,
+    todoList: [
+      TodoList(
+        documentId: '1',
+        GroupId: '1',
+        title: '모아 미팅하기',
+        createDate: DateTime.now(),
+        isAlarm: false,
+        completeCount: 0.obs,
+      ),
+    ],
+    createDate: DateTime.now(),
+  ),
+    TodoListGroup(
+      documentId: '2',
+      title: '릴렉스 루틴',
+      color: 0xff68B64D,
+      todoList: [
+        TodoList(
+          documentId: '3',
+          GroupId: '2',
+          title: '밥먹고 산책하기',
+          createDate: DateTime.now(),
+          isAlarm: false,
+          completeCount: 0.obs,
+        ),
+        TodoList(
+          documentId: '4',
+          GroupId: '2',
+          title: '10시 이후에 일 안하기',
+          createDate: DateTime.now(),
+          isAlarm: false,
+          completeCount: 0.obs,
+        )
+      ],
+      createDate: DateTime.now(),
+    ),
+    TodoListGroup(
+      documentId: '3',
+      title: '목표 없는 리스트',
+      color: 0xff684DB6,
+      todoList: [
+        TodoList(
+          documentId: '3',
+          GroupId: '3',
+          title: '드라마 보기 📺',
+          createDate: DateTime.now(),
+          isAlarm: false,
+          completeCount: 0.obs,
+        ),
+      ],
+      createDate: DateTime.now(),
+    )
+  ];
+
+  RxList<String> testText = <String>[
     '오른쪽 하단 +를 눌러 할일을 등록하세요',
     '목록의 순서를 오른쪽 = 를 잡고 드래그해서 바꿔보세요',
     '목록을 왼쪽으로 슬라이드해서 알람 설정과 삭제 기능을 구현해보세요!',
@@ -31,14 +102,24 @@ class TodoListController extends GetxController {
     '워라벨 지킴이 목표의 할 일으로는 나만의 릴렉스 루틴을 한가지라도 적어주세요. 듀디것부터 공개할게요!',
     '밥먹고 산책하기',
     '10시 이후에 일 안하기',
-  ];
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+  ].obs;
 
-  RxInt tabIndex = 0.obs;
+  RxInt tabIndex = 1.obs;
   Rx<CalendarFormat> calendarFormat = CalendarFormat.week.obs;
   bool isDrag = false;
 
   Timer? _autoScrollTimer;
   bool _isAutoScrolling = false;
+
+
 
   void startAutoScroll(double direction) {
     if (_isAutoScrolling) return;
@@ -78,13 +159,6 @@ class TodoListController extends GetxController {
           curve: Curves.easeInOut,
         );
       }
-      // scrollController
-      //     .animateTo(
-      //   scrollController.position.maxScrollExtent,
-      //   duration: Duration(seconds: 2),
-      //   curve: Curves.easeInOut,
-      // )
-      //     .then((_) => isScrolling = false);
     }
     else{
       scrollController
@@ -106,9 +180,6 @@ class TodoListController extends GetxController {
 
   void changeCalendarFormat(CalendarFormat format) {
     calendarFormat.value = format;
-  }
-  changeTab(int index) {
-    tabIndex.value = index;
   }
 
   void reorderTask(int oldIndex, int newIndex) {
@@ -255,6 +326,7 @@ class TodoListController extends GetxController {
         }
     );
   }
+
   Widget a(String path, String path2, RxInt selectIndex, int index, double width, double height){
     return GestureDetector(
         onTap: (){

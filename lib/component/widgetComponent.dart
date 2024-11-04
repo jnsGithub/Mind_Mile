@@ -66,9 +66,10 @@ Widget textFieldComponent(TextEditingController controller, double width, double
 }
 
 Widget bottomNavi(RxInt selected, PageController controller) {
-  List<int> index = [0, 1, 2, 3];
+  List<int> index = [0, 0, 0, 3];
  return Container(
     height: 70,
+   padding: EdgeInsets.only(bottom: 20),
    decoration: BoxDecoration(
       color: Color(0xffEAF6FF),
       boxShadow: [
@@ -86,6 +87,7 @@ Widget bottomNavi(RxInt selected, PageController controller) {
          onTap: () {
            // controller.jumpToPage(index);
            selected.value = index;
+           print(selected.value);
          },
          child: Container(
            width: Get.width / 4,
