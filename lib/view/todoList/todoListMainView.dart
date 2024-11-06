@@ -22,20 +22,39 @@ class TodoListMainView extends GetView<TodoListController> {
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 20),
-            width: 35,
-            height: 35,
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/appbarlogo.png'),
-                fit: BoxFit.fitWidth,
-              ),
+        // elevation: 50,
+        centerTitle: false,
+        toolbarHeight: 55,
+
+        title: SafeArea(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            width: size.width,
+            height: 50,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Image(image: AssetImage('assets/images/setting.png'), width: 16,),
+              ],
             ),
           ),
-        ],
+        ),
+        automaticallyImplyLeading: false,
+        // actions: [
+        //   Container(
+        //     alignment: Alignment.bottomRight,
+        //     margin: const EdgeInsets.only(right: 20),
+        //     width: 35,
+        //     height: 50,
+        //     decoration: const BoxDecoration(
+        //       image: DecorationImage(
+        //         image: AssetImage('assets/images/appbarlogo.png'),
+        //         fit: BoxFit.fitWidth,
+        //       ),
+        //     ),
+        //   ),
+        // ],
       ),
       body: Obx(() => controller.selectTap.value != 3 ? Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -85,6 +104,7 @@ class TodoListMainView extends GetView<TodoListController> {
                                         controller.diaryDialog(context);
                                       },
                                       child: DottedBorder(
+                                        padding: const EdgeInsets.all(0),
                                         borderType: BorderType.RRect,
                                         strokeWidth: 0.5,
                                         radius: const Radius.circular(60),
@@ -108,7 +128,7 @@ class TodoListMainView extends GetView<TodoListController> {
                               ],
                             ),
                           ),
-                          Obx(() => Column(
+                          Obx(() => controller.isDetail.value ? Container() : Column(
                               children: [
                                 TableCalendar(
                                   locale: 'ko_KR',
@@ -195,7 +215,7 @@ class TodoListMainView extends GetView<TodoListController> {
                             ),
                           ),
                           SizedBox(height: 10,),
-                          Obx(() => Container(
+                          Obx(() => controller.isDetail.value ? Container() : Container(
                             width: size.width,
                             height: 25,
                             child: CupertinoTabBar(
@@ -230,50 +250,54 @@ class TodoListMainView extends GetView<TodoListController> {
                           ),
                           ),
                           const SizedBox(height: 10),
-                          Container(
-                            alignment: Alignment.centerRight,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(3),
-                                  width: 15,
-                                  height: 15,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    color: subColor,
-                                    // image: const DecorationImage(
-                                    //   image: AssetImage('assets/images/edit.png'),
-                                    //   fit: BoxFit.cover,
-                                    // ),
-                                  ),
-                                  child: Image(image: AssetImage('assets/images/edit.png')),
+                          Obx(() => controller.isDetail.value ? Container() : GestureDetector(
+                              onTap: (){
+                                if(controller.cupertinoTabBarIValue.value == 0 && controller.isDetail.value == false) {
+                                  // var controller = Get.find<TodoListController>;
+                                  if(controller.isEdit.value) {
+                                    controller.slidableController.close();
+                                    controller.isEdit.value = false;
+
+                                  }
+                                  else {
+                                    controller.slidableController.openEndActionPane();
+                                    controller.isEdit.value = true;
+                                  }
+
+                                  print(1);
+                                }
+                                else{
+                                  controller.isGroupEdit.value = !controller.isGroupEdit.value;
+                                }
+                              },
+                              child: Container(
+                                alignment: Alignment.centerRight,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(3),
+                                      width: 15,
+                                      height: 15,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        color: subColor,
+                                        // image: const DecorationImage(
+                                        //   image: AssetImage('assets/images/edit.png'),
+                                        //   fit: BoxFit.cover,
+                                        // ),
+                                      ),
+                                      child: Image(image: AssetImage('assets/images/edit.png')),
+                                    ),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      controller.cupertinoTabBarIValue.value == 0
+                                          ? '할일 편집'
+                                          : '목표 편집',
+                                      style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w600),)
+                                  ],
                                 ),
-                                SizedBox(width: 5),
-                                Obx(() => GestureDetector(
-                                  onTap: () {
-                                    if(controller.cupertinoTabBarIValue.value == 0) {
-                                      // var controller = Get.find<TodoListController>;
-                                      if(controller.isEdit.value) {
-                                        controller.slidableController.close();
-                                        controller.isEdit.value = false;
-
-                                      }
-                                      else {
-                                        controller.slidableController.openEndActionPane();
-                                        controller.isEdit.value = true;
-                                      }
-
-                                      print(1);
-                                    }
-                                  },
-                                  child: Text(
-                                    controller.cupertinoTabBarIValue.value == 0
-                                        ? '할일 편집'
-                                        : '목표 편집',
-                                    style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w600),),
-                                ))
-                              ],
+                              ),
                             ),
                           ),
                           Obx(() => controller.cupertinoTabBarIValue.value == 0 ? TodoListView() : TodoListGroupView(),),
@@ -340,7 +364,10 @@ class TodoListMainView extends GetView<TodoListController> {
                           );
                         });
                       }
-                    } else {
+                    } else if(controller.isDetail.value) {
+                      addGroupDetailItemDialog(context, controller.isCalendar, controller.isAlarm);
+                    }
+                    else {
                       addTodoListGroup(context);
                     }
 

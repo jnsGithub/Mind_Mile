@@ -39,6 +39,9 @@ dependencies:
   fl_chart: ^0.69.0
   d_chart: ^2.10.2
   flutter_slidable: ^3.1.1
+  super_tooltip: ^2.0.9
+  aligned_tooltip: ^0.0.1
+  balloon_widget: ^0.2.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8

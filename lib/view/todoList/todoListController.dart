@@ -20,6 +20,13 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
   int cupertinoTabBarIValueGetter() => cupertinoTabBarIValue.value;
   RxBool isAdd = false.obs;
 
+  /*그룹 디테일*/
+  RxBool isGroupEdit = false.obs;
+  RxBool isDetail = false.obs;
+  Rx<TodoListGroup> todoListGroupDetail = TodoListGroup(documentId: '1', title: '당신의 첫 목표는?', todoList: [], createDate: DateTime.now(), color: 0xff32A8EB).obs;
+  RxBool isCalendar = false.obs;
+  RxBool isAlarm = false.obs;
+
   RxInt selectTap = 0.obs;
   PageController pageController = PageController();
   @override
@@ -35,6 +42,25 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
 
   RxList<DragAndDropList> contents = <DragAndDropList>[].obs;
 
+  RxList<TodoList> todoList = <TodoList>[
+    TodoList(documentId: '1', GroupId: '1', title: '오른쪽 하단 +를 눌러 할일을 등록하세요', isAlarm: true, completeCount: 0.obs, createDate: DateTime.now()),
+    TodoList(documentId: '1', GroupId: '1', title: '목록의 순서를 오른쪽 = 를 잡고 드래그해서 바꿔보세요', isAlarm: true, completeCount: 1.obs, createDate: DateTime.now()),
+    TodoList(documentId: '1', GroupId: '1', title: '목록을 왼쪽으로 슬라이드해서 알람 설정과 삭제 기능을 구현해보세요!', isAlarm: true, completeCount: 3.obs, createDate: DateTime.now()),
+    TodoList(documentId: '1', GroupId: '1', title: '목표별 할일에서 목표별로 할일을 관리해보세요', isAlarm: true, completeCount: 1.obs, createDate: DateTime.now()),
+    TodoList(documentId: '1', GroupId: '1', title: '워라벨 지킴이 목표의 할 일으로는 나만의 릴렉스 루틴을 한가지라도 적어주세요. 듀디것부터 공개할게요!', isAlarm: true, completeCount: 0.obs, createDate: DateTime.now()),
+    TodoList(documentId: '1', GroupId: '1', title: '밥먹고 산책하기', isAlarm: true, completeCount: 0.obs, createDate: DateTime.now()),
+    TodoList(documentId: '1', GroupId: '1', title: '10시 이후에 일 안하기', isAlarm: true, completeCount: 0.obs, createDate: DateTime.now()),
+  ].obs;
+
+  RxList<String> testText = <String>[
+    '오른쪽 하단 +를 눌러 할일을 등록하세요',
+    '목록의 순서를 오른쪽 = 를 잡고 드래그해서 바꿔보세요',
+    '목록을 왼쪽으로 슬라이드해서 알람 설정과 삭제 기능을 구현해보세요!',
+    '목표별 할일에서 목표별로 할일을 관리해보세요',
+    '워라벨 지킴이 목표의 할 일으로는 나만의 릴렉스 루틴을 한가지라도 적어주세요. 듀디것부터 공개할게요!',
+    '밥먹고 산책하기',
+    '10시 이후에 일 안하기',
+  ].obs;
   List<TodoListGroup> todoListGroup = [
     TodoListGroup(
     documentId: '1',
@@ -61,7 +87,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
           documentId: '3',
           GroupId: '2',
           title: '밥먹고 산책하기',
-          createDate: DateTime.now(),
+          createDate: DateTime.utc(2021, 10, 10),
           isAlarm: false,
           completeCount: 0.obs,
         ),
@@ -69,7 +95,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
           documentId: '4',
           GroupId: '2',
           title: '10시 이후에 일 안하기',
-          createDate: DateTime.now(),
+          createDate: DateTime.utc(2021, 10, 11),
           isAlarm: false,
           completeCount: 0.obs,
         )
@@ -94,23 +120,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
     )
   ];
 
-  RxList<String> testText = <String>[
-    '오른쪽 하단 +를 눌러 할일을 등록하세요',
-    '목록의 순서를 오른쪽 = 를 잡고 드래그해서 바꿔보세요',
-    '목록을 왼쪽으로 슬라이드해서 알람 설정과 삭제 기능을 구현해보세요!',
-    '목표별 할일에서 목표별로 할일을 관리해보세요',
-    '워라벨 지킴이 목표의 할 일으로는 나만의 릴렉스 루틴을 한가지라도 적어주세요. 듀디것부터 공개할게요!',
-    '밥먹고 산책하기',
-    '10시 이후에 일 안하기',
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-  ].obs;
+
 
   RxInt tabIndex = 1.obs;
   Rx<CalendarFormat> calendarFormat = CalendarFormat.week.obs;
@@ -216,110 +226,119 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                     )
                 )
             ),
-            content: Container(
-              alignment: Alignment.center,
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              width: size.width * 0.9,
-              height: 520,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20)
-              ),
-              child: Column(
-                children: [
-                  Text('오늘 하루는 어땠어?', style: TextStyle(fontSize: 20, color: subColor, fontWeight: FontWeight.w600),),
-                  SizedBox(height: 20,),
-                  Container(
-                    width: size.width,
-                    height: 97,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Obx(() => Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('오늘 하루의 점수를 매겨봐 !', style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w500),),
-                          SizedBox(height: 10,),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              a('assets/images/score/unselectTT.png',     'assets/images/score/selectTT.png', selectIndex, selectList[0], size.width*0.1154, 45),
-                              a('assets/images/score/unselectDefault.png',      'assets/images/score/select1.png', selectIndex, selectList[1], size.width*0.0513, 20),
-                              a('assets/images/score/unselectDefault.png',      'assets/images/score/select2.png', selectIndex, selectList[2], size.width*0.0513, 20),
-                              a('assets/images/score/unselectSoso.png',   'assets/images/score/selectSoso.png', selectIndex, selectList[3], size.width*0.1154, 45),
-                              a('assets/images/score/unselectDefault.png',      'assets/images/score/select3.png', selectIndex, selectList[4], size.width*0.0513, 20),
-                              a('assets/images/score/unselectDefault.png',      'assets/images/score/select4.png', selectIndex, selectList[5], size.width*0.0513, 20),
-                              a('assets/images/score/unselectHappy.png',  'assets/images/score/selectHappy.png', selectIndex, selectList[6], size.width*0.1154, 45),
-                            ]
-                          ),
-                        ],
+            content: SingleChildScrollView(
+              child: Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                width: size.width * 0.9,
+                height: 520,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20)
+                ),
+                child: Column(
+                  children: [
+                    Text('오늘 하루는 어땠어?', style: TextStyle(fontSize: 20, color: subColor, fontWeight: FontWeight.w600),),
+                    SizedBox(height: 20,),
+                    Container(
+                      width: size.width,
+                      height: 97,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
                       ),
-                    ),
-                  ),
-                  SizedBox(height: 20,),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    width: size.width,
-                    height: 300,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(height: 10,),
-                        Text('오늘의 일기 쓰기', style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500),),
-                        SizedBox(height: 10,),
-                        Row(
+                      child: Obx(() => Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('제목 : ', style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500)),
-                            Container(
-                              height: 20,
-                              width: size.width * 0.4,
-                              child: TextField(
-                                controller: titleController,
-                                maxLines: 1,
-                                decoration: InputDecoration(
-                                  hintText: '제목은 한줄 일기가 돼 !',
-                                  hintStyle: TextStyle(fontSize: 12, color: Color(0xffD9D9D9), fontWeight: FontWeight.w500),
-                                  border: InputBorder.none,
-                                ),
-                              ),
+                            Text('오늘 하루의 점수를 매겨봐 !', style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w500),),
+                            SizedBox(height: 10,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                a('assets/images/score/unselectTT.png',     'assets/images/score/selectTT.png', selectIndex, selectList[0], size.width*0.1154, 45),
+                                a('assets/images/score/unselectDefault.png',      'assets/images/score/select1.png', selectIndex, selectList[1], size.width*0.0513, 20),
+                                a('assets/images/score/unselectDefault.png',      'assets/images/score/select2.png', selectIndex, selectList[2], size.width*0.0513, 20),
+                                a('assets/images/score/unselectSoso.png',   'assets/images/score/selectSoso.png', selectIndex, selectList[3], size.width*0.1154, 45),
+                                a('assets/images/score/unselectDefault.png',      'assets/images/score/select3.png', selectIndex, selectList[4], size.width*0.0513, 20),
+                                a('assets/images/score/unselectDefault.png',      'assets/images/score/select4.png', selectIndex, selectList[5], size.width*0.0513, 20),
+                                a('assets/images/score/unselectHappy.png',  'assets/images/score/selectHappy.png', selectIndex, selectList[6], size.width*0.1154, 45),
+                              ]
                             ),
                           ],
                         ),
-                        Container(
-                          height: 100,
-                          width: size.width * 0.5,
-                          child: TextField(
-                            controller: contentController,
-                            maxLines: 20,
-                            decoration: InputDecoration(
-                              hintText: '일기쓰기...',
-                              hintStyle: TextStyle(fontSize: 12, color: Color(0xffD9D9D9), fontWeight: FontWeight.w500),
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: subColor,
-                      minimumSize: Size(size.width*0.1744, 28),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                      onPressed: (){
-                      Get.back();
-                      },
-                      child: Text('저장', style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w500),)
-                  )
-                ],
+                    SizedBox(height: 20,),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      width: size.width,
+                      height: 300,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        // crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 10,),
+                          Text('오늘의 일기 쓰기', style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500),),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                alignment: Alignment.center,
+                                  height: 50,
+                              child: Text('제목 : ', style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500))),
+                              SizedBox(
+                                height: 50,
+                                width: size.width * 0.533,
+                                child: TextField(
+                                  controller: titleController,
+                                  style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500),
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 5),
+                                    hintText: '제목은 한줄 일기가 돼 !',
+                                    hintStyle: TextStyle(fontSize: 12, color: Color(0xffD9D9D9), fontWeight: FontWeight.w500),
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            height: 150,
+                            width: size.width,
+                            child: TextField(
+                              controller: contentController,
+                              maxLines: 20,
+                              style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500),
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.zero,
+                                hintText: '일기쓰기...',
+                                hintStyle: TextStyle(fontSize: 12, color: Color(0xffD9D9D9), fontWeight: FontWeight.w500),
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: subColor,
+                        minimumSize: Size(size.width*0.1744, 28),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                        onPressed: (){
+                        Get.back();
+                        },
+                        child: Text('저장', style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w500),)
+                    )
+                  ],
+                ),
               ),
             ),
           );

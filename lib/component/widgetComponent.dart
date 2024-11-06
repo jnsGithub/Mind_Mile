@@ -68,8 +68,8 @@ Widget textFieldComponent(TextEditingController controller, double width, double
 Widget bottomNavi(RxInt selected, PageController controller) {
   List<int> index = [0, 0, 0, 3];
  return Container(
-    height: 70,
-   padding: EdgeInsets.only(bottom: 20),
+    height: 80,
+   padding: EdgeInsets.only(bottom: 30),
    decoration: BoxDecoration(
       color: Color(0xffEAF6FF),
       boxShadow: [
@@ -100,9 +100,9 @@ Widget bottomNavi(RxInt selected, PageController controller) {
                  height: 6,
                  decoration: BoxDecoration(
                    borderRadius: BorderRadius.circular(60),
-                   color: Color(0xff133C6B),
+                   color: Color(0xff7F99B5),
                  ),
-               ) : Container(),
+               ) : Container(height: 6,),
                SizedBox(height: 5),
                Image.asset(
                  index == 0

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mind_mile/view/diaryView/diaryView.dart';
+import 'package:mind_mile/view/diaryView/dirayDetail/diaryDetailView.dart';
 import 'package:mind_mile/view/sign/loginView.dart';
 import 'package:mind_mile/view/sign/signUp/signUpView.dart';
 import 'package:mind_mile/view/todoList/todoListMainView.dart';
@@ -40,7 +41,8 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/loginView', page: () => const LoginView(),),
         GetPage(name: '/signUpView', page: () => const SignUpView(),),
         GetPage(name: '/todoListView', page: () => const TodoListMainView(),),
-        GetPage(name: '/diaryView', page: () => const DiaryView())
+        GetPage(name: '/diaryView', page: () => const DiaryView()),
+        GetPage(name: '/diaryDetailView', page: () => const DiaryDetailView()),
       ],
     );
   }
