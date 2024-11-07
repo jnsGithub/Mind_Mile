@@ -144,6 +144,7 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
         ),
       ),
       body: Obx(() => DragAndDropLists(
+        listDragHandle: DragHandle(child: Icon(Icons.drag_handle, size: 30, color: Color(0xffD9D9D9),)),
             itemDragHandle: DragHandle(child: Icon(Icons.drag_handle, size: 30, color: Color(0xffD9D9D9),)),
             children: contents,
             onItemReorder: _onItemReorder,

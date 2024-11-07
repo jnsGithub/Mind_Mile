@@ -16,7 +16,46 @@ class TodoListView extends GetView<TodoListController> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    return Container(
+    return controller.todoList.length == 0
+        ? Container(
+      alignment: Alignment.center,
+      height: 400,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.info_outline,
+            size: 18,
+            color: subColor,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            '오늘 할 일이 없어요 !',
+            style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w400),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '오른쪽 하단 ',
+                style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w400),
+              ),
+              Icon(
+                Icons.add_circle,
+                size: 10,
+                color: subColor,
+              ),
+              Text(
+                ' 버튼을 눌러 할 일을 추가해보세요 :D',
+                style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w400),
+              ),
+            ],
+          ),
+        ],
+      ),
+    )
+        : Container(
       width: size.width,
       height: 500,
       child: Obx(() => ReorderableListView.builder(

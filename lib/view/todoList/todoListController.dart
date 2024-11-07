@@ -210,6 +210,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
         context: context,
         builder: (context){
           return AlertDialog(
+            insetPadding: EdgeInsets.symmetric(horizontal: 20),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20)
             ),
@@ -231,13 +232,13 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                 alignment: Alignment.center,
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 width: size.width * 0.9,
-                height: 520,
+                height: 480,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20)
                 ),
                 child: Column(
                   children: [
-                    Text('오늘 하루는 어땠어?', style: TextStyle(fontSize: 20, color: subColor, fontWeight: FontWeight.w600),),
+                    Text('오늘 하루는 어땠어?', style: TextStyle(fontSize: 15, color: subColor, fontWeight: FontWeight.w600),),
                     SizedBox(height: 20,),
                     Container(
                       width: size.width,
@@ -272,7 +273,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       width: size.width,
-                      height: 300,
+                      height: 270,
                       decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),

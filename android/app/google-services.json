@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "540150120260",
+    "project_id": "mind-mile",
+    "storage_bucket": "mind-mile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:540150120260:android:91869a181680013828e111",
+        "android_client_info": {
+          "package_name": "com.mind.mile.app.main.mind_mail"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAotEcp2zVtOcCsVP-obHfhmZTWQb5EA4U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:540150120260:android:1d8cab95f50423d928e111",
+        "android_client_info": {
+          "package_name": "com.mind.mile.app.main.mind_mile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAotEcp2zVtOcCsVP-obHfhmZTWQb5EA4U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

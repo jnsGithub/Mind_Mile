@@ -65,8 +65,32 @@ Widget textFieldComponent(TextEditingController controller, double width, double
   );
 }
 
+Widget buttonComponent(double width, double height, String text, RxInt selectIndex, int index) {
+  return Obx(() => Container(
+      width: width,
+      height: height,
+      child: ElevatedButton(
+        onPressed: () {
+          selectIndex.value = index;
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: selectIndex.value == index ? Color(0xffBFE0FB): subColor,
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: selectIndex.value == index ? Color(0xff3E658F) : Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
 Widget bottomNavi(RxInt selected, PageController controller) {
-  List<int> index = [0, 0, 0, 3];
+  List<int> index = [0, 0, 0, 0];
  return Container(
     height: 80,
    padding: EdgeInsets.only(bottom: 30),
@@ -122,3 +146,4 @@ Widget bottomNavi(RxInt selected, PageController controller) {
    )
  );
 }
+
