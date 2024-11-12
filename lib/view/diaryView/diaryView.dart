@@ -17,159 +17,340 @@ class DiaryView extends GetView<DiaryController> {
     Size size = MediaQuery.of(context).size;
     Get.lazyPut(() => DiaryController());
     final _controller = SuperTooltipController();
+    GlobalKey _targetKey = GlobalKey();
+    GlobalKey _targetKey2 = GlobalKey();
+    GlobalKey _targetKey3 = GlobalKey();
     return SingleChildScrollView(
-      child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          children: [
-            SizedBox(
-              height: 60,
-              child: Stack(
-                children: [
-                  Center(
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 7),
-                      padding: const EdgeInsets.only(left: 60, right: 10),
-                        height: 45,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          color: const Color(0xffEAF6FF),
-                        ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('선희의 기록', style: TextStyle(fontSize: 17, color: subColor, fontWeight: FontWeight.w700),),
-
-                          ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                padding: EdgeInsets.zero,
-                                backgroundColor: subColor,
-                                minimumSize: const Size(80, 23),
-                                maximumSize: const Size(80, 23),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                              ),
-                              onPressed: (){
-                                Get.toNamed('/diaryDetailView');
-                              },
-                              child: Text('전체 기록 보기', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600),))
-                        ],
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: const Color(0xff707070), width: 1),
-                      borderRadius: BorderRadius.circular(60),
-                    ),
-                    child: Container(
-                      width: 45,
-                      height: 45,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(60),
-                        image: const DecorationImage(
-                          image: AssetImage('assets/images/profileex.png'),
-                          fit: BoxFit.fitWidth,
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(height: 13,),
-            Container(
-              padding: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),
-              height: 429,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xff000000).withOpacity(0.1),
-                    spreadRadius: 0,
-                    blurRadius: 10,
-                    offset: const Offset(0, 0), // changes position of shadow
-                  ),
-                ],
-              ),
-              child: AlignedTooltipArea(
-                builder: (context, tooltip, scrim){
-                  return Stack(
-                    fit: StackFit.passthrough,
+      child: Stack(
+        fit: StackFit.passthrough,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 60,
+                  child: Stack(
                     children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10, top: 15),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                // TODO: 여기 만들어야함.
-                                Icon(Icons.circle, size: 7, color: subColor,),
-                                Text('  한 주간의 나', style: TextStyle(fontSize: 15, color: subColor,fontWeight: FontWeight.w700),),
-                                const SizedBox(width: 3,),
-                                // GestureDetector(
-                                //   onTap: (){
-                                //   },
-                                //   child: Icon(Icons.info_outline, size: 14, color: subColor),
-                                // ),
-                                // TODO: 툴팁
-                                AlignedTooltipEntry(
-                                  preferredDirection: AxisDirection.down,
-                                  barrierColor: Colors.black.withOpacity(0.5),
-                                  isModal: true,
-                                  tailBuilder: (a, b, c) {
-                                    return Path()
-                                      ..moveTo(a.dx, a.dy)      // 어디로 이동할지
-                                      ..lineTo(b.dx - 10, b.dy) // 오른쪽 선
-                                      ..lineTo(c.dx + 10, c.dy) // 왼쪽 선
-                                      ..close();
-                                  },
-                                  backgroundColor: Color(0xffD6EEFB),
-                                  borderRadius: BorderRadius.circular(15),
-                                  // margin: const EdgeInsets.only(left: 90),
-                                  child: Icon(
-                                    Icons.info_outline,
-                                    color: subColor,
-                                    size: 14,
-                                  ),
-                                  content: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      '- 일주일 동안의 요일별 내가 계획한 할 일과 수행 완료한 양을 한눈에 볼 수 있어요 !\n\n- 일주일 동안의 요일별 나의 점수 (기분) 변화를 한눈에 볼 수 있어요 !',
-                                      style: TextStyle(fontSize: 9, color: subColor, fontWeight: FontWeight.w500)
+                      Center(
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 7),
+                          padding: const EdgeInsets.only(left: 60, right: 10),
+                          height: 45,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            color: const Color(0xffEAF6FF),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('선희의 기록', style: TextStyle(fontSize: 17, color: subColor, fontWeight: FontWeight.w700),),
+
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    backgroundColor: subColor,
+                                    minimumSize: const Size(80, 23),
+                                    maximumSize: const Size(80, 23),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(50),
                                     ),
                                   ),
-                                )
-                              ],
+                                  onPressed: (){
+                                    Get.toNamed('/diaryDetailView');
+                                  },
+                                  child: Text('전체 기록 보기', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600),))
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: const Color(0xff707070), width: 1),
+                          borderRadius: BorderRadius.circular(60),
+                        ),
+                        child: Container(
+                          width: 45,
+                          height: 45,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(60),
+                            image: const DecorationImage(
+                              image: AssetImage('assets/images/profileex.png'),
+                              fit: BoxFit.fitWidth,
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          Container(alignment: Alignment.centerRight,child: Text('2024.10.06~2024.10.12', style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w400),)),
-                          Container(
-                            height: 170,
-                            child: BarChart(
-                              BarChartData(
-                                alignment: BarChartAlignment.spaceAround,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(height: 13,),
+                Container(
+                  padding: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 10),
+                  height: 429,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xff000000).withOpacity(0.1),
+                        spreadRadius: 0,
+                        blurRadius: 10,
+                        offset: const Offset(0, 0), // changes position of shadow
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10, top: 15),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // TODO: 여기 만들어야함.
+                            Icon(Icons.circle, size: 7, color: subColor,),
+                            Text('  한 주간의 나', style: TextStyle(fontSize: 15, color: subColor,fontWeight: FontWeight.w700),),
+                            const SizedBox(width: 3,),
+                            GetBuilder<GlobalController>(
+                                builder: (globalController){
+                                  return GestureDetector(
+                                    onTap: (){globalController.aa(
+                                        context,_targetKey ,
+                                        '- 일주일 동안의 요일별 내가 계획한 할 일과 수행 완료한 양을 한눈에 볼 수 있어요 !',
+                                        text2 : '- 일주일 동안의 요일별 나의 점수 (기분) 변화를 한눈에 볼 수 있어요 !');
+                                      },
+                                    child: Icon(
+                                        key: _targetKey,
+                                        Icons.info_outline,
+                                        color: subColor,
+                                        size: 14,
+                                      ),
+                                  );
+                                }
+                            ),
+                            // GestureDetector(
+                            //   onTap: (){
+                            //   },
+                            //   child: Icon(Icons.info_outline, size: 14, color: subColor),
+                            // ),
+                            // TODO: 툴팁
+                            // AlignedTooltipEntry(
+                            //   preferredDirection: AxisDirection.down,
+                            //   barrierColor: Colors.black.withOpacity(0.5),
+                            //   offset: 8.0,
+                            //   isModal: false,
+                            //   tailBuilder: (a, b, c) {
+                            //     print(a);
+                            //     print(b);
+                            //     print(c);
+                            //     return Path()
+                            //       ..moveTo(a.dx, a.dy)      // 어디로 이동할지
+                            //       ..lineTo(b.dx - 10, b.dy) // 오른쪽 선
+                            //       ..lineTo(c.dx + 10, c.dy) // 왼쪽 선
+                            //       ..close();
+                            //   },
+                            //   backgroundColor: Color(0xffD6EEFB),
+                            //   borderRadius: BorderRadius.circular(15),
+                            //   margin: const EdgeInsets.only(left: 90),
+                            //   child: Icon(
+                            //     Icons.info_outline,
+                            //     color: subColor,
+                            //     size: 14,
+                            //   ),
+                            //
+                            //   content: Padding(
+                            //     padding: const EdgeInsets.all(8.0),
+                            //     child: Text(
+                            //         '- 일주일 동안의 요일별 내가 계획한 할 일과 수행 완료한 양을 한눈에 볼 수 있어요 !\n\n- 일주일 동안의 요일별 나의 점수 (기분) 변화를 한눈에 볼 수 있어요 !',
+                            //         style: TextStyle(fontSize: 9, color: subColor, fontWeight: FontWeight.w500)
+                            //     ),
+                            //   ),
+                            // )
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Container(alignment: Alignment.centerRight,child: Text('2024.10.06~2024.10.12', style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w400),)),
+                      Container(
+                        height: 170,
+                        child: BarChart(
+                          BarChartData(
+                            alignment: BarChartAlignment.spaceAround,
 
-                                maxY: 7,
-                                barGroups: [
-                                  makeGroupData(0, 2, 7, 7),
-                                  makeGroupData(1, 5, 7, 7),
-                                  makeGroupData(2, 0.5, 7, 2),
-                                  makeGroupData(3, 4, 7, 4),
-                                  makeGroupData(4, 3, 7, 6),
-                                  makeGroupData(5, 2, 7, 4),
-                                  makeGroupData(6, 3, 7, 4),
-                                ],
-                                titlesData: FlTitlesData(
-                                  show: true,
-                                  leftTitles: AxisTitles(
+                            maxY: 7,
+                            barGroups: [
+                              makeGroupData(0, 2, 7, 7),
+                              makeGroupData(1, 5, 7, 7),
+                              makeGroupData(2, 0.5, 7, 2),
+                              makeGroupData(3, 4, 7, 4),
+                              makeGroupData(4, 3, 7, 6),
+                              makeGroupData(5, 2, 7, 4),
+                              makeGroupData(6, 3, 7, 4),
+                            ],
+                            titlesData: FlTitlesData(
+                              show: true,
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                    showTitles: true,
+                                    getTitlesWidget: (double value, TitleMeta meta) {
+                                      const style = TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      );
+                                      switch (value) {
+                                        case 0:
+                                          return Text('0', style: style);
+                                        case 3:
+                                          return Text('할일수', style: style);
+                                        case 7:
+                                          return Text('7', style: style);
+                                        default:
+                                          return Container();
+                                      }
+                                    }
+                                ),
+                              ),
+                              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (double value, TitleMeta meta) {
+                                    const style = TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    );
+                                    switch (value) {
+                                      case 0:
+                                        return Text('S', style: TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ));
+                                      case 1:
+                                        return Text('M', style: style);
+                                      case 2:
+                                        return Text('T', style: style);
+                                      case 3:
+                                        return Text('W', style: style);
+                                      case 4:
+                                        return Text('T', style: style);
+                                      case 5:
+                                        return Text('F', style: style);
+                                      case 6:
+                                        return Text('S', style: TextStyle(
+                                          color: Color(0xff78B7FF),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ));
+                                      default:
+                                        return Text('', style: style);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                            borderData: FlBorderData(
+                                show: true,
+                                border: Border(
+                                  left: BorderSide(color: Colors.black, width: 1),
+                                  bottom: BorderSide(color: Colors.black, width: 1),
+                                )
+                            ),
+                            gridData: FlGridData(
+                                getDrawingHorizontalLine: (value) {
+                                  return FlLine(
+                                    color: const Color(0xff37434d),
+                                    strokeWidth: 0.001,
+                                    dashArray: [5, 2],
+                                  );
+                                },
+                                horizontalInterval: 1,
+                                drawHorizontalLine: true,
+                                drawVerticalLine: false
+                            ),
+                            barTouchData: BarTouchData(enabled: false),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: 20,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: size.width * 0.0154,
+                                  height: size.width * 0.0154,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.bottomCenter,
+                                      end: Alignment.topCenter,
+                                      colors: [Color(0xffABE0FF), Color(0xff32A8EB)],
+                                      stops: [0, 1],
+                                    ),
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                ),
+                                SizedBox(width: 5,),
+                                Text('끝낸 일', style: TextStyle(fontSize: 7, fontWeight: FontWeight.w600),)
+                              ],
+                            ),
+                            SizedBox(width: 10,),
+                            Row(
+                              children: [
+                                Container(
+                                  width: size.width * 0.0154,
+                                  height: size.width * 0.0154,
+                                  decoration: BoxDecoration(
+                                    color: Color(0xffABE0FF),
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                ),
+                                SizedBox(width: 5,),
+                                Text('미룬 일', style: TextStyle(fontSize: 7, fontWeight: FontWeight.w600),)
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                      Container(
+                        height: 160,
+                        child: LineChart(
+                          LineChartData(
+                            gridData: FlGridData(
+                              show: true,
+                              drawVerticalLine: false,
+                              drawHorizontalLine: true,
+                              horizontalInterval: 1,
+                              getDrawingHorizontalLine: (value) {
+                                return FlLine(
+                                  color: const Color(0xff37434d),
+                                  strokeWidth: 0.001,
+                                );
+                              },
+                              // getDrawingVerticalLine: (value) {
+                              //   return FlLine(
+                              //     color: const Color(0xff37434d),
+                              //     strokeWidth: 0.001,
+                              //     dashArray: [5, 2],
+                              //   );
+                              // },
+                            ),
+                            titlesData: FlTitlesData(
+                                show: true,
+                                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                leftTitles: AxisTitles(
                                     sideTitles: SideTitles(
                                         showTitles: true,
                                         getTitlesWidget: (double value, TitleMeta meta) {
@@ -180,541 +361,305 @@ class DiaryView extends GetView<DiaryController> {
                                           );
                                           switch (value) {
                                             case 0:
-                                              return Text('0', style: style);
+                                              return Image(image: AssetImage('assets/images/score/selectTT.png'), width: 40, height: 40, fit: BoxFit.fitWidth,);
                                             case 3:
-                                              return Text('할일수', style: style);
-                                            case 7:
-                                              return Text('7', style: style);
+                                              return Image(image: AssetImage('assets/images/score/selectSoso.png'), width: 40, height: 40, fit: BoxFit.fitWidth,);
+                                            case 6:
+                                              return Image(image: AssetImage('assets/images/score/selectHappy.png'), width: 40, height: 40, fit: BoxFit.fitWidth,);
                                             default:
-                                              return Container();
+                                              return Column(
+                                                children: [
+                                                ],
+                                              );
                                           }
                                         }
-                                    ),
-                                  ),
-                                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                  bottomTitles: AxisTitles(
-                                    sideTitles: SideTitles(
-                                      showTitles: true,
-                                      getTitlesWidget: (double value, TitleMeta meta) {
-                                        const style = TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        );
-                                        switch (value) {
-                                          case 0:
-                                            return Text('S', style: TextStyle(
-                                              color: Colors.red,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
-                                            ));
-                                          case 1:
-                                            return Text('M', style: style);
-                                          case 2:
-                                            return Text('T', style: style);
-                                          case 3:
-                                            return Text('W', style: style);
-                                          case 4:
-                                            return Text('T', style: style);
-                                          case 5:
-                                            return Text('F', style: style);
-                                          case 6:
-                                            return Text('S', style: TextStyle(
-                                              color: Color(0xff78B7FF),
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
-                                            ));
-                                          default:
-                                            return Text('', style: style);
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ),
-                                borderData: FlBorderData(
-                                    show: true,
-                                    border: Border(
-                                      left: BorderSide(color: Colors.black, width: 1),
-                                      bottom: BorderSide(color: Colors.black, width: 1),
                                     )
                                 ),
-                                gridData: FlGridData(
-                                    getDrawingHorizontalLine: (value) {
-                                      return FlLine(
-                                        color: const Color(0xff37434d),
-                                        strokeWidth: 0.001,
-                                        dashArray: [5, 2],
-                                      );
-                                    },
-                                    horizontalInterval: 1,
-                                    drawHorizontalLine: true,
-                                    drawVerticalLine: false
-                                ),
-                                barTouchData: BarTouchData(enabled: false),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            height: 20,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      width: size.width * 0.0154,
-                                      height: size.width * 0.0154,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.bottomCenter,
-                                          end: Alignment.topCenter,
-                                          colors: [Color(0xffABE0FF), Color(0xff32A8EB)],
-                                          stops: [0, 1],
-                                        ),
-                                        borderRadius: BorderRadius.circular(50),
-                                      ),
-                                    ),
-                                    SizedBox(width: 5,),
-                                    Text('끝낸 일', style: TextStyle(fontSize: 7, fontWeight: FontWeight.w600),)
-                                  ],
-                                ),
-                                SizedBox(width: 10,),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: size.width * 0.0154,
-                                      height: size.width * 0.0154,
-                                      decoration: BoxDecoration(
-                                        color: Color(0xffABE0FF),
-                                        borderRadius: BorderRadius.circular(50),
-                                      ),
-                                    ),
-                                    SizedBox(width: 5,),
-                                    Text('미룬 일', style: TextStyle(fontSize: 7, fontWeight: FontWeight.w600),)
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                          Container(
-                            height: 160,
-                            child: LineChart(
-                              LineChartData(
-                                gridData: FlGridData(
-                                  show: true,
-                                  drawVerticalLine: false,
-                                  drawHorizontalLine: true,
-                                  getDrawingHorizontalLine: (value) {
-                                    return FlLine(
-                                      color: const Color(0xff37434d),
-                                      strokeWidth: 0.001,
+                                bottomTitles: AxisTitles(sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (double value, TitleMeta meta) {
+                                    const style = TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
                                     );
-                                  },
-                                  // getDrawingVerticalLine: (value) {
-                                  //   return FlLine(
-                                  //     color: const Color(0xff37434d),
-                                  //     strokeWidth: 0.001,
-                                  //     dashArray: [5, 2],
-                                  //   );
-                                  // },
-                                ),
-                                titlesData: FlTitlesData(
-                                    show: true,
-                                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                    leftTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                            showTitles: true,
-                                            getTitlesWidget: (double value, TitleMeta meta) {
-                                              const style = TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14,
-                                              );
-                                              switch (value) {
-                                                case 0:
-                                                  return Image(image: AssetImage('assets/images/score/selectTT.png'), width: 40, height: 40, fit: BoxFit.fitWidth,);
-                                                case 3:
-                                                  return Image(image: AssetImage('assets/images/score/selectSoso.png'), width: 40, height: 40, fit: BoxFit.fitWidth,);
-                                                case 6:
-                                                  return Image(image: AssetImage('assets/images/score/selectHappy.png'), width: 40, height: 40, fit: BoxFit.fitWidth,);
-                                                default:
-                                                  return Column(
-                                                    children: [
-                                                    ],
-                                                  );
-                                              }
-                                            }
-                                        )
-                                    ),
-                                    bottomTitles: AxisTitles(sideTitles: SideTitles(
-                                      showTitles: true,
-                                      getTitlesWidget: (double value, TitleMeta meta) {
-                                        const style = TextStyle(
-                                          color: Colors.black,
+                                    switch (value) {
+                                      case 1:
+                                        return Text('S', style: TextStyle(
+                                          color: Colors.red,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 14,
-                                        );
-                                        switch (value) {
-                                          case 1:
-                                            return Text('S', style: TextStyle(
-                                              color: Colors.red,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
-                                            ));
-                                          case 2:
-                                            return Text('M', style: style);
-                                          case 3:
-                                            return Text('T', style: style);
-                                          case 4:
-                                            return Text('W', style: style);
-                                          case 5:
-                                            return Text('T', style: style);
-                                          case 6:
-                                            return Text('F', style: style);
-                                          case 7:
-                                            return Text('S', style: TextStyle(
-                                              color: Color(0xff78B7FF),
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
-                                            ));
-                                          default:
-                                            return Text('', style: style);
-                                        }
-                                      },
-                                    )
-                                    )
-                                ),
-                                borderData: FlBorderData(
-                                  show: true,
-                                  border: Border(
-                                    left: BorderSide(color: Colors.black, width: 1),
-                                    bottom: BorderSide(color: Colors.black, width: 1),
-                                  ),
-                                ),
-                                minX: 0,
-                                maxX: 8,
-                                minY: 0,
-                                maxY: 7,
-                                lineBarsData: [
-                                  LineChartBarData(
-                                    spots: [
-                                      FlSpot(1, 2),
-                                      FlSpot(2, 1),
-                                      FlSpot(3, 3),
-                                      FlSpot(4, 6),
-                                      FlSpot(5, 4),
-                                      FlSpot(6, 3),
-                                      FlSpot(7, 6),
-                                    ],
-                                    // gradient: LinearGradient(
-                                    //   colors: [Color(0xffC4C3BA), Color(0xff8DCECA), Color(0xff57B7FF)],
-                                    //   stops: [0.35, 1, 1],
-                                    // ),
-                                    isCurved: false,
-                                    color: Color(0xff49A09F),
-                                    barWidth: 1,
-                                    isStrokeCapRound: true,
-                                    dotData: FlDotData(
-                                        show: true,
-                                        // checkToShowDot: (spot, barData) {
-                                        //   return spot.x != 0 && spot.x != 6;
-                                        // },
-                                        getDotPainter: (spot, percent, barData, index) {
-                                          return FlDotCirclePainter(
-                                            radius: 6,
-                                            color: Color(0xff32A8EB),
-                                            strokeWidth: 0,
-                                            strokeColor: Colors.white,
-                                          );
-                                        }
-                                    ),
-                                    belowBarData: BarAreaData(show: false),
-                                  ),
-                                ],
+                                        ));
+                                      case 2:
+                                        return Text('M', style: style);
+                                      case 3:
+                                        return Text('T', style: style);
+                                      case 4:
+                                        return Text('W', style: style);
+                                      case 5:
+                                        return Text('T', style: style);
+                                      case 6:
+                                        return Text('F', style: style);
+                                      case 7:
+                                        return Text('S', style: TextStyle(
+                                          color: Color(0xff78B7FF),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ));
+                                      default:
+                                        return Text('', style: style);
+                                    }
+                                  },
+                                )
+                                )
+                            ),
+                            borderData: FlBorderData(
+                              show: true,
+                              border: Border(
+                                left: BorderSide(color: Colors.black, width: 1),
+                                bottom: BorderSide(color: Colors.black, width: 1),
                               ),
                             ),
-                          )
-                        ],
-                      ),
-                      // Positioned(
-                      //     top: size.height * 0.04,
-                      //     left: size.width * 0.225,
-                      //     child: Balloon(
-                      //         borderRadius: BorderRadius.circular(15),
-                      //         color: Color(0xffD6EEFB),
-                      //         nipPosition: BalloonNipPosition.topLeft,
-                      //         child: Container(
-                      //             width: size.width * 0.5,
-                      //             height: 75,
-                      //             child: Column(
-                      //               children: [
-                      //                 Text(
-                      //                   '- 일주일 동안의 요일별 내가 계획한 할 일과 수행 완료한 양을 한눈에 볼 수 있어요 !',
-                      //                   style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w400, height: 1.5),
-                      //                   maxLines: 3,
-                      //
-                      //                 ),
-                      //                 Text(
-                      //                   '- 일주일 동안의 요일별 나의 점수 (기분) 변화를 한눈에 볼 수 있어요 !',
-                      //                   style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w400, height: 1.5),
-                      //                   maxLines: 3,
-                      //
-                      //                 ),
-                      //               ],
-                      //             ))
-                      //     )
-                      // ),
-                      scrim,
-                      tooltip
-                    ],
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 20,),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              height: 130,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xff000000).withOpacity(0.1),
-                    spreadRadius: 0,
-                    blurRadius: 10,
-                    offset: const Offset(0, 0), // changes position of shadow
-                  ),
-                ],
-              ),
-              child: AlignedTooltipArea(
-                builder: (context, tooltip, scrim) {
-                  return Stack(
-                    fit: StackFit.passthrough,
-                    children: [
-                      Column(
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              // TODO: 여기 만들어야함.
-                              Icon(Icons.circle, size: 7, color: subColor,),
-                              Text('  목표별 평균 달성률', style: TextStyle(
-                                  fontSize: 15,
-                                  color: subColor,
-                                  fontWeight: FontWeight.w700),),
-                              const SizedBox(width: 3,),
-                              // GestureDetector(
-                              //   onTap: () {
-                              //
-                              //   },
-                              //   child: Icon(Icons.info_outline, size: 14,
-                              //       color: subColor),
-                              //
-                              // )
-                              AlignedTooltipEntry(
-                                preferredDirection: AxisDirection.up,
-                                isModal: true,
-                                tailBuilder: (a, b, c) {
-                                  print(1);
-                                  return Path()
-                                    ..moveTo(a.dx, a.dy - 10)      // 어디로 이동할지
-                                    ..lineTo(b.dx + 10, b.dy) // 오른쪽 선
-                                    ..lineTo(c.dx - 10, c.dy) // 왼쪽 선
-                                    ..close();
-                                },
-                                backgroundColor: Color(0xffD6EEFB),
-                                borderRadius: BorderRadius.circular(15),
-                                margin: const EdgeInsets.only(left: 90),
-                                child: Icon(
-                                  Icons.info_outline,
-                                  color: subColor,
-                                  size: 14,
+                            minX: 0,
+                            maxX: 8,
+                            minY: 0,
+                            maxY: 6,
+                            lineBarsData: [
+                              LineChartBarData(
+                                spots: [
+                                  FlSpot(1, 2),
+                                  FlSpot(2, 4),
+                                  FlSpot(3, 1),
+                                  FlSpot(4, 6),
+                                  FlSpot(5, 4),
+                                  FlSpot(6, 3),
+                                  FlSpot(7, 5),
+                                ],
+                                // gradient: LinearGradient(
+                                //   colors: [Color(0xffC4C3BA), Color(0xff8DCECA), Color(0xff57B7FF)],
+                                //   stops: [0.35, 1, 1],
+                                // ),
+                                isCurved: false,
+                                color: Color(0xff49A09F),
+                                barWidth: 1,
+                                isStrokeCapRound: true,
+                                dotData: FlDotData(
+                                    show: true,
+                                    // checkToShowDot: (spot, barData) {
+                                    //   return spot.x != 0 && spot.x != 6;
+                                    // },
+                                    getDotPainter: (spot, percent, barData, index) {
+                                      return FlDotCirclePainter(
+                                        radius: 6,
+                                        color: spot.y == 0 ? const Color(0xffC4C3BA)
+                                            : spot.y == 1 ? const Color(0xffB5C7BF)
+                                            : spot.y == 2 ? const Color(0xffA1CBC5)
+                                            : spot.y == 3 ? const Color(0xff94CEC9)
+                                            : spot.y == 4 ? const Color(0xff80C9D8)
+                                            : spot.y == 5 ? const Color(0xff6FC2E9)
+                                            : const Color(0xff5EBAFA),
+                                        strokeWidth: 0,
+                                        strokeColor: Colors.white,
+                                      );
+                                    }
                                 ),
-                                content: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                      '- 내가 목표로 설정한 카테고리 속 할 일의 평균 달성률을 한눈에 볼 수 있어요 !',
-                                      style: TextStyle(fontSize: 9, color: subColor, fontWeight: FontWeight.w500)
-                                  ),
-                                ),
-                              )
+                                belowBarData: BarAreaData(show: false),
+                              ),
                             ],
                           ),
-                          const SizedBox(height: 10),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.circle, size: 3, color: subColor,),
-                                    Text('  MindMILE', style: TextStyle(
-                                        fontSize: 10,
-                                        color: subColor,
-                                        fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-                                SizedBox(height: 5,),
-                                singleBar(
-                                    35,
-                                    Color(0xff32A8EB),
-                                    LinearGradient(
-                                      colors: [
-                                        Color(0xffABE0FF),
-                                        Color(0xff32A8EB)
-                                      ],
-                                      stops: [0.01, 1],
-                                      begin: Alignment.bottomCenter,
-                                      end: Alignment.topCenter,
-                                    ),
-                                    context
-                                ),
-                                SizedBox(height: 8,),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.circle, size: 3, color: subColor,),
-                                    Text('  릴렉스루틴', style: TextStyle(
-                                        fontSize: 10,
-                                        color: subColor,
-                                        fontWeight: FontWeight.w600),),
-                                  ],
-                                ),
-                                SizedBox(height: 5,),
-
-                                singleBar(
-                                    75,
-                                    Color(0xff68B64D),
-                                    LinearGradient(
-                                      colors: [
-                                        Color(0xffA5F18B),
-                                        Color(0xff68B64D)
-                                      ],
-                                      stops: [0.01, 1],
-                                      begin: Alignment.bottomCenter,
-                                      end: Alignment.topCenter,
-                                    ),
-                                    context
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      scrim,
-                      tooltip
+                        ),
+                      )
                     ],
-                  );
-                }
-              ),
-            ),
-            SizedBox(height: 20,),
-            Container(
-              height: 130,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xff000000).withOpacity(0.1),
-                    spreadRadius: 0,
-                    blurRadius: 10,
-                    offset: const Offset(0, 0), // changes position of shadow
                   ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: AlignedTooltipArea(
-                  builder: (context, tooltip, scrim) {
-                    return Stack(
-                  children: [
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                // TODO: 여기 만들어야함.
-                                Icon(Icons.circle, size: 7, color: subColor,),
-                                Text('  의미 있는 날의 기록 키워드', style: TextStyle(fontSize: 15, color: subColor,fontWeight: FontWeight.w700),),
-                                const SizedBox(width: 3,),
-                                // GestureDetector(
-                                //   onTap: (){
-                                //
-                                //   },
-                                //   child: Icon(Icons.info_outline, size: 14, color: subColor),
-                                // )
-                                AlignedTooltipEntry(
-                                  preferredDirection: AxisDirection.up,
-                                  isModal: true,
-                                  tailBuilder: (a, b, c) {
-                                    print(1);
-                                    return Path()
-                                      ..moveTo(a.dx, a.dy - 5)      // 어디로 이동할지
-                                      ..lineTo(b.dx + 10, b.dy) // 오른쪽 선
-                                      ..lineTo(c.dx - 10, c.dy) // 왼쪽 선
-                                      ..close();
+                ),
+                SizedBox(height: 20,),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  height: 130,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xff000000).withOpacity(0.1),
+                        spreadRadius: 0,
+                        blurRadius: 10,
+                        offset: const Offset(0, 0), // changes position of shadow
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // TODO: 여기 만들어야함.
+                          Icon(Icons.circle, size: 7, color: subColor,),
+                          Text('  목표별 평균 달성률', style: TextStyle(
+                              fontSize: 15,
+                              color: subColor,
+                              fontWeight: FontWeight.w700),),
+                          const SizedBox(width: 3,),
+                          GetBuilder<GlobalController>(
+                              builder: (globalController){
+                                return GestureDetector(
+                                  onTap: (){globalController.aa(
+                                      context,_targetKey2 ,
+                                      '- 내가 목표로 설정한 카테고리 속 할 일의 평균 달성률을 한눈에 볼 수 있어요 !');
                                   },
-                                  backgroundColor: Color(0xffD6EEFB),
-                                  borderRadius: BorderRadius.circular(15),
-                                  margin: const EdgeInsets.only(right: 90),
                                   child: Icon(
+                                    key: _targetKey2,
                                     Icons.info_outline,
                                     color: subColor,
                                     size: 14,
                                   ),
-                                  content: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                        '- 내가 긍정적인 점수를 기록한 날들의 한 일 키워드 TOP 8을 듀디가 추려보았어요 !\n\n- [ 긍정 일기 보기 ] 를 누르면 긍정적인 점수의 날에 기록한 일기를 볼 수 있어요 !',
-                                        style: TextStyle(fontSize: 9, color: subColor, fontWeight: FontWeight.w500)
-                                    ),
-                                  ),
-                                )
+                                );
+                              }
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.circle, size: 3, color: subColor,),
+                                Text('  MindMILE', style: TextStyle(
+                                    fontSize: 10,
+                                    color: subColor,
+                                    fontWeight: FontWeight.w600),),
                               ],
                             ),
-                            ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  padding: EdgeInsets.zero,
-                                  backgroundColor: subColor,
-                                  minimumSize: const Size(80, 23),
-                                  maximumSize: const Size(80, 23),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
+                            SizedBox(height: 5,),
+                            singleBar(
+                                35,
+                                Color(0xff32A8EB),
+                                LinearGradient(
+                                  colors: [
+                                    Color(0xffABE0FF),
+                                    Color(0xff32A8EB)
+                                  ],
+                                  stops: [0.01, 1],
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
                                 ),
-                                onPressed: (){
+                                context
+                            ),
+                            SizedBox(height: 8,),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.circle, size: 3, color: subColor,),
+                                Text('  릴렉스루틴', style: TextStyle(
+                                    fontSize: 10,
+                                    color: subColor,
+                                    fontWeight: FontWeight.w600),),
+                              ],
+                            ),
+                            SizedBox(height: 5,),
 
-                                },
-                                child: Text('긍정 일기 보기', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w500),))
+                            singleBar(
+                                75,
+                                Color(0xff68B64D),
+                                LinearGradient(
+                                  colors: [
+                                    Color(0xffA5F18B),
+                                    Color(0xff68B64D)
+                                  ],
+                                  stops: [0.01, 1],
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
+                                ),
+                                context
+                            ),
                           ],
                         ),
-                        Expanded(
-                          child: GridView(
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 4,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                              childAspectRatio: 2.5,
-                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20,),
+                Container(
+                  height: 130,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xff000000).withOpacity(0.1),
+                        spreadRadius: 0,
+                        blurRadius: 10,
+                        offset: const Offset(0, 0), // changes position of shadow
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              for(int i = 0; i < controller.diaryList.length; i++)
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  // TODO: 여기 만들어야함.
+                                  Icon(Icons.circle, size: 7, color: subColor,),
+                                  Text('  의미 있는 날의 기록 키워드', style: TextStyle(fontSize: 15, color: subColor,fontWeight: FontWeight.w700),),
+                                  const SizedBox(width: 3,),
+                                  GetBuilder<GlobalController>(
+                                      builder: (globalController){
+                                        return GestureDetector(
+                                          onTap: (){globalController.aa(
+                                              context,_targetKey3 ,
+                                              '- 내가 긍정적인 점수를 기록한 날들의 한 일 키워드 TOP 8을 듀디가 추려보았어요 !', text2: '- [ 긍정 일기 보기 ] 를 누르면 긍정적인 점수의 날에 기록한 일기를 볼 수 있어요 !');
+                                          },
+                                          child: Icon(
+                                            key: _targetKey3,
+                                            Icons.info_outline,
+                                            color: subColor,
+                                            size: 14,
+                                          ),
+                                        );
+                                      }
+                                  ),
+                                ],
+                              ),
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    backgroundColor: subColor,
+                                    minimumSize: const Size(80, 23),
+                                    maximumSize: const Size(80, 23),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(50),
+                                    ),
+                                  ),
+                                  onPressed: (){
+
+                                  },
+                                  child: Text('긍정 일기 보기', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w500),))
+                            ],
+                          ),
+                          Expanded(
+                            child: GridView(
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 4,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                childAspectRatio: 2.5,
+                              ),
+                              children: [
+                                for(int i = 0; i < controller.diaryList.length; i++)
                                   Container(
                                     alignment: Alignment.center,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(60),
-                                      color: mainColor,
+                                      color: Color(0xffD6EEFB),
                                     ),
                                     height: 30,
                                     width: 50,
@@ -725,34 +670,29 @@ class DiaryView extends GetView<DiaryController> {
                                       color: subColor,
                                       radius: const Radius.circular(60),
                                       child: Center(
-                                        child: Text(controller.diaryList[i], style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w700),),
+                                        child: Text(controller.diaryList[i], style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w600),),
                                       ),
-                                  ),
+                                    ),
                                   )
-                            ],
-                          ),
-                        )
-                      ]
+                              ],
+                            ),
+                          )
+                        ]
                     ),
-                    scrim,
-                    tooltip
-                  ],
-                );
-                  },
-                ),
-              ),
-            )
-          ],
-        ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
 
-   /*--------------------------위젯------------------------------*/
+  /*--------------------------위젯------------------------------*/
   singleBar(double y, Color color, Gradient gradient, BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    print(y*3);
     return RotatedBox(
       quarterTurns: 1,
       child: Stack(

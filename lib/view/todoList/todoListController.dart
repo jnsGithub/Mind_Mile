@@ -13,7 +13,7 @@ import 'package:table_calendar/table_calendar.dart';
 class TodoListController extends GetxController with SingleGetTickerProviderMixin{
   TextEditingController addController = TextEditingController();
 
-  late SlidableController slidableController ;
+  // late SlidableController slidableController ;
   RxBool isEdit = false.obs;
 
   RxInt cupertinoTabBarIValue = 0.obs;
@@ -32,7 +32,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
   @override
   onInit(){
     super.onInit();
-    slidableController = SlidableController(this);
+    // slidableController = SlidableController(this);
   }
   ScrollController scrollController = ScrollController();
   Rx<PointerMoveEvent> details = PointerMoveEvent().obs;

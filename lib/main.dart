@@ -6,6 +6,9 @@ import 'package:mind_mile/view/diaryView/diaryView.dart';
 import 'package:mind_mile/view/diaryView/dirayDetail/diaryDetailView.dart';
 import 'package:mind_mile/view/sign/loginView.dart';
 import 'package:mind_mile/view/sign/signUp/signUpView.dart';
+import 'package:mind_mile/view/survey/surveyEndView.dart';
+import 'package:mind_mile/view/survey/surveyStartView.dart';
+import 'package:mind_mile/view/survey/surveyView.dart';
 import 'package:mind_mile/view/todoList/todoListMainView.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -48,6 +51,9 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/todoListView', page: () => const TodoListMainView(),),
         GetPage(name: '/diaryView', page: () => const DiaryView()),
         GetPage(name: '/diaryDetailView', page: () => const DiaryDetailView()),
+        GetPage(name: '/surveyView', page: () => const SurveyView()),
+        GetPage(name: '/surveyStartView', page: () => const SurveyStartView()),
+        GetPage(name: '/surveyEndView', page: () => const SurveyEndView()),
       ],
     );
   }

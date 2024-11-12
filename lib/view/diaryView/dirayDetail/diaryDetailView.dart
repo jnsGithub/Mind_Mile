@@ -27,7 +27,7 @@ class DiaryDetailView extends GetView<DiaryDetailController> {
           itemCount: controller.detailList.length,
           itemBuilder: (context, index){
             return Container(
-              padding: EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               margin: const EdgeInsets.only(bottom: 20),
               width: size.width,
               height: 118,
@@ -44,29 +44,31 @@ class DiaryDetailView extends GetView<DiaryDetailController> {
                 ],
               ),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Text(DateFormat.yMMMd('ko_KR').format(controller.detailList[index].createDate), style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w600),),
                       Image(image: AssetImage('assets/images/score/selectHappy.png'), width: 22, height: 22),
-
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Color(0xffEAF6FF),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                          child: Text(DateFormat.yMMMd('ko_KR').format(controller.detailList[index].createDate), style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w600),)),
                     ],
                   ),
                   Container(
                     width: size.width,
                     height: 60,
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: Color(0x33437d9e),
-                      border: Border.all(color: Color(0xff8091A47A), width: 1),
-                      ),
                     child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('${controller.detailList[index].title}\n\n${controller.detailList[index].content}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),),
+                          Text(
+                            '${controller.detailList[index].title}\n\n${controller.detailList[index].content}',
+                            style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w400),),
                           // Text(),
                           // Text(controller.detailList[index].content, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),),
                         ],

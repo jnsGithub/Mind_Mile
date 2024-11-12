@@ -16,7 +16,7 @@ class TodoListView extends GetView<TodoListController> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    return controller.todoList.length == 0
+    return Obx(() => controller.todoList.length == 0 && controller.isAdd.value == false
         ? Container(
       alignment: Alignment.center,
       height: 400,
@@ -57,156 +57,158 @@ class TodoListView extends GetView<TodoListController> {
     )
         : Container(
       width: size.width,
-      height: 500,
+      // height: 500,
       child: Obx(() => ReorderableListView.builder(
-          shrinkWrap: true,
-          onReorder: (oldIndex, newIndex) {
-            if (oldIndex < newIndex) {
-              newIndex -= 1;
-            }
-            final item = controller.todoList.removeAt(oldIndex);
-            controller.todoList.insert(newIndex, item);
-          },
-          buildDefaultDragHandles: false,
-          itemCount: controller.todoList.length,
-          itemBuilder: (context, index) {
-            RxInt selectCount = 0.obs;
-            return Slidable(
-              key: ValueKey(controller.todoList[index].title),
-              controller: controller.slidableController,
-              enabled: false,
-              endActionPane: ActionPane( // 오른쪽에서 왼쪽으로 드래그 시 액션 표시
-                extentRatio: 0.3,
-                motion: const StretchMotion(),
-                children: [
-                  CustomSlidableAction(
-                    padding: EdgeInsets.zero,
-                    backgroundColor: Color(0xff56C75B),
-                    onPressed: (context) {
-                      updateAlarmDialog(context);
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Color(0xffD9D9D9),
-                            width: 1,
-                          ),
+        shrinkWrap: true,
+        physics: ClampingScrollPhysics(),
+        onReorder: (oldIndex, newIndex) {
+          if (oldIndex < newIndex) {
+            newIndex -= 1;
+          }
+          final item = controller.todoList.removeAt(oldIndex);
+          controller.todoList.insert(newIndex, item);
+        },
+        buildDefaultDragHandles: false,
+        itemCount: controller.todoList.length,
+        itemBuilder: (context, index) {
+          RxInt selectCount = 0.obs;
+          return Slidable(
+            key: ValueKey(controller.todoList[index].title + controller.todoList[index].createDate.toString()),
+            // controller: controller.slidableController,
+            // enabled: false,
+            endActionPane: ActionPane( // 오른쪽에서 왼쪽으로 드래그 시 액션 표시
+              extentRatio: 0.3,
+              motion: const StretchMotion(),
+              children: [
+                CustomSlidableAction(
+                  padding: EdgeInsets.zero,
+                  backgroundColor: Color(0xff56C75B),
+                  onPressed: (context) {
+                    updateAlarmDialog(context);
+                  },
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Color(0xffD9D9D9),
+                          width: 1,
                         ),
                       ),
-                      // child: Icon(
-                      //   Icons.notifications,
-                      //   color: Colors.white,
-                      // ),
-                      child: ImageIcon(
-                        AssetImage('assets/images/bell.png'),
-                        color: Colors.white,
-                        size: 24,
+                    ),
+                    // child: Icon(
+                    //   Icons.notifications,
+                    //   color: Colors.white,
+                    // ),
+                    child: ImageIcon(
+                      AssetImage('assets/images/bell.png'),
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ),
+                CustomSlidableAction(
+                  padding: EdgeInsets.zero,
+                  backgroundColor: Color(0xffE44C42),
+                  onPressed: (context) {
+                    // 삭제 버튼 동작
+                    deleteItemDialog(context, controller.todoList, index);
+                    // controller.todoList.removeAt(index);
+                    // controller.todoList.refresh();
+                  },
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Color(0xffD9D9D9),
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    // child: Icon(
+                    //   Icons.delete,
+                    //   color: Colors.white,
+                    // ),
+                    child: ImageIcon(
+                      AssetImage('assets/images/delete.png'),
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: const Color(0xff999999),
+                  ),
+                ),
+              ),
+              height: 60,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Obx(() => GestureDetector(
+                    onTap: () {
+                      if (controller.todoList[index].completeCount.value == 2) {
+                        controller.todoList[index].completeCount.value = 0;
+                      } else {
+                        controller.todoList[index].completeCount.value++;
+                      }
+                    },
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(60),
+                        image: DecorationImage(
+                          image: AssetImage(
+                            controller.todoList[index].completeCount.value == 0
+                                ? 'assets/images/void.png'
+                                : controller.todoList[index].completeCount.value == 1
+                                ? 'assets/images/half.png'
+                                : 'assets/images/full.png',
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                  CustomSlidableAction(
-                    padding: EdgeInsets.zero,
-                    backgroundColor: Color(0xffE44C42),
-                    onPressed: (context) {
-                      // 삭제 버튼 동작
-                      deleteItemDialog(context, controller.todoList, index);
-                      // controller.todoList.removeAt(index);
-                      // controller.todoList.refresh();
-                    },
-                    child: Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Color(0xffD9D9D9),
-                            width: 1,
-                          ),
-                        ),
+                  ),
+                  const SizedBox(width: 10),
+                  Container(
+                    width: size.width * 0.6,
+                    child: Text(
+                      controller.todoList[index].title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400,
                       ),
-                      // child: Icon(
-                      //   Icons.delete,
-                      //   color: Colors.white,
-                      // ),
-                      child: ImageIcon(
-                        AssetImage('assets/images/delete.png'),
-                        color: Colors.white,
-                        size: 24,
-                      ),
+                      maxLines: 2,
+                    ),
+                  ),
+                  Container(
+                    width: 5,
+                  ),
+                  ReorderableDragStartListener(
+                    index: index,
+                    child: Icon(
+                      Icons.drag_handle,
+                      color: Colors.grey,
+                      size: 20,
                     ),
                   ),
                 ],
               ),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: const Color(0xff999999),
-                    ),
-                  ),
-                ),
-                height: 60,
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Obx(() => GestureDetector(
-                          onTap: () {
-                            if (controller.todoList[index].completeCount.value == 2) {
-                              controller.todoList[index].completeCount.value = 0;
-                            } else {
-                              controller.todoList[index].completeCount.value++;
-                            }
-                          },
-                          child: Container(
-                              width: 30,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(60),
-                                image: DecorationImage(
-                                  image: AssetImage(
-                                    controller.todoList[index].completeCount.value == 0
-                                        ? 'assets/images/void.png'
-                                        : controller.todoList[index].completeCount.value == 1
-                                        ? 'assets/images/half.png'
-                                        : 'assets/images/full.png',
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                          width: size.width * 0.6,
-                          child: Text(
-                            controller.todoList[index].title,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w400,
-                            ),
-                            maxLines: 2,
-                          ),
-                        ),
-                      Container(
-                        width: 5,
-                      ),
-                      ReorderableDragStartListener(
-                        index: index,
-                        child: Icon(
-                          Icons.drag_handle,
-                          color: Colors.grey,
-                          size: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-              ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
+      ),
+    )
     );
   }
 }

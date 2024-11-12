@@ -62,7 +62,7 @@ class LoginView extends GetView<LoginController> {
                         backgroundColor: Colors.blue,
                       ),
                       onPressed: () {
-                        Get.toNamed('/todoListView');
+                        Get.offAllNamed('/todoListView');
                       },
                       child: const Text('시작하기', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),)
                   ),

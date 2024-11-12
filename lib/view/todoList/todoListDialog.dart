@@ -143,13 +143,20 @@ updateAlarmDialog(BuildContext context){
               children: [
                 Text('PUSH 알람 설정',style: TextStyle(fontSize:10,  color: subColor, fontWeight: FontWeight.w600)),
                 SizedBox(width: 10),
-                Obx(() => CupertinoSwitch(
-                  value: isSwitch.value,
-                  onChanged: (value) {
-                    isSwitch.value = value;
-                    print(isSwitch.value);
-                  },
-                  activeColor: subColor,
+                Obx(() => Container(
+                  height: 20,
+                  width: 20,
+                  child: Transform.scale(
+                    scale: 0.5,
+                    child: CupertinoSwitch(
+                      value: isSwitch.value,
+                      onChanged: (value) {
+                        isSwitch.value = value;
+                        print(isSwitch.value);
+                      },
+                      activeColor: subColor,
+                    ),
+                  ),
                 ),
                 ),
               ],
@@ -570,7 +577,7 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
@@ -616,7 +623,17 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                             ),
                           ],
                         ),
-                        Text('오늘', style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w600),)
+                        SizedBox(width: 11),
+                        AnimatedContainer(
+                          duration: Duration(seconds: 1),
+                          curve: Curves.easeInOut,
+                          margin: EdgeInsets.only(left: isCalendar.value || isAlarm.value ? size.width*0.55 - 60 : 0),
+                          child: Text(
+                            '오늘',
+                            style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        // Text('오늘', style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w600),)
                       ],
                     ),
                   )

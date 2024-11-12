@@ -291,6 +291,7 @@ class SignUpView extends GetView<SignUpController> {
                         ),
                         onPressed: () {
                           // 버튼 클릭 시 동작
+                          Get.toNamed('/surveyStartView');
                         },
                         child: const Text('가입하기', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),)
                     ),

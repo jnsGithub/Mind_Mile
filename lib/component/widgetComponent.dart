@@ -65,21 +65,31 @@ Widget textFieldComponent(TextEditingController controller, double width, double
   );
 }
 
-Widget buttonComponent(double width, double height, String text, RxInt selectIndex, int index) {
+Widget buttonComponent(double width, double height, String text, RxInt selectIndex, int index, RxInt a, RxList<int> score) {
   return Obx(() => Container(
       width: width,
       height: height,
       child: ElevatedButton(
         onPressed: () {
           selectIndex.value = index;
+          if(a.value >= 10) {
+            score[a.value - 1] = index;
+          } else {
+            score[a.value] = index;
+          }
+          // score[a.value] = index;
+          print(score);
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: selectIndex.value == index ? Color(0xffBFE0FB): subColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+          ),
+          backgroundColor: a.value >= 10 ? score[a.value - 1] == index ? Color(0xffBFE0FB) : subColor : score[a.value] == index ? Color(0xffBFE0FB) : subColor,
         ),
         child: Text(
           text,
           style: TextStyle(
-            color: selectIndex.value == index ? Color(0xff3E658F) : Colors.white,
+            color: a.value >= 10 ? score[a.value - 1] == index ? subColor : Colors.white : score[a.value] == index ? subColor : Colors.white,
             fontSize: 16,
             fontWeight: FontWeight.w700,
           ),
