@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mind_mile/component/widgetComponent.dart';
+import 'package:mind_mile/global.dart';
+import 'package:mind_mile/model/todoListGroup.dart';
 import 'package:mind_mile/view/sign/loginController.dart';
 
 
@@ -61,8 +63,20 @@ class LoginView extends GetView<LoginController> {
                         ),
                         backgroundColor: Colors.blue,
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         Get.offAllNamed('/todoListView');
+                        // if(!Get.isSnackbarOpen){
+                        //   saving(context);
+                        // }
+                        // if(await controller.sign.signIn(controller.emailController.text, controller.passwordController.text)){
+                        //   Get.offAllNamed('/todoListView');
+                        // }
+                        // else{
+                        //   Get.back();
+                        //   if(!Get.isSnackbarOpen){
+                        //     Get.snackbar('로그인 실패', '아이디와 비밀번호를 확인해주세요');
+                        //   }
+                        // }
                       },
                       child: const Text('시작하기', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),)
                   ),
@@ -76,7 +90,7 @@ class LoginView extends GetView<LoginController> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     GestureDetector(
-                        onTap: () {
+                        onTap: () async {
 
                         },
                         child: const Text(
@@ -97,7 +111,7 @@ class LoginView extends GetView<LoginController> {
                       ),
                     ),
                     GestureDetector(
-                        onTap: (){
+                        onTap: () async {
                           Get.toNamed('/signUpView');
                         },
                         child: const Text(

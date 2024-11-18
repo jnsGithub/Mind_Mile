@@ -1,4 +1,6 @@
+import 'package:get/get.dart';
 import 'package:mind_mile/model/todoList.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class TodoListGroup{
   final String documentId;
@@ -6,6 +8,8 @@ class TodoListGroup{
   List<TodoList> todoList;
   final DateTime createDate;
   int color;
+  int index;
+
 
 
   TodoListGroup({
@@ -14,15 +18,25 @@ class TodoListGroup{
     required this.todoList,
     required this.createDate,
     required this.color,
+    required this.index,
   });
 
   factory TodoListGroup.fromMap(Map<String, dynamic> data) {
+    List<TodoList> todoListGroup = [];
+    for (var doc in data['todoList']) {
+      print(doc);
+      Map<String, dynamic> data = doc as Map<String, dynamic>;
+      data['documentId'] = doc.hashCode.toString();
+      todoListGroup.add(TodoList.fromMap(data));
+    }
+
     return TodoListGroup(
       documentId: data['documentId'],
       title: data['title'],
-      todoList: data['todoList'],
-      createDate: data['createDate'].toDate(),
+      todoList: todoListGroup,
+      createDate: data['createDate'],
       color: data['color'],
+      index: data['index'],
     );
   }
 
@@ -33,6 +47,7 @@ class TodoListGroup{
       'todoList': todoList,
       'createDate': createDate,
       'color': color,
+      'index': index,
     };
   }
 }

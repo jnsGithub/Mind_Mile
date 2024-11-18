@@ -289,9 +289,23 @@ class SignUpView extends GetView<SignUpController> {
                           ),
                           backgroundColor: Colors.blue,
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           // 버튼 클릭 시 동작
                           Get.toNamed('/surveyStartView');
+                          // if(await controller.sign.signUp(
+                          //     controller.emailController.text,
+                          //     controller.pwController.text,
+                          //     controller.nameController.text,
+                          //     controller.birthdayController.text,
+                          //     controller.selectSexValue.value,
+                          //     controller.selectGroupValue.value,
+                          //     controller.diaryNameController.text)){
+                          //   saving(context);
+                          //   Get.toNamed('/surveyStartView');
+                          // }
+                          // else{
+                          //   print('회원가입 실패');
+                          // }
                         },
                         child: const Text('가입하기', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),)
                     ),

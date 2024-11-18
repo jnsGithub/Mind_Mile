@@ -12,19 +12,24 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    Get.lazyPut(() => TodoListController());
+    // Get.lazyPut(() => TodoListController());
 
-    List<DateTime> length(){
-      List<DateTime> temp = [group.todoList[0].createDate];
-      for(int i = 0; i < group.todoList.length - 1; i++){
-        if(group.todoList[i].createDate.year != group.todoList[i+1].createDate.year ||
-            group.todoList[i].createDate.month != group.todoList[i+1].createDate.month ||
-            group.todoList[i].createDate.day != group.todoList[i+1].createDate.day){
-          temp.add(group.todoList[i+1].createDate);
-          print(temp);
+    List<dynamic> length(){
+      if(!controller.isEmpty.value){
+        List<DateTime> temp = [group.todoList[0].createDate];
+        for(int i = 0; i < group.todoList.length - 1; i++){
+          if(group.todoList[i].createDate.year != group.todoList[i+1].createDate.year ||
+              group.todoList[i].createDate.month != group.todoList[i+1].createDate.month ||
+              group.todoList[i].createDate.day != group.todoList[i+1].createDate.day){
+            temp.add(group.todoList[i+1].createDate);
+            print(temp);
+          }
         }
+        return temp;
       }
-      return temp;
+      else{
+        return [];
+      }
     }
     print(length());
     RxList<DragAndDropList> contents = <DragAndDropList>[].obs;
@@ -139,11 +144,11 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
           children: [
             Icon(Icons.circle, size: 13, color: Color(group.color),),
             SizedBox(width: 20,),
-            Text(group.title, style: TextStyle(fontSize: 18, color: subColor, fontWeight: FontWeight.w600),),
+            controller.isEmpty.value ? SizedBox() : Text(group.title, style: TextStyle(fontSize: 18, color: subColor, fontWeight: FontWeight.w600),),
           ],
         ),
       ),
-      body: Obx(() => DragAndDropLists(
+      body: controller.isEmpty.value ? Container() : Obx(() => DragAndDropLists(
         listDragHandle: DragHandle(child: Icon(Icons.drag_handle, size: 30, color: Color(0xffD9D9D9),)),
             itemDragHandle: DragHandle(child: Icon(Icons.drag_handle, size: 30, color: Color(0xffD9D9D9),)),
             children: contents,

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:mind_mile/util/sign.dart';
 
 class SignUpController extends GetxController{
   TextEditingController emailController = TextEditingController();
@@ -11,6 +12,8 @@ class SignUpController extends GetxController{
 
   RxInt selectSexValue = (-1).obs;
   RxInt selectGroupValue = (-1).obs;
+
+  Sign sign = Sign();
 
   @override
   void onInit() {

@@ -5,6 +5,24 @@ import 'package:get/get.dart';
 Color mainColor = const Color(0xffBFE0FB);
 Color subColor = const Color(0xff133C6B);
 
+String? uid;
+
+void saving(BuildContext context) async {
+  return showDialog<void>(
+      context: context,
+      barrierDismissible:false,
+      builder: (BuildContext context) {
+        return const AlertDialog(
+            contentPadding: EdgeInsets.zero,
+            backgroundColor: Colors.transparent,
+            elevation: 0, // 그림자 효과 없애기
+            content: Center(
+              child: CircularProgressIndicator(color: Colors.white,),
+            )
+        );
+      });
+}
+
 class GlobalController extends GetxController {
   RxBool isShow = false.obs;
   OverlayEntry? overlayEntry;
@@ -38,6 +56,8 @@ class GlobalController extends GetxController {
     final size = renderBox.size;
     final position = renderBox.localToGlobal(Offset.zero);
     Size size2 = MediaQuery.of(context).size;
+
+    double a = ((key.currentContext?.findRenderObject() as RenderBox).localToGlobal(Offset.zero)).dy;
 
     overlayEntry = OverlayEntry(
       builder: (context) =>

@@ -4,7 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:mind_mile/global.dart';
 import 'package:mind_mile/model/todoList.dart';
+import 'package:mind_mile/view/todoList/todoListController.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
 
 deleteTodoListDialog(BuildContext context) {
   Size size = MediaQuery.of(context).size;
@@ -370,7 +372,7 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
             elevation: 0,
             backgroundColor: Colors.transparent,
             title: isCalendar.value ? Container(
-              padding: EdgeInsets.all(15),
+              padding: EdgeInsets.symmetric(horizontal: 20),
               width: 260,
               height: 260,
               margin: EdgeInsets.only(bottom: 17),
@@ -386,61 +388,99 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                   ),
                 ],
               ),
-              child: TableCalendar(
-                locale: 'ko_KR',
-                rowHeight: 30.0,
-                firstDay: DateTime.utc(2021, 1, 1),
-                lastDay: DateTime.utc(2030, 12, 31),
-                focusedDay: DateTime.now(),
-                calendarFormat: CalendarFormat.month,
-                headerStyle: HeaderStyle(
-                  titleCentered: true,
-                  formatButtonVisible: false,
-                ),
-                daysOfWeekStyle: DaysOfWeekStyle(
-                  weekdayStyle: TextStyle(fontSize: 13, color: Color(0xffDADADA)),
-                  weekendStyle: TextStyle(fontSize: 13, color: Color(0xffDADADA)),
-                ),
-                calendarStyle: CalendarStyle(
-                  cellMargin: EdgeInsets.zero,
-                  outsideDaysVisible: false,
+              child: Center(
+                child: GetBuilder<TodoListController>(
+                  builder: (controller) {
+                    return TableCalendar(
+                      locale: 'ko_KR',
+                      rowHeight: 30.0,
+                      firstDay: DateTime.utc(2021, 1, 1),
+                      lastDay: DateTime.utc(2030, 12, 31),
+                      focusedDay: DateTime.now(),
+                      calendarFormat: CalendarFormat.month,
+                        headerStyle: HeaderStyle(
+                          formatButtonVisible: false, // 포맷 버튼 숨기기
+                          leftChevronVisible: false, // 왼쪽 화살표 숨기기
+                          rightChevronVisible: false, // 오른쪽 화살표 숨기기
+                          titleTextFormatter: (date, locale) =>
+                              DateFormat.yMMMM(locale).format(date),
+                        ),
+                      daysOfWeekStyle: DaysOfWeekStyle(
+                        weekdayStyle: TextStyle(fontSize: 13, color: Color(0xffDADADA)),
+                        weekendStyle: TextStyle(fontSize: 13, color: Color(0xffDADADA)),
+                      ),
+                      calendarStyle: CalendarStyle(
+                        cellMargin: EdgeInsets.zero,
+                        outsideDaysVisible: false,
 
-                  defaultTextStyle: TextStyle(fontSize: 13,),
-                  weekendTextStyle: TextStyle(fontSize: 13,),
-                  holidayTextStyle: TextStyle(fontSize: 13,),
-                  todayDecoration: BoxDecoration(
-                    color: Color(0xff008BE4),
-                    shape: BoxShape.circle,
-                  ),
-                  selectedDecoration: BoxDecoration(
-                    color: Color(0xff008BE4),
-                    shape: BoxShape.circle,
-                  ),
-                  selectedTextStyle: TextStyle(color: Colors.white),
-                ),
-                onDaySelected: (selectedDay, focusedDay) {
-                  print(selectedDay);
-                },
-                calendarBuilders: CalendarBuilders(
-                  defaultBuilder: (context, day, focusedDay) {
-                    if (day.isBefore(DateTime.now())) {
-                      // 지난 날짜 스타일
-                      return Center(
-                        child: Text(
-                          '${day.day}',
-                          style: TextStyle(fontSize: 13, color: Color(0xffDADADA)), // 원하는 색상으로 변경
+                        defaultTextStyle: TextStyle(fontSize: 13,),
+                        weekendTextStyle: TextStyle(fontSize: 13,),
+                        holidayTextStyle: TextStyle(fontSize: 13,),
+                        todayDecoration: BoxDecoration(
+                          color: Color(0xff008BE4),
+                          shape: BoxShape.circle,
                         ),
-                      );
-                    } else {
-                      // 기본 날짜 스타일
-                      return Center(
-                        child: Text(
-                          '${day.day}',
-                          style: TextStyle(fontSize: 13,), // 기본 색상 설정
+                        selectedDecoration: BoxDecoration(
+                          color: Color(0xff008BE4),
+                          shape: BoxShape.circle,
                         ),
-                      );
-                    }
-                  },
+                        selectedTextStyle: TextStyle(color: Colors.white),
+                      ),
+                      onDaySelected: (selectedDay, focusedDay) {
+                        print(selectedDay);
+                      },
+                      calendarBuilders: CalendarBuilders(
+                          headerTitleBuilder: (context, date) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '${DateFormat.y('ko_KR').format(date) + ' ' +  DateFormat.M('ko_KR').format(date)}'
+                                  , // 제목 표시
+                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                                ),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.chevron_left, size: 20,),
+                                      onPressed: () {
+                                        controller.previousMonth();
+                                        // controller.update();
+                                      }, // 이전 달로 이동
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.chevron_right, size: 20,),
+                                      onPressed: () {
+                                        controller.nextMonth();
+                                      }, // 다음 달로 이동
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          },
+                        defaultBuilder: (context, day, focusedDay) {
+                          if (day.isBefore(DateTime.now())) {
+                            // 지난 날짜 스타일
+                            return Center(
+                              child: Text(
+                                '${day.day}',
+                                style: TextStyle(fontSize: 13, color: Color(0xffDADADA)), // 원하는 색상으로 변경
+                              ),
+                            );
+                          } else {
+                            // 기본 날짜 스타일
+                            return Center(
+                              child: Text(
+                                '${day.day}',
+                                style: TextStyle(fontSize: 13,), // 기본 색상 설정
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    );
+                  }
                 ),
               ),
             )

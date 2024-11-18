@@ -99,11 +99,13 @@ Widget buttonComponent(double width, double height, String text, RxInt selectInd
   );
 }
 
-Widget bottomNavi(RxInt selected, PageController controller) {
+Widget bottomNavi(BuildContext context, RxInt selected, PageController controller) {
+  Size size = MediaQuery.of(context).size;
   List<int> index = [0, 0, 0, 0];
  return Container(
+   alignment: Alignment.center,
     height: 80,
-   padding: EdgeInsets.only(bottom: 30),
+   padding: EdgeInsets.only(bottom: 15),
    decoration: BoxDecoration(
       color: Color(0xffEAF6FF),
       boxShadow: [
@@ -124,8 +126,11 @@ Widget bottomNavi(RxInt selected, PageController controller) {
            print(selected.value);
          },
          child: Container(
-           width: Get.width / 4,
-           height: 51,
+           decoration: BoxDecoration(
+             border: Border.all(color: Colors.transparent),
+           ),
+           width: size.width * 0.25,
+           height: 70,
            child: Column(
              mainAxisAlignment: MainAxisAlignment.center,
              children: [

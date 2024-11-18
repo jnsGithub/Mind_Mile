@@ -18,7 +18,17 @@ class DiaryDetailView extends GetView<DiaryDetailController> {
         elevation: 2,
         backgroundColor: Color(0xffD6EEFB),
         shadowColor: Colors.black,
-        title: const Text('DiaryDetailView'),
+        centerTitle: true,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('${DateFormat.yMMM('ko_KR').format(controller.detailList[0].createDate)}', style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w600),),
+            Icon(Icons.keyboard_arrow_down, color: subColor, size: 23),
+          ],
+        ),
+        actions: [
+          IconButton(onPressed: (){}, icon: Icon(Icons.search, color: subColor, size: 24)),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
@@ -49,7 +59,7 @@ class DiaryDetailView extends GetView<DiaryDetailController> {
                 children: [
                   Row(
                     children: [
-                      Image(image: AssetImage('assets/images/score/selectHappy.png'), width: 22, height: 22),
+                      Image(image: AssetImage(controller.detailList[index].score != 0 ? 'assets/images/score/selectHappy.png' : 'assets/images/score/selectSoso.png'), width: 22, height: 22),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                         decoration: BoxDecoration(

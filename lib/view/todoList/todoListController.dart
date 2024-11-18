@@ -8,10 +8,13 @@ import 'package:get/get.dart';
 import 'package:mind_mile/global.dart';
 import 'package:mind_mile/model/todoList.dart';
 import 'package:mind_mile/model/todoListGroup.dart';
+import 'package:mind_mile/util/todoList.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class TodoListController extends GetxController with SingleGetTickerProviderMixin{
   TextEditingController addController = TextEditingController();
+
+  TodoListInfo todoListInfo = TodoListInfo(); // 지워야함
 
   // late SlidableController slidableController ;
   RxBool isEdit = false.obs;
@@ -23,33 +26,35 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
   /*그룹 디테일*/
   RxBool isGroupEdit = false.obs;
   RxBool isDetail = false.obs;
-  Rx<TodoListGroup> todoListGroupDetail = TodoListGroup(documentId: '1', title: '당신의 첫 목표는?', todoList: [], createDate: DateTime.now(), color: 0xff32A8EB).obs;
+  Rx<TodoListGroup> todoListGroupDetail = TodoListGroup(documentId: '1', title: '당신의 첫 목표는?', todoList: [], createDate: DateTime.now(), color: 0xff32A8EB, index: 0).obs;
+  RxBool isEmpty = false.obs;
   RxBool isCalendar = false.obs;
   RxBool isAlarm = false.obs;
 
   RxInt selectTap = 0.obs;
   PageController pageController = PageController();
-  @override
-  onInit(){
-    super.onInit();
-    // slidableController = SlidableController(this);
-  }
+
   ScrollController scrollController = ScrollController();
   Rx<PointerMoveEvent> details = PointerMoveEvent().obs;
   Rx<PointerDownEvent> offset = PointerDownEvent().obs;
 
   bool isScrolling = false;
 
+  /*그룹 리스트*/
   RxList<DragAndDropList> contents = <DragAndDropList>[].obs;
+  RxList<SlidableController> slidableGroupControllers = <SlidableController>[].obs;
+  RxList<bool> isGroupDragHandleVisibleList = <bool>[].obs;
+  RxBool isPress = false.obs;
+
 
   RxList<TodoList> todoList = <TodoList>[
-    TodoList(documentId: '1', GroupId: '1', title: '오른쪽 하단 +를 눌러 할일을 등록하세요', isAlarm: true, completeCount: 0.obs, createDate: DateTime.now()),
-    TodoList(documentId: '1', GroupId: '1', title: '목록의 순서를 오른쪽 = 를 잡고 드래그해서 바꿔보세요', isAlarm: true, completeCount: 1.obs, createDate: DateTime.now()),
-    TodoList(documentId: '1', GroupId: '1', title: '목록을 왼쪽으로 슬라이드해서 알람 설정과 삭제 기능을 구현해보세요!', isAlarm: true, completeCount: 3.obs, createDate: DateTime.now()),
-    TodoList(documentId: '1', GroupId: '1', title: '목표별 할일에서 목표별로 할일을 관리해보세요', isAlarm: true, completeCount: 1.obs, createDate: DateTime.now()),
-    TodoList(documentId: '1', GroupId: '1', title: '워라벨 지킴이 목표의 할 일으로는 나만의 릴렉스 루틴을 한가지라도 적어주세요. 듀디것부터 공개할게요!', isAlarm: true, completeCount: 0.obs, createDate: DateTime.now()),
-    TodoList(documentId: '1', GroupId: '1', title: '밥먹고 산책하기', isAlarm: true, completeCount: 0.obs, createDate: DateTime.now()),
-    TodoList(documentId: '1', GroupId: '1', title: '10시 이후에 일 안하기', isAlarm: true, completeCount: 0.obs, createDate: DateTime.now()),
+    TodoList(documentId: '1', GroupId: '1', title: '오른쪽 하단 +를 눌러 할일을 등록하세요', isAlarm: true, alarmDate: DateTime.now(), completeCount: 0.obs, createDate: DateTime.now(), index: 0),
+    TodoList(documentId: '1', GroupId: '1', title: '목록의 순서를 오른쪽 = 를 잡고 드래그해서 바꿔보세요', isAlarm: true, alarmDate: DateTime.now(), completeCount: 0.obs, createDate: DateTime.now(), index: 1),
+    TodoList(documentId: '1', GroupId: '1', title: '목록을 왼쪽으로 슬라이드해서 알람 설정과 삭제 기능을 구현해보세요!', isAlarm: true, alarmDate: DateTime.now(), completeCount: 0.obs, createDate: DateTime.now(), index: 2),
+    TodoList(documentId: '1', GroupId: '1', title: '목표별 할일에서 목표별로 할일을 관리해보세요', isAlarm: true, alarmDate: DateTime.now(), completeCount: 0.obs, createDate: DateTime.now(), index: 3),
+    TodoList(documentId: '1', GroupId: '1', title: '워라벨 지킴이 목표의 할 일으로는 나만의 릴렉스 루틴을 한가지라도 적어주세요. 듀디것부터 공개할게요!', isAlarm: true, alarmDate: DateTime.now(), completeCount: 0.obs, createDate: DateTime.now(), index: 4),
+    TodoList(documentId: '1', GroupId: '1', title: '밥먹고 산책하기', isAlarm: true, alarmDate: DateTime.now(), completeCount: 0.obs, createDate: DateTime.now(), index: 5),
+    TodoList(documentId: '1', GroupId: '1', title: '10시 이후에 일 안하기', isAlarm: true, alarmDate: DateTime.now(), completeCount: 0.obs, createDate: DateTime.now(), index: 6),
   ].obs;
 
   RxList<String> testText = <String>[
@@ -61,7 +66,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
     '밥먹고 산책하기',
     '10시 이후에 일 안하기',
   ].obs;
-  List<TodoListGroup> todoListGroup = [
+  RxList<TodoListGroup> todoListGroup = [
     TodoListGroup(
     documentId: '1',
     title: '당신의 첫 목표는?',
@@ -73,10 +78,13 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
         title: '모아 미팅하기',
         createDate: DateTime.now(),
         isAlarm: false,
+        alarmDate: DateTime.now(),
         completeCount: 0.obs,
+        index: 0,
       ),
     ],
     createDate: DateTime.now(),
+      index: 0,
   ),
     TodoListGroup(
       documentId: '2',
@@ -89,7 +97,9 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
           title: '밥먹고 산책하기',
           createDate: DateTime.utc(2021, 10, 10),
           isAlarm: false,
+          alarmDate: DateTime.now(),
           completeCount: 0.obs,
+          index: 0,
         ),
         TodoList(
           documentId: '4',
@@ -97,10 +107,13 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
           title: '10시 이후에 일 안하기',
           createDate: DateTime.utc(2021, 10, 11),
           isAlarm: false,
+          alarmDate: DateTime.now(),
           completeCount: 0.obs,
+          index: 1,
         )
       ],
       createDate: DateTime.now(),
+      index: 1,
     ),
     TodoListGroup(
       documentId: '3',
@@ -113,12 +126,15 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
           title: '드라마 보기 📺',
           createDate: DateTime.now(),
           isAlarm: false,
+          alarmDate: DateTime.now(),
           completeCount: 0.obs,
+          index: 0,
         ),
       ],
       createDate: DateTime.now(),
+      index: 2,
     )
-  ];
+  ].obs;
 
 
 
@@ -129,8 +145,59 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
   Timer? _autoScrollTimer;
   bool _isAutoScrolling = false;
 
+  @override
+  onInit(){
+    super.onInit();
+    for (int i = 0; i < todoListGroup.length; i++) {
+      slidableGroupControllers.add(SlidableController(this));
+      isGroupDragHandleVisibleList.add(true);
 
-
+      // 슬라이드 상태 변화에 따른 드래그 핸들 표시 여부 업데이트
+      int currentIndex = i; // 클로저에서 i를 캡처하기 위해
+      // slidableGroupControllers[currentIndex].animation.addListener(() {
+      //   print(slidableGroupControllers[currentIndex].closing);
+      //   print(slidableGroupControllers[currentIndex].animation.value);
+      //   if (slidableGroupControllers[currentIndex].animation.value == 0.0) {
+      //     isGroupDragHandleVisibleList[currentIndex] = true;
+      //   }
+      //   else if(slidableGroupControllers[currentIndex].animation.value == 0.3 ){
+      //     isGroupDragHandleVisibleList[currentIndex] = false;
+      //   }
+      //   else if(slidableGroupControllers[currentIndex].animation.value == 0.15){
+      //     if(todoListGroup[currentIndex].title == '목표 없는 리스트' || todoListGroup[currentIndex].title == '릴렉스 루틴'){
+      //       isGroupDragHandleVisibleList[currentIndex] = false;
+      //
+      //     }
+      //   }
+      // });
+      // slidableGroupControllers[i].actionPaneType.addListener(() async {
+      //     Future.delayed(Duration(milliseconds: 100), () {
+      //       // print(slidableGroupControllers[currentIndex].);
+      //       if (slidableGroupControllers[currentIndex].actionPaneType.value ==
+      //           ActionPaneType.none) {
+      //         isGroupDragHandleVisibleList[currentIndex] = true;
+      //       }
+      //       else {
+      //         isGroupDragHandleVisibleList[currentIndex] = false;
+      //       }
+      //     });
+      // });
+    }
+  }
+  test(currentIndex){
+    if (slidableGroupControllers[currentIndex].animation.value == 0.0) {
+          isGroupDragHandleVisibleList[currentIndex] = true;
+        }
+        else if(slidableGroupControllers[currentIndex].animation.value == 0.3 ){
+          isGroupDragHandleVisibleList[currentIndex] = false;
+        }
+        else if(slidableGroupControllers[currentIndex].animation.value == 0.15) {
+      if (todoListGroup[currentIndex].title == '목표 없는 리스트' ||
+          todoListGroup[currentIndex].title == '릴렉스 루틴') {
+        isGroupDragHandleVisibleList[currentIndex] = false;
+      }
+    }
+  }
   void startAutoScroll(double direction) {
     if (_isAutoScrolling) return;
 
@@ -364,5 +431,38 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
           ),
         ),
       );
+  }
+
+
+  var focusedDay = DateTime.now().obs;
+  void previousMonth() {
+    int month = focusedDay.value.month - 1;
+    if(DateTime.now().month > month && DateTime.now().year == focusedDay.value.year) {
+      if(!Get.isSnackbarOpen){
+        Get.snackbar('알림', '이전달에는 예약을 할 수 없습니다.');
+      }
+      return;
+    }
+    focusedDay.value = DateTime(
+      focusedDay.value.year,
+      month,
+      DateTime.now().month == focusedDay.value.month - 1 ? DateTime.now().day : 1,
+    );
+    update();
+  }
+
+  void nextMonth() {
+    if(DateTime.now().year + 1 == focusedDay.value.year && DateTime.now().month == focusedDay.value.month){
+      if(!Get.isSnackbarOpen){
+        Get.snackbar('알림', '예약은 1년 이내로만 가능합니다.');
+      }
+      return;
+    }
+    focusedDay.value = DateTime(
+      focusedDay.value.year,
+      focusedDay.value.month + 1,
+      1,
+    );
+    update();
   }
 }

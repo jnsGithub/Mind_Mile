@@ -5,6 +5,7 @@ import 'package:cupertino_tabbar/cupertino_tabbar.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:mind_mile/component/widgetComponent.dart';
 import 'package:mind_mile/global.dart';
+import 'package:mind_mile/model/todoList.dart';
 import 'package:mind_mile/view/diaryView/diaryView.dart';
 import 'package:mind_mile/view/todoList/todoListDialog.dart';
 import 'package:mind_mile/view/todoList/todoListGroupView.dart';
@@ -38,6 +39,13 @@ class TodoListMainView extends GetView<TodoListController> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
+                    // TextButton(
+                    //     onPressed: () async {
+                    //       List<TodoList> todoList = await controller.todoListInfo.getTodayTodoList1();
+                    //       for(int i = 0; i < todoList.length; i++) {
+                    //         print(todoList[i].title);
+                    //       }
+                    // }, child: Text('TestButton')),
                     Image(image: AssetImage('assets/images/setting.png'), width: 16,),
                   ],
                 ),
@@ -196,6 +204,34 @@ class TodoListMainView extends GetView<TodoListController> {
                                             style: TextStyle(fontSize: 11, color: subColor, fontWeight: FontWeight.w700),
                                           ),
                                         ),
+                                        outsideBuilder: (context, date, events) => Container(
+                                          margin: const EdgeInsets.all(10.0),
+                                          alignment: Alignment.center,
+                                          width: date.day != 1 ? 30 : 40,
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(60),
+                                          ),
+                                          child: Text(
+                                            date.day != 1 ? date.day.toString() : '${date.month}/${date.day}',
+                                            style: TextStyle(fontSize: 11, color: const Color(0xff999999), fontWeight: FontWeight.w700),
+                                          ),
+                                        ),
+                                        dowBuilder: (context, day) => Container(
+                                          // margin: const EdgeInsets.all(10.0),
+                                          alignment: Alignment.center,
+                                          width: 30,
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(60),
+                                          ),
+                                          child: Text(
+                                            day.weekday == 1 ? '월' : day.weekday == 2 ? '화' : day.weekday == 3 ? '수' : day.weekday == 4 ? '목' : day.weekday == 5 ? '금' : day.weekday == 6 ? '토' : '일',
+                                            style: TextStyle(fontSize: 11, color: Color(0xff0999999), fontWeight: FontWeight.w700),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                     Container(
@@ -245,6 +281,18 @@ class TodoListMainView extends GetView<TodoListController> {
                                   controller.cupertinoTabBarIValueGetter,
                                       (int index) {
                                     controller.cupertinoTabBarIValue.value = index;
+                                    controller.isAdd.value = false;
+                                    controller.isGroupEdit.value = false;
+                                    if(controller.cupertinoTabBarIValue.value == 1) {
+                                      print(index);
+                                      print(controller.isGroupEdit.value);
+                                        for(var i in controller.slidableGroupControllers){
+                                          print(1);
+                                          i.close();
+                                        }
+                                      controller.isGroupEdit.value = false;
+                                    }
+                                    controller.addController.clear();
                                   },
                                   allowExpand: true,
                                   borderRadius: BorderRadius.circular(5),
@@ -270,7 +318,13 @@ class TodoListMainView extends GetView<TodoListController> {
                                       print(1);
                                     }
                                     else{
+                                      if(controller.isGroupEdit.value == true){
+                                        for(var i in controller.slidableGroupControllers){
+                                          i.close();
+                                        }
+                                      }
                                       controller.isGroupEdit.value = !controller.isGroupEdit.value;
+
                                     }
                                   },
                                   child: Container(
@@ -295,8 +349,8 @@ class TodoListMainView extends GetView<TodoListController> {
                                         SizedBox(width: 5),
                                         controller.cupertinoTabBarIValue.value == 0 ? SizedBox() : Obx(() => Text(
                                             controller.isGroupEdit.value
-                                                ? '목표 편집'
-                                                : '완료',
+                                                ? '완료'
+                                                : '목표 편집',
                                             style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w600),),
                                         )
                                       ],
@@ -404,56 +458,58 @@ class TodoListMainView extends GetView<TodoListController> {
               ),
             ) : DiaryView(),
           ),
-          bottomNavigationBar: Obx(() => bottomNavi(controller.selectTap, controller.pageController)),
+          bottomNavigationBar: Obx(() => bottomNavi(context, controller.selectTap, controller.pageController)),
         ),
-        Positioned(
-          bottom: 100,
-          right: 30,
-          child: GestureDetector(
-            onTap: () {
-              // controller.addTodoListDialog(context);
-              if(controller.cupertinoTabBarIValue.value == 0) {
-                controller.isAdd.value = !controller.isAdd.value;
-                print(controller.isAdd.value);
-                if(controller.isAdd.value) {
-                  Future.delayed(Duration(milliseconds: 100), () {
-                    controller.scrollController.animateTo(
-                      controller.scrollController.position.maxScrollExtent,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeOut,
-                    );
-                  });
+        Obx(() => controller.selectTap.value != 3 ? Positioned(
+            bottom: 100,
+            right: 30,
+            child: GestureDetector(
+              onTap: () {
+                print(controller.selectTap.value);
+                // controller.addTodoListDialog(context);
+                if(controller.cupertinoTabBarIValue.value == 0) {
+                  controller.isAdd.value = !controller.isAdd.value;
+                  print(controller.isAdd.value);
+                  if(controller.isAdd.value) {
+                    Future.delayed(Duration(milliseconds: 100), () {
+                      controller.scrollController.animateTo(
+                        controller.scrollController.position.maxScrollExtent,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOut,
+                      );
+                    });
+                  }
+                } else if(controller.isDetail.value) {
+                  addGroupDetailItemDialog(context, controller.isCalendar, controller.isAlarm);
                 }
-              } else if(controller.isDetail.value) {
-                addGroupDetailItemDialog(context, controller.isCalendar, controller.isAlarm);
-              }
-              else {
-                addTodoListGroup(context);
-              }
+                else {
+                  addTodoListGroup(context);
+                }
 
-            },
-            child: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: subColor,
-                borderRadius: BorderRadius.circular(60),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5), // 그림자 색상 및 투명도
-                    offset: const Offset(0, 4), // 그림자 방향 (x, y) 설정
-                    blurRadius: 0.5, // 그림자의 흐릿함 정도
-                    spreadRadius: 0, // 그림자 확산 정도
-                  ),
-                ],
-              ),
-              child: Icon(
-                Icons.add,
-                color: Colors.white,
-                size: 35,
+              },
+              child: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: subColor,
+                  borderRadius: BorderRadius.circular(60),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5), // 그림자 색상 및 투명도
+                      offset: const Offset(0, 4), // 그림자 방향 (x, y) 설정
+                      blurRadius: 0.5, // 그림자의 흐릿함 정도
+                      spreadRadius: 0, // 그림자 확산 정도
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 35,
+                ),
               ),
             ),
-          ),
+          ) : SizedBox(),
         ),
         GetBuilder<GlobalController>(
             builder: (globalController) {
