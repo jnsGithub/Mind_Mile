@@ -3,6 +3,7 @@ import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_slidable_panel/flutter_slidable_panel.dart';
 import 'package:get/get.dart';
 import 'package:mind_mile/global.dart';
 import 'package:mind_mile/view/todoList/todoListController.dart';
@@ -16,15 +17,30 @@ class TodoListGroupView extends GetView<TodoListController> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    void _onItemReorder(int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
+    void _onItemReorder(int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) async {
+      print('oldItemIndex : $oldItemIndex, oldListIndex : $oldListIndex, newItemIndex : $newItemIndex, newListIndex : $newListIndex');
       var movedItem = controller.todoListGroup[oldListIndex].todoList.removeAt(oldItemIndex);
       controller.todoListGroup[newListIndex].todoList.insert(newItemIndex, movedItem);
+      for(int i = 0; i < controller.todoListGroup[newListIndex].todoList.length; i++){
+        controller.todoListGroup[newListIndex].todoList[i].sequence = i;
+      }
+      controller.changeTodoListGroup(
+          controller.todoListGroup[newListIndex],
+          controller.todoListGroup[oldListIndex],
+          controller.todoListGroup[newListIndex].todoList,
+          controller.todoListGroup[oldListIndex].todoList);
+      await controller.init();
       controller.todoListGroup.refresh();
-      // `controller.todoListGroup`이 변경되었으므로 자동으로 UI가 업데이트됩니다.
     }
-    void _onListReorder(int oldListIndex, int newListIndex) {
+
+    void _onListReorder(int oldListIndex, int newListIndex) async {
       var movedList = controller.todoListGroup.removeAt(oldListIndex);
       controller.todoListGroup.insert(newListIndex, movedList);
+      for(int i = 0; i < controller.todoListGroup[newListIndex].todoList.length; i++){
+        controller.todoListGroup[newListIndex].sequence = i;
+      }
+      await controller.todoListInfo.updateIndexGroup(controller.todoListGroup);
+      await controller.init();
       controller.todoListGroup.refresh();
       // 마찬가지로 UI가 업데이트됩니다.
     }
@@ -32,79 +48,116 @@ class TodoListGroupView extends GetView<TodoListController> {
       child: Obx(() {
         controller.contents.value = List.generate(controller.todoListGroup.length, (index) {
           return DragAndDropList(
-
             contentsWhenEmpty: SizedBox(),
             verticalAlignment: CrossAxisAlignment.center,
             horizontalAlignment: MainAxisAlignment.start,
-            canDrag: controller.isGroupEdit.value && controller.isGroupDragHandleVisibleList[index],
+            canDrag: controller.isGroupEdit.value && controller.isGroupDragHandleVisibleList[index],//controller.slidableGroupControllers[index].dismissed,//controller.isGroupDragHandleVisibleList[index],
             header: Container(
               height: 50,
               // decoration: controller.isGroupEdit.value ? BoxDecoration(
               //     border: Border(bottom: BorderSide(color: Color(0xff999999), width: 0.5))
               // ) : null,
               child: Obx(() => controller.todoListGroup.length == 0 ? Container()
-                  : Slidable(
-
+                  : SlidablePanel(
                 controller: controller.slidableGroupControllers[index],
-                closeOnScroll: true,
-                enabled: controller.isGroupEdit.value,
-                key: ValueKey(controller.todoListGroup[index].title + controller.todoListGroup[index].createDate.toString()),
-                // controller: controller.slidableController,
-                // enabled: false,
-
-                endActionPane: ActionPane( // 오른쪽에서 왼쪽으로 드래그 시 액션 표시
-                  dismissible: DismissiblePane(
-                    onDismissed: () {
-                    controller.isGroupDragHandleVisibleList[index] = false;
-                    print('dismissed');
-                  },
-                  ),
-                  extentRatio: controller.todoListGroup[index].title == '릴렉스 루틴' || controller.todoListGroup[index].title == '목표 없는 리스트' ? 0.15 : 0.3,
-                  motion: const ScrollMotion(),
-                  children: [
-                    CustomSlidableAction(
-                      padding: EdgeInsets.zero,
-                      backgroundColor: Color(0xff56C75B),
-                      onPressed: (context) {
-                        addTodoListGroup(context);
-                      },
-                      child: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              color: Color(0xffD9D9D9),
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: ImageIcon(
-                          AssetImage('assets/add.png'),
-                          color: Colors.white,
-                          size: 16,
-                        ),
+                gestureDisabled: !controller.isGroupEdit.value,
+                key: ValueKey(controller.todoListGroup[index].content + controller.todoListGroup[index].createAt.toString()),
+                maxSlideThreshold: controller.todoListGroup[index].content == '릴렉스 루틴' || controller.todoListGroup[index].content == '목표 없는 리스트' ? 0.15 : 0.3,
+                onSlideStart: () async {
+                  print('수정중임? ${controller.isGroupEdit.value}');
+                  print('슬라이드 닫힘? ${controller.slidableGroupControllers[index].dismissed}');
+                  print('얘꺼 뭐 됨? ${controller.isGroupDragHandleVisibleList[index]}');
+                  Future.delayed(Duration(milliseconds: 200), () {
+                    if(!controller.slidableGroupControllers[index].dismissed){
+                      print('닫힘');
+                      controller.isGroupDragHandleVisibleList[index] = false;
+                    }
+                    else{
+                      print('열림');
+                      controller.isGroupDragHandleVisibleList[index] = true;
+                    }
+                  });
+                  // controller.isGroupDragHandleVisibleList[index] = false;
+                  controller.update();
+                },
+                axis: Axis.horizontal,
+                postActions: [
+                  GestureDetector(
+                    onTap: () {
+                      addTodoListGroup(context, true, title: controller.todoListGroup[index].content, group: controller.todoListGroup[index]);
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      color: Color(0xff56C75B),
+                      child: ImageIcon(
+                        AssetImage('assets/add.png'),
+                        color: Colors.white,
+                        size: 16,
                       ),
                     ),
-                    controller.todoListGroup[index].title == '릴렉스 루틴' || controller.todoListGroup[index].title == '목표 없는 리스트' ? SizedBox() : CustomSlidableAction(
-                      padding: EdgeInsets.zero,
-                      backgroundColor: Color(0xffE44C42),
-                      onPressed: (context) {
-                        // 삭제 버튼 동작
-                        deleteItemDialog(context, controller.todoList, index);
-                        // controller.todoList.removeAt(index);
-                        // controller.todoList.refresh();
+                  ),
+                  if(controller.todoListGroup[index].content != '릴렉스 루틴' && controller.todoListGroup[index].content != '목표 없는 리스트')
+                    GestureDetector(
+                      onTap: () {
+                        deleteTodoListGroupDialog(context, controller.todoListGroup[index]);
                       },
                       child: Container(
                         alignment: Alignment.center,
+                        color: Color(0xffE44C42),
                         child: ImageIcon(
                           AssetImage('assets/images/delete.png'),
                           color: Colors.white,
                           size: 20,
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    )
+                ],
+                // endActionPane: ActionPane( // 오른쪽에서 왼쪽으로 드래그 시 액션 표시
+                //   extentRatio: controller.todoListGroup[index].title == '릴렉스 루틴' || controller.todoListGroup[index].title == '목표 없는 리스트' ? 0.15 : 0.3,
+                //   children: [
+                //     CustomSlidableAction(
+                //       padding: EdgeInsets.zero,
+                //       backgroundColor: Color(0xff56C75B),
+                //       onPressed: (context) {
+                //         addTodoListGroup(context);
+                //       },
+                //       child: Container(
+                //         alignment: Alignment.center,
+                //         decoration: BoxDecoration(
+                //           border: Border(
+                //             bottom: BorderSide(
+                //               color: Color(0xffD9D9D9),
+                //               width: 1,
+                //             ),
+                //           ),
+                //         ),
+                //         child: ImageIcon(
+                //           AssetImage('assets/add.png'),
+                //           color: Colors.white,
+                //           size: 16,
+                //         ),
+                //       ),
+                //     ),
+                //     controller.todoListGroup[index].title == '릴렉스 루틴' || controller.todoListGroup[index].title == '목표 없는 리스트' ? SizedBox() : CustomSlidableAction(
+                //       padding: EdgeInsets.zero,
+                //       backgroundColor: Color(0xffE44C42),
+                //       onPressed: (context) {
+                //         // 삭제 버튼 동작
+                //         deleteItemDialog(context, controller.todoList, index);
+                //         // controller.todoList.removeAt(index);
+                //         // controller.todoList.refresh();
+                //       },
+                //       child: Container(
+                //         alignment: Alignment.center,
+                //         child: ImageIcon(
+                //           AssetImage('assets/images/delete.png'),
+                //           color: Colors.white,
+                //           size: 20,
+                //         ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 child: Container(
                   height: 60,
                   decoration: BoxDecoration(
@@ -116,11 +169,13 @@ class TodoListGroupView extends GetView<TodoListController> {
                     children: [
                       Icon(Icons.add_circle, size: 20, color: Color(controller.todoListGroup[index].color),),
                       SizedBox(width: 10,),
-                      Text('${controller.todoListGroup[index].title}', style: TextStyle(fontSize: 16, color: subColor, fontWeight: FontWeight.w500),),
+                      Text('${controller.todoListGroup[index].content}', style: TextStyle(fontSize: 16, color: subColor, fontWeight: FontWeight.w500),),
                       !controller.isGroupEdit.value ? IconButton(
                         onPressed: (){
+                          controller.selectedGroupId = controller.todoListGroup[index].documentId;
                           if(controller.todoListGroup[index].todoList.length == 0) {
                             controller.isEmpty.value = true;
+                            controller.todoListGroupDetail.value = controller.todoListGroup[index];
                           } else {
                             controller.isEmpty.value = false;
                             controller.todoListGroupDetail.value = controller.todoListGroup[index];
@@ -149,12 +204,13 @@ class TodoListGroupView extends GetView<TodoListController> {
                               children: [
                                 GestureDetector(
                                   onTap: (){
-                                    if (i.completeCount.value == 2) {
-                                      i.completeCount.value = 0;
+                                    if (i.complete.value == 2) {
+                                      i.complete.value = 0;
                                     } else {
-                                      i.completeCount.value++;
+                                      i.complete.value++;
                                     }
-                                    print(i.completeCount.value);
+                                    controller.updateComplete(i);
+                                    print(i.complete.value);
                                   },
                                   child: Obx(() => Container(
                                     width: 25,
@@ -162,8 +218,8 @@ class TodoListGroupView extends GetView<TodoListController> {
                                     decoration: BoxDecoration(
                                       image: DecorationImage(
                                         image: AssetImage(
-                                            i.completeCount.value == 0 ? 'assets/images/void.png'
-                                                : i.completeCount.value == 1 ? 'assets/images/half.png'
+                                            i.complete.value == 0 ? 'assets/images/void.png'
+                                                : i.complete.value == 1 ? 'assets/images/half.png'
                                                 : 'assets/images/full.png'
                                         ),
                                         fit: BoxFit.cover,
@@ -173,7 +229,7 @@ class TodoListGroupView extends GetView<TodoListController> {
                                   ),
                                 ),
                                 SizedBox(width: 10,),
-                                Text(i.title, style: TextStyle(fontSize: 16, color: subColor, fontWeight: FontWeight.w400),),
+                                Text(i.content, style: TextStyle(fontSize: 16, color: subColor, fontWeight: FontWeight.w400),),
                               ],
                             )
                         )
@@ -187,7 +243,7 @@ class TodoListGroupView extends GetView<TodoListController> {
         return Container(
           width: size.width,
           height: 500,
-          child: controller.isDetail.value ? TodoListGroupDetailView(controller.todoListGroupDetail.value)
+          child: controller.isDetail.value ? TodoListGroupDetailView(controller.todoListGroupDetail)
               : DragAndDropLists(
             onListDraggingChanged: (isDragging, bool) {
 

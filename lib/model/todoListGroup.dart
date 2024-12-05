@@ -4,50 +4,53 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 class TodoListGroup{
   final String documentId;
-  String title;
-  List<TodoList> todoList;
-  final DateTime createDate;
+  String content;
+  List<TodoLists> todoList;
+  final DateTime createAt;
+  DateTime lasteditAt;
   int color;
-  int index;
+  int sequence;
 
 
 
   TodoListGroup({
     required this.documentId,
-    required this.title,
+    required this.content,
     required this.todoList,
-    required this.createDate,
+    required this.createAt,
+    required this.lasteditAt,
     required this.color,
-    required this.index,
+    required this.sequence,
   });
 
   factory TodoListGroup.fromMap(Map<String, dynamic> data) {
-    List<TodoList> todoListGroup = [];
-    for (var doc in data['todoList']) {
-      print(doc);
-      Map<String, dynamic> data = doc as Map<String, dynamic>;
-      data['documentId'] = doc.hashCode.toString();
-      todoListGroup.add(TodoList.fromMap(data));
-    }
-
+    // List<TodoLists> todoListGroup = [];
+    // for (var doc in data['todoList']) {
+    //   print(doc);
+    //   Map<String, dynamic> data = doc as Map<String, dynamic>;
+    //   data['documentId'] = doc.hashCode.toString();
+    //   todoListGroup.add(TodoLists.fromMap(data));
+    // }
     return TodoListGroup(
       documentId: data['documentId'],
-      title: data['title'],
-      todoList: todoListGroup,
-      createDate: data['createDate'],
+      content: data['content'],
+      todoList: data['todoList'],
+      createAt: data['createAt'],
+      lasteditAt: data['lasteditAt'],
       color: data['color'],
-      index: data['index'],
+      sequence: data['sequence'],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'documentId': documentId,
-      'title': title,
+      'content': content,
       'todoList': todoList,
-      'createDate': createDate,
+      'createAt': createAt,
+      'lasteditAt': lasteditAt,
       'color': color,
-      'index': index,
+      'sequence': sequence,
     };
   }
 }

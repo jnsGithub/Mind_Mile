@@ -1,50 +1,69 @@
 import 'package:get/get.dart';
 
-class TodoList{
-  final String documentId;
+class TodoLists{
+  String documentId;
   String GroupId;
-  String title;
-  bool isAlarm;
-  DateTime? alarmDate;
-  RxInt completeCount;
-  DateTime createDate;
-  int index;
+  String content;
+  bool alarmTrue;
+  DateTime? alarmAt;
+  RxInt complete;
+  DateTime createAt;
+  DateTime completeTime;
+  DateTime lasteditAt;
+  DateTime date;
 
-  TodoList({
+  int sequence;
+  int? todayIndex;
+
+  TodoLists({
     required this.documentId,
     required this.GroupId,
-    required this.title,
-    required this.isAlarm,
-    required this.alarmDate,
-    required this.completeCount,
-    required this.createDate,
-    required this.index,
+    required this.content,
+    required this.alarmTrue,
+    required this.alarmAt,
+    required this.complete,
+    required this.completeTime,
+    required this.createAt,
+    required this.sequence,
+    required this.lasteditAt,
+    required this.date,
+    this.todayIndex = 0,
   });
 
-  factory TodoList.fromMap(Map<String, dynamic> data) {
-    RxInt a = RxInt(data['completeCount']);
-    return TodoList(
-      documentId: data['documentId'],
-      GroupId: data['GroupId'],
-      title: data['title'],
-      isAlarm: data['isAlarm'],
-      alarmDate: data['alarmDate'].toDate() ,
-      completeCount: a,
-      createDate: data['createDate'].toDate(),
-      index: data['index'],
-    );
-  }
+  factory TodoLists.fromMap(Map<String, dynamic> data) {
+    RxInt a = RxInt(data['complete']);
+    // print(data);
+    // print('여긴 오나?');
+      return TodoLists(
+        documentId: data['documentId'],
+        GroupId: data['GroupId'],
+        content: data['content'],
+        alarmTrue: data['alarmTrue'],
+        alarmAt: data['alarmAt'],
+        complete: a,
+        completeTime: data['completeTime'],
+        createAt: data['createAt'],
+        sequence: data['sequence'],
+        todayIndex: data['todayIndex'],
+        date: data['date'],
+        lasteditAt: data['lasteditAt'],
+      );
+    }
 
   Map<String, dynamic> toMap() {
     return {
-      'documentId': documentId,
+      // 'documentId': documentId,
       'GroupId': GroupId,
-      'title': title,
-      'isAlarm': isAlarm,
-      'alarmDate': alarmDate,
-      'completeCount': completeCount,
-      'createDate': createDate,
-      'index': index,
+      'content': content,
+      'alarmTrue': alarmTrue,
+      'alarmAt': alarmAt,
+      'complete': complete.value,
+      'completeTime': completeTime,
+      'createAt': createAt,
+      'sequence': sequence,
+      'date': date,
+      'todayIndex': todayIndex,
+      'lasteditAt': lasteditAt,
     };
   }
 }

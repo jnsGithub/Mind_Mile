@@ -10,7 +10,7 @@ class LoginController extends GetxController {
   Sign sign = Sign();
   TodoListInfo todoListInfo = TodoListInfo();
 
-  RxBool isObscure = false.obs;
+  RxBool isObscure = true.obs;
 
   @override
   void onInit() {

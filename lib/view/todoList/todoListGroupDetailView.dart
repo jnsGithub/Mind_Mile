@@ -7,22 +7,24 @@ import 'package:mind_mile/view/todoList/todoListController.dart';
 import 'package:intl/intl.dart';
 
 class TodoListGroupDetailView extends GetView<TodoListController> {
-  TodoListGroup group;
+  Rx<TodoListGroup> group;
   TodoListGroupDetailView(this.group, {super.key});
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     // Get.lazyPut(() => TodoListController());
 
+    print(group.value.content);
+    print(controller.isEmpty.value);
     List<dynamic> length(){
       if(!controller.isEmpty.value){
-        List<DateTime> temp = [group.todoList[0].createDate];
-        for(int i = 0; i < group.todoList.length - 1; i++){
-          if(group.todoList[i].createDate.year != group.todoList[i+1].createDate.year ||
-              group.todoList[i].createDate.month != group.todoList[i+1].createDate.month ||
-              group.todoList[i].createDate.day != group.todoList[i+1].createDate.day){
-            temp.add(group.todoList[i+1].createDate);
-            print(temp);
+        List<DateTime> temp = [group.value.todoList[0].date];
+        for(int i = 0; i < group.value.todoList.length - 1; i++){
+          if(group.value.todoList[i].date.year != group.value.todoList[i+1].date.year ||
+              group.value.todoList[i].date.month != group.value.todoList[i+1].date.month ||
+              group.value.todoList[i].date.day != group.value.todoList[i+1].date.day){
+            temp.add(group.value.todoList[i+1].date);
+            // print(temp);
           }
         }
         return temp;
@@ -45,9 +47,9 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
           ],
         ),
         children: [
-          for(var i in group.todoList) // 날짜 비교해서 삽입해야함.
+          for(var i in group.value.todoList) // 날짜 비교해서 삽입해야함.
             DragAndDropItem(
-                child: length()[index] != i.createDate ? SizedBox() : Container(
+                child: length()[index] != i.date ? SizedBox() : Container(
                     decoration: BoxDecoration(
                         border: Border(bottom: BorderSide(color: Color(0xff999999), width: 0.5))
                     ),
@@ -58,12 +60,12 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
                       children: [
                         GestureDetector(
                           onTap: (){
-                            if (i.completeCount.value == 2) {
-                              i.completeCount.value = 0;
+                            if (i.complete.value == 2) {
+                              i.complete.value = 0;
                             } else {
-                              i.completeCount.value++;
+                              i.complete.value++;
                             }
-                            print(i.completeCount.value);
+                            print(i.complete.value);
                           },
                           child: Obx(() => Container(
                             width: 25,
@@ -71,8 +73,8 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
                             decoration: BoxDecoration(
                               image: DecorationImage(
                                 image: AssetImage(
-                                    i.completeCount.value == 0 ? 'assets/images/void.png'
-                                        : i.completeCount.value == 1 ? 'assets/images/half.png'
+                                    i.complete.value == 0 ? 'assets/images/void.png'
+                                        : i.complete.value == 1 ? 'assets/images/half.png'
                                         : 'assets/images/full.png'
                                 ),
                                 fit: BoxFit.cover,
@@ -82,7 +84,7 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
                           ),
                         ),
                         SizedBox(width: 10,),
-                        Text(i.title, style: TextStyle(fontSize: 16, color: subColor, fontWeight: FontWeight.w400),),
+                        Text(i.content, style: TextStyle(fontSize: 16, color: subColor, fontWeight: FontWeight.w400),),
                       ],
                     )
                 )
@@ -142,9 +144,10 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
         ),
         title: Row(
           children: [
-            Icon(Icons.circle, size: 13, color: Color(group.color),),
+            Icon(Icons.circle, size: 13, color: Color(group.value.color),),
             SizedBox(width: 20,),
-            controller.isEmpty.value ? SizedBox() : Text(group.title, style: TextStyle(fontSize: 18, color: subColor, fontWeight: FontWeight.w600),),
+            //controller.isEmpty.value ? SizedBox() :
+            Text(group.value.content, style: TextStyle(fontSize: 18, color: subColor, fontWeight: FontWeight.w600),),
           ],
         ),
       ),

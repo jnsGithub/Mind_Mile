@@ -1,11 +1,12 @@
 import 'package:get/get.dart';
+import 'package:mind_mile/util/testUpdate.dart';
 
 class SurveyController extends GetxController {
-  RxInt selectIndex = (-1).obs;
+  RxInt selectIndex = (0).obs;
   RxInt pageIndex = (0).obs;
 
+  TestUpdate testUpdate = TestUpdate();
   RxList<int> score = <int>[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1].obs;
-
   List<String> symptoms = [
     "기분이 가라앉거나, 우울하거나, 희망이 없\n다고 느꼈다.",
     "평소 하던 일에 대한 흥미가 없어지거나 즐\n거움을 느끼지 못했다.",

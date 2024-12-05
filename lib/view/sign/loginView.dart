@@ -64,19 +64,19 @@ class LoginView extends GetView<LoginController> {
                         backgroundColor: Colors.blue,
                       ),
                       onPressed: () async {
-                        Get.offAllNamed('/todoListView');
-                        // if(!Get.isSnackbarOpen){
-                        //   saving(context);
-                        // }
-                        // if(await controller.sign.signIn(controller.emailController.text, controller.passwordController.text)){
-                        //   Get.offAllNamed('/todoListView');
-                        // }
-                        // else{
-                        //   Get.back();
-                        //   if(!Get.isSnackbarOpen){
-                        //     Get.snackbar('로그인 실패', '아이디와 비밀번호를 확인해주세요');
-                        //   }
-                        // }
+                        // Get.offAllNamed('/todoListView');
+                        if(!Get.isSnackbarOpen){
+                          saving(context);
+                        }
+                        if(await controller.sign.signIn(controller.emailController.text, controller.passwordController.text)){
+                          Get.offAllNamed('/todoListView');
+                        }
+                        else{
+                          Get.back();
+                          if(!Get.isSnackbarOpen){
+                            Get.snackbar('로그인 실패', '아이디와 비밀번호를 확인해주세요');
+                          }
+                        }
                       },
                       child: const Text('시작하기', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),)
                   ),

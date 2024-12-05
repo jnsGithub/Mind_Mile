@@ -77,8 +77,6 @@ Widget buttonComponent(double width, double height, String text, RxInt selectInd
           } else {
             score[a.value] = index;
           }
-          // score[a.value] = index;
-          print(score);
         },
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
@@ -123,7 +121,6 @@ Widget bottomNavi(BuildContext context, RxInt selected, PageController controlle
          onTap: () {
            // controller.jumpToPage(index);
            selected.value = index;
-           print(selected.value);
          },
          child: Container(
            decoration: BoxDecoration(

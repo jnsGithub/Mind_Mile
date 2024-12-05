@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mind_mile/view/survey/surveyController.dart';
 
 class SurveyEndView extends StatelessWidget {
   const SurveyEndView({super.key});
@@ -7,6 +8,7 @@ class SurveyEndView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    var controller = Get.find<SurveyController>();
     return Scaffold(
       body: Center(
         child: Column(
@@ -35,6 +37,7 @@ class SurveyEndView extends StatelessWidget {
                 elevation: 5,
               ),
               onPressed: () {
+                controller.testUpdate.updateTest(controller.score);
                 Get.offAllNamed('/todoListView');
               },
               child: Text('시작하기', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600),),

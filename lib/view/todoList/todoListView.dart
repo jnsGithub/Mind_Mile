@@ -65,15 +65,21 @@ class TodoListView extends GetView<TodoListController> {
           if (oldIndex < newIndex) {
             newIndex -= 1;
           }
+          print(1);
           final item = controller.todoList.removeAt(oldIndex);
           controller.todoList.insert(newIndex, item);
+          for(int i = 0 ; i < controller.todoList.length; i++){
+            controller.todoList[i].todayIndex = i;
+          }
+          controller.updateTodoList();
         },
+
         buildDefaultDragHandles: false,
         itemCount: controller.todoList.length,
         itemBuilder: (context, index) {
           RxInt selectCount = 0.obs;
           return Slidable(
-            key: ValueKey(controller.todoList[index].title + controller.todoList[index].createDate.toString()),
+            key: ValueKey(controller.todoList[index].content + controller.todoList[index].createAt.toString()),
             // controller: controller.slidableController,
             // enabled: false,
             endActionPane: ActionPane( // 오른쪽에서 왼쪽으로 드래그 시 액션 표시
@@ -84,7 +90,7 @@ class TodoListView extends GetView<TodoListController> {
                   padding: EdgeInsets.zero,
                   backgroundColor: Color(0xff56C75B),
                   onPressed: (context) {
-                    updateAlarmDialog(context);
+                    updateAlarmDialog(context, controller.todoList[index].documentId);
                   },
                   child: Container(
                     alignment: Alignment.center,
@@ -112,7 +118,8 @@ class TodoListView extends GetView<TodoListController> {
                   backgroundColor: Color(0xffE44C42),
                   onPressed: (context) {
                     // 삭제 버튼 동작
-                    deleteItemDialog(context, controller.todoList, index);
+
+                    deleteItemDialog(context, controller.todoList, index, controller.todoList[index].documentId);
                     // controller.todoList.removeAt(index);
                     // controller.todoList.refresh();
                   },
@@ -148,59 +155,108 @@ class TodoListView extends GetView<TodoListController> {
                 ),
               ),
               height: 60,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Obx(() => GestureDetector(
-                    onTap: () {
-                      if (controller.todoList[index].completeCount.value == 2) {
-                        controller.todoList[index].completeCount.value = 0;
-                      } else {
-                        controller.todoList[index].completeCount.value++;
-                      }
-                    },
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(60),
-                        image: DecorationImage(
-                          image: AssetImage(
-                            controller.todoList[index].completeCount.value == 0
-                                ? 'assets/images/void.png'
-                                : controller.todoList[index].completeCount.value == 1
-                                ? 'assets/images/half.png'
-                                : 'assets/images/full.png',
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Obx(() => GestureDetector(
+                        onTap: () {
+                          if (controller.todoList[index].complete.value == 2) {
+                            controller.todoList[index].complete.value = 0;
+                          } else {
+                            controller.todoList[index].complete.value++;
+                          }
+                          controller.updateComplete(controller.todoList[index]);
+                        },
+                        child: Container(
+                          width: 30,
+                          height: 29,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(60),
+                            image: DecorationImage(
+                              image: AssetImage(
+                                controller.todoList[index].complete.value == 0
+                                    ? 'assets/images/void.png'
+                                    : controller.todoList[index].complete.value == 1
+                                    ? 'assets/images/half.png'
+                                    : 'assets/images/full.png',
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                  ),
-                  const SizedBox(width: 10),
-                  Container(
-                    width: size.width * 0.6,
-                    child: Text(
-                      controller.todoList[index].title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w400,
                       ),
-                      maxLines: 2,
-                    ),
+                      const SizedBox(width: 10),
+                      Container(
+                        width: size.width * 0.6,
+                        child: Text(
+                          controller.todoList[index].content,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          maxLines: 2,
+                        ),
+                      ),
+                      Container(
+                        width: 5,
+                      ),
+                      ReorderableDragStartListener(
+                        index: index,
+                        child: Icon(
+                          Icons.drag_handle,
+                          color: Colors.grey,
+                          size: 20,
+                        ),
+                      ),
+                    ],
                   ),
-                  Container(
-                    width: 5,
-                  ),
-                  ReorderableDragStartListener(
-                    index: index,
-                    child: Icon(
-                      Icons.drag_handle,
-                      color: Colors.grey,
-                      size: 20,
-                    ),
-                  ),
+                  controller.todoList[index].alarmTrue ? Row(
+                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        width: 30,
+                        // decoration: BoxDecoration(
+                        //   borderRadius: BorderRadius.circular(60),
+                        //   image: DecorationImage(
+                        //     image: AssetImage(
+                        //       controller.todoList[index].complete.value == 0
+                        //           ? 'assets/images/void.png'
+                        //           : controller.todoList[index].complete.value == 1
+                        //           ? 'assets/images/half.png'
+                        //           : 'assets/images/full.png',
+                        //     ),
+                        //   ),
+                        // ),
+                      ),
+                      const SizedBox(width: 30),
+                      controller.todoList[index].alarmAt == null ? SizedBox() : Container(
+                        width: size.width * 0.6,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.notifications,
+                              color: Color(0xff68B64D),
+                              size: 10,
+                            ),
+                            SizedBox(width: 2),
+                            Text(
+                              '${controller.todoList[index].alarmAt!.hour < 12 ? 'AM' : 'PM'} ${controller.todoList[index].alarmAt!.hour}:${controller.todoList[index].alarmAt!.minute}',
+                              style: TextStyle(
+                                fontSize: 7,
+                                color: Color(0xff68B64D),
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 2,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ) : Container(),
                 ],
               ),
             ),

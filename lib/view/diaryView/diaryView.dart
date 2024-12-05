@@ -44,7 +44,7 @@ class DiaryView extends GetView<DiaryController> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('선희의 기록', style: TextStyle(fontSize: 17, color: subColor, fontWeight: FontWeight.w700),),
+                              Text('${myName}의 기록', style: TextStyle(fontSize: 17, color: subColor, fontWeight: FontWeight.w700),),
 
                               ElevatedButton(
                                   style: ElevatedButton.styleFrom(
@@ -87,435 +87,474 @@ class DiaryView extends GetView<DiaryController> {
                   ),
                 ),
                 SizedBox(height: 13,),
-                Container(
-                  padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 5),
-                  height: 450,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xff000000).withOpacity(0.1),
-                        spreadRadius: 0,
-                        blurRadius: 10,
-                        offset: const Offset(0, 0), // changes position of shadow
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            // TODO: 여기 만들어야함.
-                            Icon(Icons.circle, size: 7, color: subColor,),
-                            Text('  한 주간의 나', style: TextStyle(fontSize: 15, color: subColor,fontWeight: FontWeight.w700),),
-                            const SizedBox(width: 3,),
-                            GetBuilder<GlobalController>(
-                                builder: (globalController){
-                                  return GestureDetector(
-                                    onTap: (){globalController.aa(
-                                        context,_targetKey ,
-                                        '- 일주일 동안의 요일별 내가 계획한 할 일과 수행 완료한 양을 한눈에 볼 수 있어요 !',
-                                        text2 : '- 일주일 동안의 요일별 나의 점수 (기분) 변화를 한눈에 볼 수 있어요 !');
-                                    },
-                                    child: Icon(
-                                      key: _targetKey,
-                                      Icons.info_outline,
-                                      color: subColor,
-                                      size: 14,
-                                    ),
-                                  );
-                                }
-                            ),
-                          ],
+                GestureDetector(
+                  onHorizontalDragEnd: (details){
+                    if(details.primaryVelocity! > 0){
+                      controller.week.value++;
+                      controller.init();
+                    }
+                    else if(details.primaryVelocity! < 0){
+                      if(controller.week.value > 0){
+                        controller.week.value--;
+                        controller.init();
+                      }
+                    }
+                    print(controller.week.value);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 5),
+                    height: 450,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xff000000).withOpacity(0.1),
+                          spreadRadius: 0,
+                          blurRadius: 10,
+                          offset: const Offset(0, 0), // changes position of shadow
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(alignment: Alignment.centerRight,child: Text('2024.10.06~2024.10.12', style: TextStyle(fontSize: 7, color: Color(0xff767676), fontWeight: FontWeight.w500),)),
-                      Container(
-                        height: 170,
-                        child: BarChart(
-                          BarChartData(
-                            alignment: BarChartAlignment.spaceAround,
-
-                            maxY: 6,
-                            barGroups: [
-                              makeGroupData(0, 1, 6, 6), // x축, 끝낸 일, y축, 전체 일
-                              makeGroupData(1, 4, 6, 6),
-                              makeGroupData(2, 0, 6, 1),
-                              makeGroupData(3, 3, 6, 3),
-                              makeGroupData(4, 2, 6, 5),
-                              makeGroupData(5, 1, 6, 3),
-                              makeGroupData(6, 2, 6, 3),
-                            ],
-                            titlesData: FlTitlesData(
-                              show: true,
-                              leftTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                    reservedSize: 30,
-                                    interval: 1,
-                                    showTitles: true,
-                                    getTitlesWidget: (double value, TitleMeta meta) {
-                                      const style = TextStyle(
-                                        color: Color(0xff767676),
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      );
-                                      switch (value) {
-                                        case 0:
-                                          return Text('0개', style: style, textAlign: TextAlign.center,);
-                                        case 3:
-                                          return Column(
-                                            children: [
-                                              Container(
-                                                alignment: Alignment.center,
-                                                width: 0.58,
-                                                height: 50,
-                                                decoration: BoxDecoration(
-                                                  color: Color(0xffBEBEBE),
-                                                ),
-                                              ),
-                                              Text('할일수', style: TextStyle(
-                                                color: Color(0xff767676),
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 9,
-                                              )),
-                                              Container(
-                                                width: 0.58,
-                                                height: 50,
-                                                decoration: BoxDecoration(
-                                                  color: Color(0xffBEBEBE),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        case 6:
-                                          return Text('7개', style: style, textAlign: TextAlign.center,);
-                                        default:
-                                          return Container();
-                                      }
-                                    }
-                                ),
-                              ),
-                              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                              bottomTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  getTitlesWidget: (double value, TitleMeta meta) {
-                                    const style = TextStyle(
-                                      color: Color(0xff767676),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 10,
-                                    );
-                                    switch (value) {
-                                      case 0:
-                                        return Container(
-                                          padding: EdgeInsets.only(top: 3),
-                                          child: Text('S', style: TextStyle(
-                                            color: Color(0xffD65050),
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 10,
-                                          )),
-                                        );
-                                      case 1:
-                                        return Container(
-                                          padding: EdgeInsets.only(top: 3),
-                                            child: Text('M', style: style));
-                                      case 2:
-                                        return Container(
-                                            padding: EdgeInsets.only(top: 3),
-                                            child: Text('T', style: style));
-                                      case 3:
-                                        return Container(
-                                          padding: EdgeInsets.only(top: 3),
-                                            child: Text('W', style: style));
-                                      case 4:
-                                        return Container(
-                                            padding: EdgeInsets.only(top: 3),
-                                            child: Text('T', style: style));
-                                      case 5:
-                                        return Container(
-                                            padding: EdgeInsets.only(top: 3),
-                                            child: Text('F', style: style));
-                                      case 6:
-                                        return Container(
-                                          padding: EdgeInsets.only(top: 3),
-                                          child: Text('S', style: TextStyle(
-                                            color: Color(0xff78B7FF),
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 10,
-                                          )),
-                                        );
-                                      default:
-                                        return Text('', style: style);
-                                    }
-                                  },
-                                ),
-                              ),
-                            ),
-                            borderData: FlBorderData(
-                                show: true,
-                                border: Border(
-                                  left: BorderSide(color: Color(0xff595959), width: 1.17),
-                                  bottom: BorderSide(color: Color(0xff595959), width: 1.17),
-                                )
-                            ),
-                            gridData: FlGridData(
-                                getDrawingHorizontalLine: (value) {
-                                  return FlLine(
-                                    color: const Color(0xff37434d),
-                                    strokeWidth: 0.2,
-                                    dashArray: [5, 2],
-                                  );
-                                },
-                                horizontalInterval: 1,
-                                drawHorizontalLine: true,
-                                drawVerticalLine: false
-                            ),
-                            barTouchData: BarTouchData(
-                                enabled: true,
-                                touchTooltipData: BarTouchTooltipData(
-                                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                                    return BarTooltipItem(
-                                      rodIndex.toString(),
-                                      TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // TODO: 여기 만들어야함.
+                              Icon(Icons.circle, size: 7, color: subColor,),
+                              Text('  한 주간의 나', style: TextStyle(fontSize: 15, color: subColor,fontWeight: FontWeight.w700),),
+                              const SizedBox(width: 3,),
+                              GetBuilder<GlobalController>(
+                                  builder: (globalController){
+                                    return GestureDetector(
+                                      onTap: (){globalController.aa(
+                                          context,_targetKey ,
+                                          '- 일주일 동안의 요일별 내가 계획한 할 일과 수행 완료한 양을 한눈에 볼 수 있어요 !',
+                                          text2 : '- 일주일 동안의 요일별 나의 점수 (기분) 변화를 한눈에 볼 수 있어요 !');
+                                      },
+                                      child: Icon(
+                                        key: _targetKey,
+                                        Icons.info_outline,
+                                        color: subColor,
+                                        size: 14,
                                       ),
                                     );
-                                  },
-                                )
+                                  }
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Container(alignment: Alignment.centerRight,child: Text('2024.10.06~2024.10.12', style: TextStyle(fontSize: 7, color: Color(0xff767676), fontWeight: FontWeight.w500),)),
+                        Container(
+                          height: 170,
+                          child: Obx(() => BarChart(
+                              BarChartData(
+                                alignment: BarChartAlignment.spaceAround,
+
+                                maxY: controller.maxY.value,
+                                barGroups: [
+                                  makeGroupData(0, controller.weeklyTodoList[1][0], controller.weeklyTodoList[0][0]), // x축, 끝낸 일, y축, 전체 일
+                                  makeGroupData(1, controller.weeklyTodoList[1][1], controller.weeklyTodoList[0][1]),
+                                  makeGroupData(2, controller.weeklyTodoList[1][2], controller.weeklyTodoList[0][2]),
+                                  makeGroupData(3, controller.weeklyTodoList[1][3], controller.weeklyTodoList[0][3]),
+                                  makeGroupData(4, controller.weeklyTodoList[1][4], controller.weeklyTodoList[0][4]),
+                                  makeGroupData(5, controller.weeklyTodoList[1][5], controller.weeklyTodoList[0][5]),
+                                  makeGroupData(6, controller.weeklyTodoList[1][6], controller.weeklyTodoList[0][6]),
+                                ],
+                                titlesData: FlTitlesData(
+                                  show: true,
+                                  leftTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                        reservedSize: 30,
+                                        interval: 1,
+                                        showTitles: true,
+                                        getTitlesWidget: (double value, TitleMeta meta) {
+                                          print('밸류 : ${value}');
+
+                                          const style = TextStyle(
+                                            color: Color(0xff767676),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14,
+                                          );
+                                          if(value == 0){
+                                            return Text('0개', style: style, textAlign: TextAlign.center,);
+                                          }
+                                          else if(value == controller.maxY.value / 2){
+                                            return Column(
+                                              children: [
+                                                Container(
+                                                  alignment: Alignment.center,
+                                                  width: 0.58,
+                                                  height: 50,
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xffBEBEBE),
+                                                  ),
+                                                ),
+                                                Text('할일수', style: TextStyle(
+                                                  color: Color(0xff767676),
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 9,
+                                                )),
+                                                Container(
+                                                  width: 0.58,
+                                                  height: 50,
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xffBEBEBE),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          }
+                                          else if(value == controller.maxY.value){
+                                            return Text('${controller.maxY.value.toInt()}개', style: style, textAlign: TextAlign.center,);
+                                          }
+                                          else{
+                                            return Container();
+                                          }
+                                        }
+                                    ),
+                                  ),
+                                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                  bottomTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      getTitlesWidget: (double value, TitleMeta meta) {
+                                        const style = TextStyle(
+                                          color: Color(0xff767676),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 10,
+                                        );
+                                        switch (value) {
+                                          case 0:
+                                            return Container(
+                                              padding: EdgeInsets.only(top: 3),
+                                              child: Text('S', style: TextStyle(
+                                                color: Color(0xffD65050),
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 10,
+                                              )),
+                                            );
+                                          case 1:
+                                            return Container(
+                                              padding: EdgeInsets.only(top: 3),
+                                                child: Text('M', style: style));
+                                          case 2:
+                                            return Container(
+                                                padding: EdgeInsets.only(top: 3),
+                                                child: Text('T', style: style));
+                                          case 3:
+                                            return Container(
+                                              padding: EdgeInsets.only(top: 3),
+                                                child: Text('W', style: style));
+                                          case 4:
+                                            return Container(
+                                                padding: EdgeInsets.only(top: 3),
+                                                child: Text('T', style: style));
+                                          case 5:
+                                            return Container(
+                                                padding: EdgeInsets.only(top: 3),
+                                                child: Text('F', style: style));
+                                          case 6:
+                                            return Container(
+                                              padding: EdgeInsets.only(top: 3),
+                                              child: Text('S', style: TextStyle(
+                                                color: Color(0xff78B7FF),
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 10,
+                                              )),
+                                            );
+                                          default:
+                                            return Text('', style: style);
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                borderData: FlBorderData(
+                                    show: true,
+                                    border: Border(
+                                      left: BorderSide(color: Color(0xff595959), width: 1.17),
+                                      bottom: BorderSide(color: Color(0xff595959), width: 1.17),
+                                    )
+                                ),
+                                gridData: FlGridData(
+                                    getDrawingHorizontalLine: (value) {
+                                      return FlLine(
+                                        color: const Color(0xff37434d),
+                                        strokeWidth: 0.2,
+                                        dashArray: [5, 2],
+                                      );
+                                    },
+                                    horizontalInterval: 1,
+                                    drawHorizontalLine: true,
+                                    drawVerticalLine: false
+                                ),
+                                barTouchData: BarTouchData(
+                                    enabled: true,
+                                    touchTooltipData: BarTouchTooltipData(
+
+                                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                        return BarTooltipItem(
+                                          controller.weeklyTodoList[0][groupIndex].toString(),
+                                          TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        );
+                                      },
+                                    )
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Container(
-                        height: 20,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: size.width * 0.0154,
-                                  height: size.width * 0.0154,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.bottomCenter,
-                                      end: Alignment.topCenter,
-                                      colors: [Color(0xffABE0FF), Color(0xff32A8EB)],
-                                      stops: [0, 1],
+                        Container(
+                          height: 20,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: size.width * 0.0154,
+                                    height: size.width * 0.0154,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.bottomCenter,
+                                        end: Alignment.topCenter,
+                                        colors: [Color(0xffABE0FF), Color(0xff32A8EB)],
+                                        stops: [0, 1],
+                                      ),
+                                      borderRadius: BorderRadius.circular(50),
                                     ),
-                                    borderRadius: BorderRadius.circular(50),
                                   ),
-                                ),
-                                SizedBox(width: 5,),
-                                Text('끝낸 일', style: TextStyle(fontSize: 7, fontWeight: FontWeight.w600),)
-                              ],
-                            ),
-                            SizedBox(width: 10,),
-                            Row(
-                              children: [
-                                Container(
-                                  width: size.width * 0.0154,
-                                  height: size.width * 0.0154,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xffABE0FF),
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                ),
-                                SizedBox(width: 5,),
-                                Text('미룬 일', style: TextStyle(fontSize: 7, fontWeight: FontWeight.w600),)
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 20,),
-                      Container(
-                        height: 160,
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              left: 15.5,
-                              top: 8,
-                              child: Container(
-                                width: 0.58,
-                                height: 120,
-                                color: Color(0xffBEBEBE),
-                              ),
-                            ),
-                            // Positioned(
-                            //   left: 0,
-                            //   top: 57,
-                            //   child: Image(image: AssetImage('assets/images/score/selectSoso.png'), width: 32, height: 32, fit: BoxFit.fitWidth,),
-                            // ),
-                            LineChart(
-
-                              LineChartData(
-                                minX: -0.5,  // X 축의 최소값을 낮춰 패딩 효과 추가
-                                maxX: 6.5,   // X 축의 최대값을 높여 패딩 효과 추가
-                                minY: -1,    // Y 축의 최소값을 낮춰 패딩 효과 추가
-                                maxY: 6.5,     // Y 축의 최대값을 높여 패딩 효과 추가
-                                // minX: 0,
-                                // maxX: 6,
-                                // minY: 0,
-                                // maxY: 6,
-                                gridData: FlGridData(
-                                  show: true,
-                                  drawVerticalLine: false,
-                                  drawHorizontalLine: true,
-                                  horizontalInterval: 1,
-                                  verticalInterval: 1,
-                                  getDrawingHorizontalLine: (value) {
-                                    return FlLine(
-                                      color: const Color(0xff37434d),
-                                      strokeWidth: 0.2,
-                                    );
-                                  },
-                                  // getDrawingVerticalLine: (value) {
-                                  //   return FlLine(
-                                  //     color: const Color(0xff37434d),
-                                  //     strokeWidth: 0.001,
-                                  //     dashArray: [5, 2],
-                                  //   );
-                                  // },
-                                ),
-                                titlesData: FlTitlesData(
-                                    show: true,
-                                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                    leftTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          reservedSize: 30,
-                                            showTitles: true,
-                                            interval: 1,
-                                            getTitlesWidget: (double value, TitleMeta meta) {
-                                              const style = TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14,
-                                              );
-                                              print(value);
-                                              switch (value) {
-                                                case 0:
-                                                  return Image(image: AssetImage('assets/images/score/selectTT.png'), width: 30, height: 30, fit: BoxFit.fitWidth,);
-                                                case 3:
-                                                  return Image(image: AssetImage('assets/images/score/selectSoso.png'), width: 30, height: 30, fit: BoxFit.fitWidth,);
-                                                case 6:
-                                                  return Image(image: AssetImage('assets/images/score/selectHappy.png'), width: 30, height: 30, fit: BoxFit.fitWidth,);
-                                                default:
-                                                  return Column(
-                                                    children: [
-                                                    ],
-                                                  );
-                                              }
-                                            }
-                                        )
-                                    ),
-                                    bottomTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          showTitles: true,
-                                          getTitlesWidget: (double value, TitleMeta meta) {
-                                            const style = TextStyle(
-                                              color: Color(0xff767676),
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 10,
-                                            );
-                                            switch (value) {
-                                              case 0:
-                                                return Text('S', style: TextStyle(
-                                                  color: Color(0xffD65050),
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 10,
-                                                ));
-                                              case 1:
-                                                return Text('M', style: style);
-                                              case 2:
-                                                return Text('T', style: style);
-                                              case 3:
-                                                return Text('W', style: style);
-                                              case 4:
-                                                return Text('T', style: style);
-                                              case 5:
-                                                return Text('F', style: style);
-                                              case 6:
-                                                return Text('S', style: TextStyle(
-                                                  color: Color(0xff78B7FF),
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 10,
-                                                ));
-                                              default:
-                                                return Text('', style: style);
-                                            }
-                                          },
-                                        )
-                                    )
-                                ),
-                                borderData: FlBorderData(
-                                  show: true,
-                                  border: Border(
-                                    left: BorderSide(color: Color(0xff595959), width: 1.17),
-                                    bottom: BorderSide(color: Color(0xff595959), width: 1.17),
-                                  ),
-                                ),
-
-                                lineBarsData: [
-                                  LineChartBarData(
-                                    spots: [
-                                      FlSpot(0, 2),
-                                      FlSpot(1, 4),
-                                      FlSpot(2, 1),
-                                      FlSpot(3, 6),
-                                      FlSpot(4, 4),
-                                      FlSpot(5, 3),
-                                      FlSpot(6, 5),
-                                    ],
-                                    // gradient: LinearGradient(
-                                    //   colors: [Color(0xffC4C3BA), Color(0xff8DCECA), Color(0xff57B7FF)],
-                                    //   stops: [0.35, 1, 1],
-                                    // ),
-                                    isCurved: false,
-                                    color: Color(0xff49A09F),
-                                    barWidth: 1,
-                                    isStrokeCapRound: true,
-                                    dotData: FlDotData(
-                                        show: true,
-                                        // checkToShowDot: (spot, barData) {
-                                        //   return spot.x != 0 && spot.x != 6;
-                                        // },
-                                        getDotPainter: (spot, percent, barData, index) {
-                                          return FlDotCirclePainter(
-                                            radius: 6,
-                                            color: spot.y == 0 ? const Color(0xffC4C3BA)
-                                                : spot.y == 1 ? const Color(0xffB5C7BF)
-                                                : spot.y == 2 ? const Color(0xffA1CBC5)
-                                                : spot.y == 3 ? const Color(0xff94CEC9)
-                                                : spot.y == 4 ? const Color(0xff80C9D8)
-                                                : spot.y == 5 ? const Color(0xff6FC2E9)
-                                                : const Color(0xff5EBAFA),
-                                            strokeWidth: 0,
-                                            strokeColor: Colors.white,
-                                          );
-                                        }
-                                    ),
-                                    belowBarData: BarAreaData(show: false),
-                                  ),
+                                  SizedBox(width: 5,),
+                                  Text('끝낸 일', style: TextStyle(fontSize: 7, fontWeight: FontWeight.w600),)
                                 ],
                               ),
-                            ),
-                          ],
+                              SizedBox(width: 10,),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: size.width * 0.0154,
+                                    height: size.width * 0.0154,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xffABE0FF),
+                                      borderRadius: BorderRadius.circular(50),
+                                    ),
+                                  ),
+                                  SizedBox(width: 5,),
+                                  Text('미룬 일', style: TextStyle(fontSize: 7, fontWeight: FontWeight.w600),)
+                                ],
+                              )
+                            ],
+                          ),
                         ),
-                      )
-                    ],
+                        SizedBox(height: 20,),
+                        Container(
+                          height: 160,
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                left: 15.5,
+                                top: 8,
+                                child: Container(
+                                  width: 0.58,
+                                  height: 120,
+                                  color: Color(0xffBEBEBE),
+                                ),
+                              ),
+                              // Positioned(
+                              //   left: 0,
+                              //   top: 57,
+                              //   child: Image(image: AssetImage('assets/images/score/selectSoso.png'), width: 32, height: 32, fit: BoxFit.fitWidth,),
+                              // ),
+                              Obx(() => LineChart(
+
+                                  LineChartData(
+                                    minX: -0.5,  // X 축의 최소값을 낮춰 패딩 효과 추가
+                                    maxX: 6.5,   // X 축의 최대값을 높여 패딩 효과 추가
+                                    minY: -1,    // Y 축의 최소값을 낮춰 패딩 효과 추가
+                                    maxY: 6.5,     // Y 축의 최대값을 높여 패딩 효과 추가
+                                    // minX: 0,
+                                    // maxX: 6,
+                                    // minY: 0,
+                                    // maxY: 6,
+                                    gridData: FlGridData(
+                                      show: true,
+                                      drawVerticalLine: false,
+                                      drawHorizontalLine: true,
+                                      horizontalInterval: 1,
+                                      verticalInterval: 1,
+                                      getDrawingHorizontalLine: (value) {
+                                        return FlLine(
+                                          color: const Color(0xff37434d),
+                                          strokeWidth: 0.2,
+                                        );
+                                      },
+                                      // getDrawingVerticalLine: (value) {
+                                      //   return FlLine(
+                                      //     color: const Color(0xff37434d),
+                                      //     strokeWidth: 0.001,
+                                      //     dashArray: [5, 2],
+                                      //   );
+                                      // },
+                                    ),
+                                    titlesData: FlTitlesData(
+                                        show: true,
+                                        rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                        leftTitles: AxisTitles(
+                                            sideTitles: SideTitles(
+                                              reservedSize: 30,
+                                                showTitles: true,
+                                                interval: 1,
+                                                getTitlesWidget: (double value, TitleMeta meta) {
+                                                  const style = TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 14,
+                                                  );
+                                                  switch (value) {
+                                                    case 0:
+                                                      return Image(image: AssetImage('assets/images/score/selectTT.png'), width: 30, height: 30, fit: BoxFit.fitWidth,);
+                                                    case 3:
+                                                      return Image(image: AssetImage('assets/images/score/selectSoso.png'), width: 30, height: 30, fit: BoxFit.fitWidth,);
+                                                    case 6:
+                                                      return Image(image: AssetImage('assets/images/score/selectHappy.png'), width: 30, height: 30, fit: BoxFit.fitWidth,);
+                                                    default:
+                                                      return Column(
+                                                        children: [
+                                                        ],
+                                                      );
+                                                  }
+                                                }
+                                            )
+                                        ),
+                                        bottomTitles: AxisTitles(
+                                            sideTitles: SideTitles(
+                                              showTitles: true,
+                                              getTitlesWidget: (double value, TitleMeta meta) {
+                                                const style = TextStyle(
+                                                  color: Color(0xff767676),
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 10,
+                                                );
+                                                switch (value) {
+                                                  case 0:
+                                                    return Container(
+                                                      padding: EdgeInsets.only(top: 3),
+                                                      child: Text('S', style: TextStyle(
+                                                        color: Color(0xffD65050),
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 10,
+                                                      )),
+                                                    );
+                                                  case 1:
+                                                    return Container(
+                                                        padding: EdgeInsets.only(top: 3),
+                                                        child: Text('M', style: style));
+                                                  case 2:
+                                                    return Container(
+                                                        padding: EdgeInsets.only(top: 3),
+                                                        child: Text('T', style: style));
+                                                  case 3:
+                                                    return Container(
+                                                        padding: EdgeInsets.only(top: 3),
+                                                        child: Text('W', style: style));
+                                                  case 4:
+                                                    return Container(
+                                                        padding: EdgeInsets.only(top: 3),
+                                                        child: Text('T', style: style));
+                                                  case 5:
+                                                    return Container(
+                                                        padding: EdgeInsets.only(top: 3),
+                                                        child: Text('F', style: style));
+                                                  case 6:
+                                                    return Container(
+                                                      padding: EdgeInsets.only(top: 3),
+                                                      child: Text('S', style: TextStyle(
+                                                        color: Color(0xff78B7FF),
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 10,
+                                                      )),
+                                                    );
+                                                  default:
+                                                    return Text('', style: style);
+                                                }
+                                              },
+                                            )
+                                        )
+                                    ),
+                                    borderData: FlBorderData(
+                                      show: true,
+                                      border: Border(
+                                        left: BorderSide(color: Color(0xff595959), width: 1.17),
+                                        bottom: BorderSide(color: Color(0xff595959), width: 1.17),
+                                      ),
+                                    ),
+
+                                    lineBarsData: [
+                                      LineChartBarData(
+
+                                        spots: [
+                                          FlSpot(0, controller.weeklyFeelingScore['sun']!),
+                                          FlSpot(1, controller.weeklyFeelingScore['mon']!),
+                                          FlSpot(2, controller.weeklyFeelingScore['tue']!),
+                                          FlSpot(3, controller.weeklyFeelingScore['wed']!),
+                                          FlSpot(4, controller.weeklyFeelingScore['thu']!),
+                                          FlSpot(5, controller.weeklyFeelingScore['fri']!),
+                                          FlSpot(6, controller.weeklyFeelingScore['sat']!),
+                                        ],
+                                        // gradient: LinearGradient(
+                                        //   colors: [Color(0xffC4C3BA), Color(0xff8DCECA), Color(0xff57B7FF)],
+                                        //   stops: [0.35, 1, 1],
+                                        // ),
+                                        isCurved: false,
+                                        color: Color(0xff49A09F),
+                                        barWidth: 1,
+                                        isStrokeCapRound: true,
+                                        dotData: FlDotData(
+                                            show: true,
+                                            // checkToShowDot: (spot, barData) {
+                                            //   return spot.x != 0 && spot.x != 6;
+                                            // },
+                                            getDotPainter: (spot, percent, barData, index) {
+                                              return FlDotCirclePainter(
+                                                radius: 6,
+                                                color: spot.y == 0 ? const Color(0xffC4C3BA)
+                                                    : spot.y == 1 ? const Color(0xffB5C7BF)
+                                                    : spot.y == 2 ? const Color(0xffA1CBC5)
+                                                    : spot.y == 3 ? const Color(0xff94CEC9)
+                                                    : spot.y == 4 ? const Color(0xff80C9D8)
+                                                    : spot.y == 5 ? const Color(0xff6FC2E9)
+                                                    : spot.y == 6 ? const Color(0xff57B7FF)
+                                                    : Colors.transparent,
+                                                strokeWidth: 0,
+                                                strokeColor: Colors.white,
+                                              );
+                                            }
+                                        ),
+                                        belowBarData: BarAreaData(show: false),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: 20,),
@@ -838,13 +877,13 @@ class DiaryView extends GetView<DiaryController> {
     );
   }
 
-  BarChartGroupData makeGroupData(int x, double y1, double y2, double y3) {
+  BarChartGroupData makeGroupData(int x, double completeCount, double maxY) {
     return BarChartGroupData(
       barsSpace: -22,
       x: x,
       barRods: [
         BarChartRodData(
-          toY: y3, // 전체 높이를 설정하여 두 값을 합쳐줌
+          toY: maxY, // 전체 높이를 설정하여 두 값을 합쳐줌
           width: 22,
           color: Color(0xff32A8EB).withOpacity(0.2),
           borderRadius: BorderRadius.only(
@@ -853,10 +892,10 @@ class DiaryView extends GetView<DiaryController> {
           ),
         ),
         BarChartRodData(
-          toY: y1,
+          toY: completeCount,
           width: 22,
           color: Colors.transparent,
-          borderRadius: y1 == y3 ?  BorderRadius.only(
+          borderRadius: completeCount == maxY ?  BorderRadius.only(
             topLeft: Radius.circular(6),
             topRight: Radius.circular(6),
           ) : BorderRadius.zero,

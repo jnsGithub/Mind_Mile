@@ -56,7 +56,6 @@ class SurveyView extends GetView<SurveyController> {
                   if(controller.pageIndex.value != 0){
                     controller.pageIndex.value--;
                   }
-                  print(controller.score);
                 },
                     icon: Icon(Icons.arrow_back_ios)),
                 IconButton(onPressed: (){
@@ -77,8 +76,6 @@ class SurveyView extends GetView<SurveyController> {
                         print('다음화면 넘어가야함.');
                       }
                     }
-                    print(controller.pageIndex.value);
-                    print(controller.score);
                   }
                 },
                     icon: Icon(Icons.arrow_forward_ios)),
