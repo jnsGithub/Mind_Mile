@@ -756,26 +756,28 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                         }
 
                         DateTime pushTime = DateTime(selectedDate.value.year, selectedDate.value.month, selectedDate.value.day, hour, min);
+                        TodoLists temp = TodoLists(
+                          documentId: '',
+                          GroupId: groupId,
+                          completeTime: DateTime.now(),
+                          complete: 0.obs,
+                          createAt: DateTime.now(),
+                          date: selectedDate.value,
+                          todayIndex: 0,
+                          lasteditAt: DateTime.now(),
+                          content: value,
+                          alarmTrue: true,
+                          alarmAt: hourController.text == '' || minController.text == '' ? null : DateTime(selectedDate.value.year, selectedDate.value.month, selectedDate.value.day, int.parse(hourController.text), int.parse(minController.text)),
+                          sequence: 0,
+                        );
 
                         TodoListInfo().addTodoLists(
                           isInit: false,
-                          TodoLists(
-                            documentId: '',
-                            GroupId: groupId,
-                            completeTime: DateTime.now(),
-                            complete: 0.obs,
-                            createAt: DateTime.now(),
-                            date: selectedDate.value,
-                            todayIndex: 0,
-                            lasteditAt: DateTime.now(),
-                            content: value,
-                            alarmTrue: true,
-                            alarmAt: hourController.text == '' || minController.text == '' ? null : DateTime(selectedDate.value.year, selectedDate.value.month, selectedDate.value.day, int.parse(hourController.text), int.parse(minController.text)),
-                            sequence: 0,
-                          ),
+                          temp,
                         );
                         var controller = Get.find<TodoListController>();
-                        controller.init();
+                        controller.todoListGroupDetail.value.todoList.add(temp);
+
                         Get.back();
                       },
                     ),

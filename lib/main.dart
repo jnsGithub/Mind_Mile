@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mind_mile/firebase_options.dart';
+import 'package:mind_mile/global.dart';
 import 'package:mind_mile/view/diaryView/diaryView.dart';
 import 'package:mind_mile/view/diaryView/dirayDetail/diaryDetailView.dart';
 import 'package:mind_mile/view/sign/loginView.dart';
@@ -11,6 +12,10 @@ import 'package:mind_mile/view/survey/surveyStartView.dart';
 import 'package:mind_mile/view/survey/surveyView.dart';
 import 'package:mind_mile/view/todoList/todoListMainView.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:permission_handler/permission_handler.dart';
+
+bool isLogin = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +23,24 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await initializeDateFormatting();
+
+
+
+  PermissionStatus status = await Permission.notification.request();
+  if(status.isGranted){
+    print('권한 허용');
+  }else{
+    print('권한 거부');
+  }
+
+
+  if(auth.FirebaseAuth.instance.currentUser != null) {
+    await getMyInfo();
+    // await setFcmToken();
+    setFirebaseMessaging();
+    isLogin = true;
+  }
+
   runApp(const MyApp());
 }
 
@@ -44,7 +67,7 @@ class MyApp extends StatelessWidget {
               ), elevation:0
           )
       ),
-      initialRoute: '/loginView',
+      initialRoute: isLogin ? '/todoListView' : '/loginView',
       getPages: [
         GetPage(name: '/loginView', page: () => const LoginView(),),
         GetPage(name: '/signUpView', page: () => const SignUpView(),),

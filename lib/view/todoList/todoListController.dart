@@ -70,6 +70,9 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
   Timer? _autoScrollTimer;
   bool _isAutoScrolling = false;
 
+  RxBool isVisibility = false.obs;
+  RxString diaryText = ''.obs;
+
   @override
   onInit() async {
     super.onInit();
@@ -193,156 +196,163 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
     showDialog(
         context: context,
         builder: (context){
-          return AlertDialog(
-            insetPadding: EdgeInsets.symmetric(horizontal: 20),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20)
-            ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            titlePadding: EdgeInsets.zero,
-            backgroundColor: Color(0xffEAF6FF),
-            title: Container(
-                alignment: Alignment.topRight,
-                child: IconButton(
-                    onPressed: (){
-                      Get.back();
-                    },
-                    icon: Icon(Icons.close, color: Color(0xff133C6B),
-                    )
-                )
-            ),
-            content: SingleChildScrollView(
-              child: Container(
-                alignment: Alignment.center,
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                width: size.width * 0.9,
-                height: 480,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20)
-                ),
-                child: Column(
-                  children: [
-                    Text('오늘 하루는 어땠어?', style: TextStyle(fontSize: 15, color: subColor, fontWeight: FontWeight.w600),),
-                    SizedBox(height: 20,),
-                    Container(
-                      width: size.width,
-                      height: 97,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Obx(() => Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('오늘 하루의 점수를 매겨봐 !', style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w500),),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                a('assets/images/score/unselectTT.png',     'assets/images/score/selectTT.png', selectIndex, selectList[0], size.width*0.1154, 45),
-                                a('assets/images/score/unselectDefault.png',      'assets/images/score/select1.png', selectIndex, selectList[1], size.width*0.0513, 20),
-                                a('assets/images/score/unselectDefault.png',      'assets/images/score/select2.png', selectIndex, selectList[2], size.width*0.0513, 20),
-                                a('assets/images/score/unselectSoso.png',   'assets/images/score/selectSoso.png', selectIndex, selectList[3], size.width*0.1154, 45),
-                                a('assets/images/score/unselectDefault.png',      'assets/images/score/select3.png', selectIndex, selectList[4], size.width*0.0513, 20),
-                                a('assets/images/score/unselectDefault.png',      'assets/images/score/select4.png', selectIndex, selectList[5], size.width*0.0513, 20),
-                                a('assets/images/score/unselectHappy.png',  'assets/images/score/selectHappy.png', selectIndex, selectList[6], size.width*0.1154, 45),
-                              ]
-                            ),
-                          ],
+          return GestureDetector(
+            onTap: (){
+              FocusScope.of(context).unfocus();
+            },
+            child: AlertDialog(
+              insetPadding: EdgeInsets.symmetric(horizontal: 20),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)
+              ),
+              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              titlePadding: EdgeInsets.zero,
+              backgroundColor: Color(0xffEAF6FF),
+              title: Container(
+                  alignment: Alignment.topRight,
+                  child: IconButton(
+                      onPressed: (){
+                        Get.back();
+                      },
+                      icon: Icon(Icons.close, color: Color(0xff133C6B),
+                      )
+                  )
+              ),
+              content: SingleChildScrollView(
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  width: size.width * 0.9,
+                  height: 480,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20)
+                  ),
+                  child: Column(
+                    children: [
+                      Text('오늘 하루는 어땠어?', style: TextStyle(fontSize: 15, color: subColor, fontWeight: FontWeight.w600),),
+                      SizedBox(height: 20,),
+                      Container(
+                        width: size.width,
+                        height: 97,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
                         ),
-                      ),
-                    ),
-                    SizedBox(height: 20,),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      width: size.width,
-                      height: 270,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(height: 10,),
-                          Text('오늘의 일기 쓰기', style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500),),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
+                        child: Obx(() => Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Container(
-                                alignment: Alignment.center,
-                                  height: 50,
-                              child: Text('제목 : ', style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500))),
-                              SizedBox(
-                                height: 50,
-                                width: size.width * 0.533,
-                                child: TextField(
-                                  controller: titleController,
-                                  style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500),
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 5),
-                                    hintText: '제목은 한줄 일기가 돼 !',
-                                    hintStyle: TextStyle(fontSize: 12, color: Color(0xffD9D9D9), fontWeight: FontWeight.w500),
-                                    border: InputBorder.none,
-                                  ),
-                                ),
+                              Text('오늘 하루의 점수를 매겨봐 !', style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w500),),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  a('assets/images/score/unselectTT.png',     'assets/images/score/selectTT.png', selectIndex, selectList[0], size.width*0.1154, 45),
+                                  a('assets/images/score/unselectDefault.png',      'assets/images/score/select1.png', selectIndex, selectList[1], size.width*0.0513, 20),
+                                  a('assets/images/score/unselectDefault.png',      'assets/images/score/select2.png', selectIndex, selectList[2], size.width*0.0513, 20),
+                                  a('assets/images/score/unselectSoso.png',   'assets/images/score/selectSoso.png', selectIndex, selectList[3], size.width*0.1154, 45),
+                                  a('assets/images/score/unselectDefault.png',      'assets/images/score/select3.png', selectIndex, selectList[4], size.width*0.0513, 20),
+                                  a('assets/images/score/unselectDefault.png',      'assets/images/score/select4.png', selectIndex, selectList[5], size.width*0.0513, 20),
+                                  a('assets/images/score/unselectHappy.png',  'assets/images/score/selectHappy.png', selectIndex, selectList[6], size.width*0.1154, 45),
+                                ]
                               ),
                             ],
                           ),
-                          Container(
-                            height: 150,
-                            width: size.width,
-                            child: TextField(
-                              controller: contentController,
-                              maxLines: 20,
-                              style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500),
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.zero,
-                                hintText: '일기쓰기...',
-                                hintStyle: TextStyle(fontSize: 12, color: Color(0xffD9D9D9), fontWeight: FontWeight.w500),
-                                border: InputBorder.none,
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: subColor,
-                        minimumSize: Size(size.width*0.1744, 28),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                        onPressed: () async {
-                        if(selectIndex.value == -1 || titleController.text == '' || contentController.text == ''){
-                          if(!Get.isSnackbarOpen){
-                            Get.snackbar('알림', '모든 항목을 입력해주세요.');
+                      SizedBox(height: 20,),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        width: size.width,
+                        height: 270,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(height: 10,),
+                            Text('오늘의 일기 쓰기', style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500),),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  alignment: Alignment.center,
+                                    height: 50,
+                                child: Text('제목 : ', style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500))),
+                                SizedBox(
+                                  height: 50,
+                                  width: size.width * 0.533,
+                                  child: TextField(
+                                    controller: titleController,
+                                    style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500),
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.only(left: 5),
+                                      hintText: '제목은 한줄 일기가 돼 !',
+                                      hintStyle: TextStyle(fontSize: 12, color: Color(0xffD9D9D9), fontWeight: FontWeight.w500),
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              height: 150,
+                              width: size.width,
+                              child: TextField(
+                                controller: contentController,
+                                maxLines: 20,
+                                style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500),
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.zero,
+                                  hintText: '일기쓰기...',
+                                  hintStyle: TextStyle(fontSize: 12, color: Color(0xffD9D9D9), fontWeight: FontWeight.w500),
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: subColor,
+                          minimumSize: Size(size.width*0.1744, 28),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                          onPressed: () async {
+                          if(selectIndex.value == -1 || titleController.text == '' || contentController.text == ''){
+                            if(!Get.isSnackbarOpen){
+                              Get.snackbar('알림', '모든 항목을 입력해주세요.');
+                            }
+                            return;
                           }
-                          return;
-                        }
 
-                        int moodSort = 0;
-                        if(selectIndex.value < 3){
-                          moodSort = 1;
-                        }
-                        else if(selectIndex.value > 5){
-                          moodSort = 2;
-                        }
-                        else{
-                          moodSort = 1;
-                        }
-                        RecordsInfo recordsInfo = RecordsInfo();
-                        await recordsInfo.setRecords(selectIndex.value, moodSort, titleController.text, contentController.text, false);
-                        await init();
-                        Get.back();
-                        },
-                        child: Text('저장', style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w500),)
-                    )
-                  ],
+                          int moodSort = 0;
+                          if(selectIndex.value < 3){
+                            moodSort = 1;
+                          }
+                          else if(selectIndex.value > 5){
+                            moodSort = 2;
+                          }
+                          else{
+                            moodSort = 1;
+                          }
+                          RecordsInfo recordsInfo = RecordsInfo();
+                          saving(context);
+                          await recordsInfo.setRecords(selectIndex.value, moodSort, titleController.text, contentController.text, false);
+                          await init();
+                          Get.back();
+                          Get.back();
+                          },
+                          child: Text('저장', style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w500),)
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -376,7 +386,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
     int month = focusedDay.value.month - 1;
     if(DateTime.now().month > month && DateTime.now().year == focusedDay.value.year) {
       if(!Get.isSnackbarOpen){
-        Get.snackbar('알림', '이전달에는 예약을 할 수 없습니다.');
+        // Get.snackbar('알림', '이전달에는 예약을 할 수 없습니다.');
       }
       return;
     }
@@ -391,7 +401,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
   void nextMonth() {
     if(DateTime.now().year + 1 == focusedDay.value.year && DateTime.now().month == focusedDay.value.month){
       if(!Get.isSnackbarOpen){
-        Get.snackbar('알림', '예약은 1년 이내로만 가능합니다.');
+        // Get.snackbar('알림', '예약은 1년 이내로만 가능합니다.');
       }
       return;
     }

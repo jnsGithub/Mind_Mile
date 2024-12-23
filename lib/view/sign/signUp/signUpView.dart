@@ -78,14 +78,14 @@ class SignUpView extends GetView<SignUpController> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('생년월일', style: TextStyle(fontSize: 14, color: subColor, fontWeight: FontWeight.w600),),
-                          textFieldComponent(controller.birthdayController, size.width*0.6308, 34)
+                          textFieldComponent(controller.birthdayController, size.width*0.6308, 34, isNumber: true, hint: 'YYYYMMDD')
                         ],
                       ),
                       SizedBox(height: 10,),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('생년월일', style: TextStyle(fontSize: 14, color: subColor, fontWeight: FontWeight.w600),),
+                          Text('성별', style: TextStyle(fontSize: 14, color: subColor, fontWeight: FontWeight.w600),),
                           Container(
                             width: size.width*0.6308,
                             child: Obx(() => Row(
@@ -333,6 +333,7 @@ class SignUpView extends GetView<SignUpController> {
                                 ),);
                                   //title.docs[0].id, title.docs[0].data()['content'].toString(), controller.todoList[i].content, false, null, i, todayIndex: i);
                             }
+                            groupValue = controller.selectGroupValue.value;
                             Get.toNamed('/surveyStartView');
                           }
                           else{

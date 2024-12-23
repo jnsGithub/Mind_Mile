@@ -54,9 +54,6 @@ class TodoListGroupView extends GetView<TodoListController> {
             canDrag: controller.isGroupEdit.value && controller.isGroupDragHandleVisibleList[index],//controller.slidableGroupControllers[index].dismissed,//controller.isGroupDragHandleVisibleList[index],
             header: Container(
               height: 50,
-              // decoration: controller.isGroupEdit.value ? BoxDecoration(
-              //     border: Border(bottom: BorderSide(color: Color(0xff999999), width: 0.5))
-              // ) : null,
               child: Obx(() => controller.todoListGroup.length == 0 ? Container()
                   : SlidablePanel(
                 controller: controller.slidableGroupControllers[index],
@@ -77,7 +74,6 @@ class TodoListGroupView extends GetView<TodoListController> {
                       controller.isGroupDragHandleVisibleList[index] = true;
                     }
                   });
-                  // controller.isGroupDragHandleVisibleList[index] = false;
                   controller.update();
                 },
                 axis: Axis.horizontal,
@@ -112,52 +108,6 @@ class TodoListGroupView extends GetView<TodoListController> {
                       ),
                     )
                 ],
-                // endActionPane: ActionPane( // 오른쪽에서 왼쪽으로 드래그 시 액션 표시
-                //   extentRatio: controller.todoListGroup[index].title == '릴렉스 루틴' || controller.todoListGroup[index].title == '목표 없는 리스트' ? 0.15 : 0.3,
-                //   children: [
-                //     CustomSlidableAction(
-                //       padding: EdgeInsets.zero,
-                //       backgroundColor: Color(0xff56C75B),
-                //       onPressed: (context) {
-                //         addTodoListGroup(context);
-                //       },
-                //       child: Container(
-                //         alignment: Alignment.center,
-                //         decoration: BoxDecoration(
-                //           border: Border(
-                //             bottom: BorderSide(
-                //               color: Color(0xffD9D9D9),
-                //               width: 1,
-                //             ),
-                //           ),
-                //         ),
-                //         child: ImageIcon(
-                //           AssetImage('assets/add.png'),
-                //           color: Colors.white,
-                //           size: 16,
-                //         ),
-                //       ),
-                //     ),
-                //     controller.todoListGroup[index].title == '릴렉스 루틴' || controller.todoListGroup[index].title == '목표 없는 리스트' ? SizedBox() : CustomSlidableAction(
-                //       padding: EdgeInsets.zero,
-                //       backgroundColor: Color(0xffE44C42),
-                //       onPressed: (context) {
-                //         // 삭제 버튼 동작
-                //         deleteItemDialog(context, controller.todoList, index);
-                //         // controller.todoList.removeAt(index);
-                //         // controller.todoList.refresh();
-                //       },
-                //       child: Container(
-                //         alignment: Alignment.center,
-                //         child: ImageIcon(
-                //           AssetImage('assets/images/delete.png'),
-                //           color: Colors.white,
-                //           size: 20,
-                //         ),
-                //       ),
-                //     ),
-                //   ],
-                // ),
                 child: Container(
                   height: 60,
                   decoration: BoxDecoration(
@@ -240,34 +190,35 @@ class TodoListGroupView extends GetView<TodoListController> {
           );
         });
 
-        return Container(
-          width: size.width,
-          height: 500,
-          child: controller.isDetail.value ? TodoListGroupDetailView(controller.todoListGroupDetail)
-              : DragAndDropLists(
-            onListDraggingChanged: (isDragging, bool) {
+        return Obx(() => Container(
+            width: size.width,
+            height: 500,
+            child: controller.isDetail.value ? TodoListGroupDetailView(controller.todoListGroupDetail)
+                : DragAndDropLists(
+              onListDraggingChanged: (isDragging, bool) {
 
-            },
+              },
 
-              contentsWhenEmpty: Container(
-                height: 50,
-                width: size.width,
-                child: Center(
-                  child: Text('No items'),
+                contentsWhenEmpty: Container(
+                  height: 50,
+                  width: size.width,
+                  child: Center(
+                    child: Text('No items'),
+                  ),
                 ),
-              ),
-              lastItemTargetHeight: 5,
-              verticalAlignment: CrossAxisAlignment.center,
-              // listDivider: controller.isGroupEdit.value ?  Divider(
-              //   height: 0,
-              //   thickness: 2,
-              //   color: Color(0xffD9D9D9),
-              // ) : null,
-              listDragHandle: controller.isGroupEdit.value ? DragHandle(child: Icon(Icons.drag_handle, size: 30, color: Color(0xffD9D9D9),)) : null,
-              itemDragHandle: !controller.isGroupEdit.value ? DragHandle(child: Icon(Icons.drag_handle, size: 30, color: Color(0xffD9D9D9),)) : null,
-              children: controller.contents,
-              onItemReorder: _onItemReorder,
-              onListReorder: _onListReorder
+                lastItemTargetHeight: 5,
+                verticalAlignment: CrossAxisAlignment.center,
+                // listDivider: controller.isGroupEdit.value ?  Divider(
+                //   height: 0,
+                //   thickness: 2,
+                //   color: Color(0xffD9D9D9),
+                // ) : null,
+                listDragHandle: controller.isGroupEdit.value ? DragHandle(child: Icon(Icons.drag_handle, size: 30, color: Color(0xffD9D9D9),)) : null,
+                itemDragHandle: !controller.isGroupEdit.value ? DragHandle(child: Icon(Icons.drag_handle, size: 30, color: Color(0xffD9D9D9),)) : null,
+                children: controller.contents,
+                onItemReorder: _onItemReorder,
+                onListReorder: _onListReorder
+            ),
           ),
         );
       }),

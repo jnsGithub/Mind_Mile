@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:mind_mile/global.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
-Widget textFieldComponent(TextEditingController controller, double width, double height, {String? hint, RxBool? isObscure}) {
+Widget textFieldComponent(TextEditingController controller, double width, double height, {String? hint, RxBool? isObscure, bool? isNumber}) {
   return Container(
     width: width,
     height: height,
@@ -45,6 +45,7 @@ Widget textFieldComponent(TextEditingController controller, double width, double
             ),
           ) : TextField(
             controller: controller,
+            keyboardType: isNumber == null ? null : isNumber ? TextInputType.number : TextInputType.text,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.only(left: 10),
               hintText: hint,

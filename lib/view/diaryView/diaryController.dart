@@ -27,6 +27,15 @@ class DiaryController extends GetxController {
     'fri': -1.toDouble(),
     'sat': -1.toDouble(),
   }.obs;
+  RxMap<String, String> weeklyDate = {
+    'sun': '',
+    'mon': '',
+    'tue': '',
+    'wed': '',
+    'thu': '',
+    'fri': '',
+    'sat': '',
+  }.obs;
 
   @override
   void onInit() {
@@ -43,6 +52,7 @@ class DiaryController extends GetxController {
     await getRecords();
     await getWeeklyTodoList();
     await getWeeklyFeelingScore();
+    await getWeeklyDate();
   }
 
   getWeeklyTodoList() async {
@@ -63,5 +73,9 @@ class DiaryController extends GetxController {
 
   getWeeklyFeelingScore() async {
     weeklyFeelingScore.value = await diaryInfo.getWeeklyFeelingScore(week.value);
+  }
+
+  getWeeklyDate() async {
+    weeklyDate.value = await diaryInfo.getWeeklyDate(week.value);
   }
 }

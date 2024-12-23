@@ -47,6 +47,7 @@ class Sign{
       DocumentSnapshot snapshot = await db.collection('users').doc(userCredential.user!.uid).get();
       myName = snapshot['diaryName'];
       uid = userCredential.user!.uid;
+      groupValue = snapshot['randomGroup'];
       return true;
     } catch (e) {
       print(e);

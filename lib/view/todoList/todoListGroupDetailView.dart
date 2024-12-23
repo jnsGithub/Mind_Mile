@@ -18,12 +18,12 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
     print(controller.isEmpty.value);
     List<dynamic> length(){
       if(!controller.isEmpty.value){
-        List<DateTime> temp = [group.value.todoList[0].date];
-        for(int i = 0; i < group.value.todoList.length - 1; i++){
-          if(group.value.todoList[i].date.year != group.value.todoList[i+1].date.year ||
-              group.value.todoList[i].date.month != group.value.todoList[i+1].date.month ||
-              group.value.todoList[i].date.day != group.value.todoList[i+1].date.day){
-            temp.add(group.value.todoList[i+1].date);
+        List<DateTime> temp = [controller.todoListGroupDetail.value.todoList[0].date];
+        for(int i = 0; i < controller.todoListGroupDetail.value.todoList.length - 1; i++){
+          if(controller.todoListGroupDetail.value.todoList[i].date.year != controller.todoListGroupDetail.value.todoList[i+1].date.year ||
+              controller.todoListGroupDetail.value.todoList[i].date.month != controller.todoListGroupDetail.value.todoList[i+1].date.month ||
+              controller.todoListGroupDetail.value.todoList[i].date.day != controller.todoListGroupDetail.value.todoList[i+1].date.day){
+            temp.add(controller.todoListGroupDetail.value.todoList[i+1].date);
             // print(temp);
           }
         }
@@ -47,47 +47,47 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
           ],
         ),
         children: [
-          for(var i in group.value.todoList) // 날짜 비교해서 삽입해야함.
+          for(var i in controller.todoListGroupDetail.value.todoList) // 날짜 비교해서 삽입해야함.
             DragAndDropItem(
                 child: length()[index] != i.date ? SizedBox() : Container(
-                    decoration: BoxDecoration(
-                        border: Border(bottom: BorderSide(color: Color(0xff999999), width: 0.5))
-                    ),
-                    alignment: Alignment.centerLeft,
-                    height: 50,
-                    width: size.width,
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: (){
-                            if (i.complete.value == 2) {
-                              i.complete.value = 0;
-                            } else {
-                              i.complete.value++;
-                            }
-                            print(i.complete.value);
-                          },
-                          child: Obx(() => Container(
-                            width: 25,
-                            height: 25,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(
-                                    i.complete.value == 0 ? 'assets/images/void.png'
-                                        : i.complete.value == 1 ? 'assets/images/half.png'
-                                        : 'assets/images/full.png'
+                      decoration: BoxDecoration(
+                          border: Border(bottom: BorderSide(color: Color(0xff999999), width: 0.5))
+                      ),
+                      alignment: Alignment.centerLeft,
+                      height: 50,
+                      width: size.width,
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: (){
+                              if (i.complete.value == 2) {
+                                i.complete.value = 0;
+                              } else {
+                                i.complete.value++;
+                              }
+                              print(i.complete.value);
+                            },
+                            child: Obx(() => Container(
+                              width: 25,
+                              height: 25,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage(
+                                      i.complete.value == 0 ? 'assets/images/void.png'
+                                          : i.complete.value == 1 ? 'assets/images/half.png'
+                                          : 'assets/images/full.png'
+                                  ),
+                                  fit: BoxFit.cover,
                                 ),
-                                fit: BoxFit.cover,
                               ),
                             ),
+                            ),
                           ),
-                          ),
-                        ),
-                        SizedBox(width: 10,),
-                        Text(i.content, style: TextStyle(fontSize: 16, color: subColor, fontWeight: FontWeight.w400),),
-                      ],
-                    )
-                )
+                          SizedBox(width: 10,),
+                          Text(i.content, style: TextStyle(fontSize: 16, color: subColor, fontWeight: FontWeight.w400),),
+                        ],
+                      )
+                  ),
             ),
           // DragAndDropItem(
           //   child: Padding(
@@ -144,10 +144,10 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
         ),
         title: Row(
           children: [
-            Icon(Icons.circle, size: 13, color: Color(group.value.color),),
+            Icon(Icons.circle, size: 13, color: Color(controller.todoListGroupDetail.value.color),),
             SizedBox(width: 20,),
             //controller.isEmpty.value ? SizedBox() :
-            Text(group.value.content, style: TextStyle(fontSize: 18, color: subColor, fontWeight: FontWeight.w600),),
+            Text(controller.todoListGroupDetail.value.content, style: TextStyle(fontSize: 18, color: subColor, fontWeight: FontWeight.w600),),
           ],
         ),
       ),

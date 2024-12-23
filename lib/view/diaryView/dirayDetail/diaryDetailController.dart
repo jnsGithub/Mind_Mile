@@ -29,27 +29,27 @@ class DiaryDetailController extends GetxController {
     recordsList.value = await recordsInfo.getRecords();
   }
 
-  Future<void> selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: selectedDate.value, // 기본값: 현재 날짜
-      firstDate: DateTime(2024,1), // 선택 가능 범위 시작
-      lastDate: selectedDate.value,  // 선택 가능 범위 끝
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            primaryColor: Colors.blue,
-
-            colorScheme: ColorScheme.light(primary: Colors.blue),
-            buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (pickedDate != null && pickedDate != selectedDate.value) {
-      selectedDate.value = pickedDate;
-    }
-  }
+  // Future<void> selectDate(BuildContext context) async {
+  //   final DateTime? pickedDate = await showDatePicker(
+  //     context: context,
+  //     initialDate: selectedDate.value, // 기본값: 현재 날짜
+  //     firstDate: DateTime(2024,1), // 선택 가능 범위 시작
+  //     lastDate: selectedDate.value,  // 선택 가능 범위 끝
+  //     builder: (BuildContext context, Widget? child) {
+  //       return Theme(
+  //         data: ThemeData.light().copyWith(
+  //           primaryColor: Colors.blue,
+  //
+  //           colorScheme: ColorScheme.light(primary: Colors.blue),
+  //           buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
+  //         ),
+  //         child: child!,
+  //       );
+  //     },
+  //   );
+  //
+  //   if (pickedDate != null && pickedDate != selectedDate.value) {
+  //     selectedDate.value = pickedDate;
+  //   }
+  // }
 }

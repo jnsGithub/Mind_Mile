@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mind_mile/global.dart';
+import 'package:intl/intl.dart';
 
 class DiaryInfo{
   final db = FirebaseFirestore.instance;
@@ -163,6 +164,24 @@ class DiaryInfo{
       print(e);
       return feelingScore;
     }
+  }
+
+  Future<Map<String, String>> getWeeklyDate(int num) async {
+    DateTime mood = DateTime.now().subtract(Duration(days: DateTime.now().weekday));
+    mood = DateTime(mood.year, mood.month, mood.day, 0, 0, 0, 0);
+    mood = mood.subtract(Duration(days: num * 7));
+    DateFormat.M('ko_KR').format(mood);
+    Map<String, String> weeklyDate = {
+      'sun': DateFormat('yyyy.MM.dd', 'ko_KR').format(mood),
+      'mon': DateFormat('yyyy.MM.dd', 'ko_KR').format(mood.add(Duration(days: 1))),
+      'tue': DateFormat('yyyy.MM.dd', 'ko_KR').format(mood.add(Duration(days: 2))),
+      'wed': DateFormat('yyyy.MM.dd', 'ko_KR').format(mood.add(Duration(days: 3))),
+      'thu': DateFormat('yyyy.MM.dd', 'ko_KR').format(mood.add(Duration(days: 4))),
+      'fri': DateFormat('yyyy.MM.dd', 'ko_KR').format(mood.add(Duration(days: 5))),
+      'sat': DateFormat('yyyy.MM.dd', 'ko_KR').format(mood.add(Duration(days: 6))),
+    };
+    print(weeklyDate);
+    return weeklyDate;
   }
 
   // n주차 계산
