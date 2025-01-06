@@ -155,8 +155,8 @@ updateAlarmDialog(BuildContext context, String docId){
                             value = value.substring(1, 2);
                             minController.text = value;
                           }
-                          if(int.parse(value) > 24){
-                            value = '24';
+                          if(int.parse(value) > 59){
+                            value = '59';
                             minController.text = value;
                           }
                         } catch(e){
@@ -225,7 +225,7 @@ updateAlarmDialog(BuildContext context, String docId){
   );
 }
 
-deleteTodoListGroupDialog(BuildContext context, TodoListGroup group) {
+deleteTodoListGroupDialog(BuildContext context, TodoListGroup group, int index) {
   Size size = MediaQuery.of(context).size;
   showDialog(
     context: context,
@@ -266,8 +266,16 @@ deleteTodoListGroupDialog(BuildContext context, TodoListGroup group) {
                         shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
                         minimumSize: WidgetStateProperty.all(Size(70, 15)),
                       ),
-                      onPressed: () {
-                        Navigator.pop(context);
+                      onPressed: () async {
+                        saving(context);
+                        await TodoListInfo().deleteTodoListGroup(group.documentId);
+                        await Get.find<TodoListController>().init();
+                        Get.find<TodoListController>().slidableGroupControllers.removeAt(index);
+                        Get.find<TodoListController>().isGroupDragHandleVisibleList.removeAt(index);
+
+                        print(Get.find<TodoListController>().slidableGroupControllers.length);
+                        Get.back();
+                        Get.back();
                       },
                       child: Text('네', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),),
                     ),
@@ -402,6 +410,7 @@ addTodoListGroup(BuildContext context, bool isEdit, {String? title, TodoListGrou
                       minimumSize: WidgetStateProperty.all(Size(52, 21)),
                     ),
                     onPressed: () async {
+                      saving(context);
                       var controller = Get.find<TodoListController>();
                       if(!isEdit){
                         await controller.todoListInfo.setTodoListGroup(titleController.text, color, controller.todoListGroup.length);
@@ -416,6 +425,7 @@ addTodoListGroup(BuildContext context, bool isEdit, {String? title, TodoListGrou
                       for(var i in controller.slidableGroupControllers){
                         i.dismiss();
                       }
+                      Get.back();
                       Get.back();
                     },
                     child: Text('확인')

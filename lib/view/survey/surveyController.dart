@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:mind_mile/util/testUpdate.dart';
 
 class SurveyController extends GetxController {
-  RxInt selectIndex = (0).obs;
+  RxInt selectIndex = (-1).obs;
   RxInt pageIndex = (0).obs;
 
   TestUpdate testUpdate = TestUpdate();

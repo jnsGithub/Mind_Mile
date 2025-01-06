@@ -121,6 +121,10 @@ Widget bottomNavi(BuildContext context, RxInt selected, PageController controlle
        return GestureDetector(
          onTap: () {
            // controller.jumpToPage(index);
+           if(index == 2){
+              Get.toNamed('/chatView');
+              return;
+            }
            selected.value = index;
          },
          child: Container(

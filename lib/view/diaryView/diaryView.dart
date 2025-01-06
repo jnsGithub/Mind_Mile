@@ -103,7 +103,7 @@ class DiaryView extends GetView<DiaryController> {
                           controller.init();
                         }
                       }
-                      print(controller.week.value);
+                      // print(controller.week.value);
                     },
                     child: Container(
                       padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 5),
@@ -181,7 +181,7 @@ class DiaryView extends GetView<DiaryController> {
                                           interval: 1,
                                           showTitles: true,
                                           getTitlesWidget: (double value, TitleMeta meta) {
-                                            print('밸류 : ${value}');
+                                            // print('밸류 : ${value}');
 
                                             const style = TextStyle(
                                               color: Color(0xff767676),
@@ -567,7 +567,7 @@ class DiaryView extends GetView<DiaryController> {
                   SizedBox(height: 20,),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-                    height: 140,
+                    // height: 140,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: Colors.white,
@@ -612,62 +612,98 @@ class DiaryView extends GetView<DiaryController> {
                         ),
                         const SizedBox(height: 10),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.circle, size: 3, color: subColor,),
-                                  Text('  MindMILE', style: TextStyle(
-                                      fontSize: 10,
-                                      color: subColor,
-                                      fontWeight: FontWeight.w600),),
-                                ],
-                              ),
-                              SizedBox(height: 5,),
-                              singleBar(
-                                  35,
-                                  Color(0xff32A8EB),
-                                  LinearGradient(
-                                    colors: [
-                                      Color(0xffABE0FF),
-                                      Color(0xff32A8EB)
-                                    ],
-                                    stops: [0.01, 1],
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                  ),
-                                  context
-                              ),
-                              SizedBox(height: 8,),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.circle, size: 3, color: subColor,),
-                                  Text('  릴렉스루틴', style: TextStyle(
-                                      fontSize: 10,
-                                      color: subColor,
-                                      fontWeight: FontWeight.w600),),
-                                ],
-                              ),
-                              SizedBox(height: 5,),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Obx(() => ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: controller.todoListGroup.length,
+                              itemBuilder: (context, index) {
+                                double avg = 0;
+                                for(int i = 0; i < controller.todoListGroup[index].todoList.length; i++) {
+                                  if(controller.todoListGroup[index].todoList.isEmpty){
+                                    avg = 0;
+                                    break;
+                                  }
+                                  if (controller.todoListGroup[index]
+                                      .todoList[i].complete == 0) {
+                                    avg = avg + 0;
+                                  }
+                                  else if (controller.todoListGroup[index]
+                                      .todoList[i].complete == 1) {
+                                    avg = avg + 50;
+                                  }
+                                  else if (controller.todoListGroup[index]
+                                      .todoList[i].complete == 2) {
+                                    avg = avg + 100;
+                                  }
+                                }
+                                avg = controller.todoListGroup[index].todoList.isEmpty ? 0 : avg / controller.todoListGroup[index].todoList.length;
+                                // print('평균 : ${avg / controller.todoListGroup[index].todoList.length}');
+                                Color color = Color(controller.todoListGroup[index].color);
 
-                              singleBar(
-                                  75,
-                                  Color(0xff68B64D),
-                                  LinearGradient(
-                                    colors: [
-                                      Color(0xffA5F18B),
-                                      Color(0xff68B64D)
-                                    ],
-                                    stops: [0.01, 1],
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                  ),
-                                  context
-                              ),
-                            ],
+                                // 각 RGB 성분을 연하게 조절
+                                int r = color.red + ((255 - color.red) * (70 / 100)).round();
+                                int g = color.green + ((255 - color.green) * (70 / 100)).round();
+                                int b = color.blue + ((255 - color.blue) * (70 / 100)).round();
+                                Color startColor = Color.fromARGB(color.alpha, r.clamp(0, 255), g.clamp(0, 255), b.clamp(0, 255));
+                                return Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.circle, size: 3, color: subColor,),
+                                        Text('  ${controller.todoListGroup[index].content}', style: TextStyle(
+                                            fontSize: 10,
+                                            color: subColor,
+                                            fontWeight: FontWeight.w600),),
+                                      ],
+                                    ),
+                                    SizedBox(height: 5,),
+                                    singleBar(
+                                        avg,
+                                        Color(controller.todoListGroup[index].color),
+                                        LinearGradient(
+                                          colors: [
+                                            startColor,
+                                            Color(controller.todoListGroup[index].color)
+                                          ],
+                                          stops: [0.01, 1],
+                                          begin: Alignment.bottomCenter,
+                                          end: Alignment.topCenter,
+                                        ),
+                                        context
+                                    ),
+                                    SizedBox(height: 8,),
+                                    // Row(
+                                    //   children: [
+                                    //     Icon(
+                                    //       Icons.circle, size: 3, color: subColor,),
+                                    //     Text('  릴렉스루틴', style: TextStyle(
+                                    //         fontSize: 10,
+                                    //         color: subColor,
+                                    //         fontWeight: FontWeight.w600),),
+                                    //   ],
+                                    // ),
+                                    // SizedBox(height: 5,),
+                                    //
+                                    // singleBar(
+                                    //     75,
+                                    //     Color(0xff68B64D),
+                                    //     LinearGradient(
+                                    //       colors: [
+                                    //         Color(0xffA5F18B),
+                                    //         Color(0xff68B64D)
+                                    //       ],
+                                    //       stops: [0.01, 1],
+                                    //       begin: Alignment.bottomCenter,
+                                    //       end: Alignment.topCenter,
+                                    //     ),
+                                    //     context
+                                    // ),
+                                  ],
+                                );
+                              }
+                            ),
                           ),
                         ),
                       ],
@@ -867,7 +903,7 @@ class DiaryView extends GetView<DiaryController> {
           ),
           Positioned(
             left: 4,
-            bottom: y != 100 ?  y*3 + 5 : null, // 차트의 위치에 맞추어 텍스트 배치
+            bottom: y == 0 ? 10 : y != 100 ?  y*3 + 5 - 10 : null, // 차트의 위치에 맞추어 텍스트 배치
             top: y == 100 ?  0 : null,
             child: RotatedBox(
               quarterTurns: 3,

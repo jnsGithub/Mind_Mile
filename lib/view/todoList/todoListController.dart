@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:intl/intl.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +13,11 @@ import 'package:mind_mile/model/todoListGroup.dart';
 import 'package:mind_mile/util/recordsInfo.dart';
 import 'package:mind_mile/util/todoList.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math';
 
 class TodoListController extends GetxController with SingleGetTickerProviderMixin{
+
   TextEditingController addController = TextEditingController();
   late FocusNode focusNode;
   RxBool hasFocus = false.obs;
@@ -51,6 +54,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
 
   /*그룹 리스트*/
   RxList<DragAndDropList> contents = <DragAndDropList>[].obs;
+  RxList<DragAndDropList> detailContents = <DragAndDropList>[].obs;
   RxList<SlideController> slidableGroupControllers = <SlideController>[].obs;
   RxList<bool> isGroupDragHandleVisibleList = <bool>[].obs;
   // RxBool isPress = false.obs;
@@ -62,6 +66,8 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
   // 오늘 하루 기록
   RecordsInfo recordsInfo = RecordsInfo();
   RxList<Records> recordsList = <Records>[].obs;
+  RxBool isVisible = false.obs;
+  RxString dailyText = ''.obs;
 
   RxInt tabIndex = 1.obs;
   Rx<CalendarFormat> calendarFormat = CalendarFormat.week.obs;
@@ -71,7 +77,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
   bool _isAutoScrolling = false;
 
   RxBool isVisibility = false.obs;
-  RxString diaryText = ''.obs;
+  // RxString diaryText = ''.obs;
 
   @override
   onInit() async {
@@ -87,10 +93,12 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
     }
   }
 
+
   init() async {
     await getTodoList();
     await getTodoListGroup();
     await getRecords();
+    setIsVisible();
   }
 
   getRecords() async {
@@ -120,9 +128,58 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
   setTodoListGroup() async {
   }
   updateTodoListGroup() async {
+
   }
+
   changeTodoListGroup(newGroup, oldGroup, newTodoList, oldTodoList) async {
     await todoListInfo.updateIndexGroupInItem(newGroup, oldGroup, newTodoList, oldTodoList);
+  }
+
+  setIsVisible() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    DateTime now = DateTime.now();
+    DateTime startTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 11, 0);
+    DateTime endTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 23, 59, 59);
+    // bool isVisible = now.isAfter(startTime) && now.isBefore(endTime);
+    if(now.hour >= 19){
+      print('case 1');
+      if(prefs.getInt('lastRecordDate') == int.parse(DateFormat('yyyyMMdd').format(DateTime.now()))){
+        isVisible.value = false;
+      }
+      else{
+        isVisible.value = true;
+        dailyText.value = '오늘 하루는 어땠나요??';
+      }
+    }
+    else if(now.hour < 19 && now.hour > 14){
+      print('case 2');
+      isVisible.value = false;
+    }
+    else if(now.hour <= 14){
+      print('case 3');
+      if((prefs.getInt('lastRecordDate') ?? int.parse(DateFormat('yyyyMMdd').format(DateTime.now())) - 1) <= int.parse(DateFormat('yyyyMMdd').format(DateTime.now())) - 1){
+        print(prefs.getInt('lastRecordDate'));
+        isVisible.value = true;
+        if(groupValue == 0){
+          dailyText.value = '어제의 하루는 어땠나요?';
+        }
+        else{
+          if(wellness! < 3){
+            dailyText.value = dailyWords['bad'][Random().nextInt(dailyWords['bad'].length)];
+          }
+          else if(wellness! < 5){
+            dailyText.value = dailyWords['well'][Random().nextInt(dailyWords['well'].length)];
+          }
+          else{
+            dailyText.value = dailyWords['good'][Random().nextInt(dailyWords['good'].length)];
+          }
+        }
+
+      }
+      else{
+        isVisible.value = false;
+      }
+    }
   }
 
   void startAutoScroll(double direction) {
@@ -190,6 +247,10 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
   diaryDialog(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     RxInt selectIndex = (-1).obs;
+    bool isGroup1 = groupValue == 1;
+    if(isGroup1){
+      selectIndex.value = wellness ?? -1;
+    }
     List<int> selectList = [0, 1, 2, 3, 4, 5, 6];
     TextEditingController titleController = TextEditingController();
     TextEditingController contentController = TextEditingController();
@@ -223,17 +284,17 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                   alignment: Alignment.center,
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   width: size.width * 0.9,
-                  height: 480,
+                  height: isGroup1 ? 400 : 480,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20)
                   ),
                   child: Column(
                     children: [
-                      Text('오늘 하루는 어땠어?', style: TextStyle(fontSize: 15, color: subColor, fontWeight: FontWeight.w600),),
+                      Text(isGroup1 ? '듀디가 어제 하루가 어땠을지 생각해 봤어.\n이렇게 기록해도 괜찮을지 한번 확인해 줘!' : '오늘 하루는 어땠어?', style: TextStyle(fontSize: isGroup1 ? 13 : 15, color: subColor, fontWeight: FontWeight.w600),),
                       SizedBox(height: 20,),
                       Container(
                         width: size.width,
-                        height: 97,
+                        height: isGroup1 ? 136 : 97,
                         decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
@@ -256,6 +317,12 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                                   a('assets/images/score/unselectHappy.png',  'assets/images/score/selectHappy.png', selectIndex, selectList[6], size.width*0.1154, 45),
                                 ]
                               ),
+                              isGroup1 ? Icon(Icons.info_outline, color: subColor, size: 10,) : SizedBox(),
+                              SizedBox(height: isGroup1 ? 5 : 0,),
+                              isGroup1 ? Text('듀디가 예측해서 임의로 기록한 점수에요.\n실제 어제 하루와 다르다면 수정해 주세요.',
+                                style: TextStyle(
+                                  fontSize: 9, color: Color(0xff6F6F6F), fontWeight: FontWeight.w500
+                                ),) : SizedBox(),
                             ],
                           ),
                         ),
@@ -264,7 +331,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 16),
                         width: size.width,
-                        height: 270,
+                        height: isGroup1 ? 140 : 270,
                         decoration: BoxDecoration(
                           color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
@@ -299,7 +366,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                               ],
                             ),
                             Container(
-                              height: 150,
+                              height: 60,
                               width: size.width,
                               child: TextField(
                                 controller: contentController,
@@ -342,6 +409,8 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                           else{
                             moodSort = 1;
                           }
+                          final SharedPreferences prefs = await SharedPreferences.getInstance();
+                          prefs.setInt('lastRecordDate', int.parse(DateFormat('yyyyMMdd').format(DateTime.now())));
                           RecordsInfo recordsInfo = RecordsInfo();
                           saving(context);
                           await recordsInfo.setRecords(selectIndex.value, moodSort, titleController.text, contentController.text, false);

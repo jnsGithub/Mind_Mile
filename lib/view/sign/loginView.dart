@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:mind_mile/component/widgetComponent.dart';
 import 'package:mind_mile/global.dart';
 import 'package:mind_mile/model/todoListGroup.dart';
+import 'package:mind_mile/util/test.dart';
 import 'package:mind_mile/view/sign/loginController.dart';
 
 
@@ -132,6 +133,13 @@ class LoginView extends GetView<LoginController> {
                       ],
                     ),
                   ),
+                  TextButton(
+                      onPressed: () async {
+                        // int a = await test().Test1() ?? 0;
+                        // print(a);
+                        PredectedWellness().realTest();
+                      },
+                      child: Text('test'))
                 ],
               ),
             ),

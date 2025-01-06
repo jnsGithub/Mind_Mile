@@ -34,15 +34,26 @@ class DiaryInfo{
       QuerySnapshot<Map> snapshot = await db.collection('users').doc(uid).collection('TodoLists').orderBy('date', descending: true).get();
       for(int i = 0 ; i < snapshot.docs.length; i++){
         var date = (snapshot.docs[i].data()['date'] as Timestamp).toDate();
+        print(snapshot.docs.length);
         if(date.subtract(Duration(days: date.weekday)).isBefore(currentDate)){
+          for(int j = 0; j <= getWeek(date, 0); j++){
+            if(weekList.length <= getWeek(date, 0)){
+              weekList.add([]);
+            }
+          }
           if(weekList.length <= getWeek(date, 0)){
-            weekList.add([]);
+            // weekList.add([]);
+            print(getWeek(date, 0));
+            print(weekList.length);
           }
           DateTime temp = DateTime(date.year, date.month, date.day, 0, 0, 0, 0);
+          print(1);
           weekList[getWeek(date, 0)].add(temp);
+          print(2);
 
         }
       }
+      print(weekList);
       for(int i = 0; i < weekList[num].length; i++){
         DateTime date = (snapshot.docs[i].data()['date'] as Timestamp).toDate();
         if(weekList[num][i].isAtSameMomentAs(DateTime(date.year, date.month, date.day, 0, 0, 0, 0))){
@@ -73,38 +84,38 @@ class DiaryInfo{
       }
       for(int i = 0; i < weekList[num].length; i++){
         if(weekList[num][i].weekday == 7){
-          print('일요일 : ${weekList[num][i]}');
+          // print('일요일 : ${weekList[num][i]}');
           weekMaxCountList[0]++;
         }
         else if(weekList[num][i].weekday == 1){
-          print('월요일 : ${weekList[num][i]}');
+          // print('월요일 : ${weekList[num][i]}');
           weekMaxCountList[1]++;
         }
         else if(weekList[num][i].weekday == 2){
-          print('화요일 : ${weekList[num][i]}');
+          // print('화요일 : ${weekList[num][i]}');
           weekMaxCountList[2]++;
         }
         else if(weekList[num][i].weekday == 3){
-          print('수요일 : ${weekList[num][i]}');
+          // print('수요일 : ${weekList[num][i]}');
           weekMaxCountList[3]++;
         }
         else if(weekList[num][i].weekday == 4){
-          print('목요일 : ${weekList[num][i]}');
+          // print('목요일 : ${weekList[num][i]}');
           weekMaxCountList[4]++;
         }
         else if(weekList[num][i].weekday == 5){
-          print('금요일 : ${weekList[num][i]}');
+          // print('금요일 : ${weekList[num][i]}');
           weekMaxCountList[5]++;
         }
         else if(weekList[num][i].weekday == 6){
-          print('토요일 : ${weekList[num][i]}');
+          // print('토요일 : ${weekList[num][i]}');
           weekMaxCountList[6]++;
         }
       }
 
-      print(weekMaxCountList);
-      print(weekCompleteList);
-      print(weekList);
+      // print(weekMaxCountList);
+      // print(weekCompleteList);
+      // print(weekList);
       return [weekMaxCountList, weekCompleteList];
     } catch (e) {
       print('일기 추가할때 걸림');
@@ -156,7 +167,7 @@ class DiaryInfo{
           }
         }
       }
-      print(feelingScore);
+      // print(feelingScore);
 
       return feelingScore;
     } catch (e) {
@@ -180,7 +191,7 @@ class DiaryInfo{
       'fri': DateFormat('yyyy.MM.dd', 'ko_KR').format(mood.add(Duration(days: 5))),
       'sat': DateFormat('yyyy.MM.dd', 'ko_KR').format(mood.add(Duration(days: 6))),
     };
-    print(weeklyDate);
+    // print(weeklyDate);
     return weeklyDate;
   }
 

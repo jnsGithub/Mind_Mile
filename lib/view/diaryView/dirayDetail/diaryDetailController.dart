@@ -6,9 +6,18 @@ import 'package:mind_mile/util/recordsInfo.dart';
 
 class DiaryDetailController extends GetxController {
   RecordsInfo recordsInfo = RecordsInfo();
+  RxList<Records> allRecordsList = <Records>[].obs;
   RxList<Records> recordsList = <Records>[].obs;
 
   Rx<DateTime> selectedDate = DateTime.now().obs;
+
+  RxList<int> years = <int>[].obs;
+  RxInt selectedYear = 0.obs;
+  RxInt selectedMonth = (DateTime.now().month - 1).obs;
+  RxInt yearsLength = 0.obs;
+
+  RxBool isSearch = false.obs;
+
 
   @override
   void onInit() {
@@ -23,10 +32,37 @@ class DiaryDetailController extends GetxController {
 
   init() async {
     await getRecords();
+    years.value = getRecordsMaxYear();
+    sortRecords();
   }
 
+
+
   getRecords() async {
-    recordsList.value = await recordsInfo.getRecords();
+    allRecordsList.value = await recordsInfo.getRecords();
+    recordsList.assignAll(allRecordsList);
+  }
+
+  getRecordsMaxYear() {
+    List<int> years = [];
+    for (int i = 0; i < allRecordsList.length; i++) {
+      if(years.length == 0){
+        years.add(allRecordsList[i].createAt.year);
+      }
+      else if(years[years.length-1] != allRecordsList[i].createAt.year){
+        years.add(allRecordsList[i].createAt.year);
+      }
+    }
+    print(years);
+    return years;
+  }
+
+  void searchRecords(String search) {
+    recordsList.assignAll(allRecordsList.where((element) => element.title.contains(search) || element.content.contains(search)).toList().obs);
+  }
+
+  void sortRecords() {
+    recordsList.assignAll(allRecordsList.where((element) => element.createAt.year == years[selectedYear.value] && element.createAt.month == selectedMonth.value + 1).toList().obs);
   }
 
   // Future<void> selectDate(BuildContext context) async {

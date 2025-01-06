@@ -59,11 +59,16 @@ class SurveyView extends GetView<SurveyController> {
                 },
                     icon: Icon(Icons.arrow_back_ios)),
                 IconButton(onPressed: (){
+                  if(controller.selectIndex.value == -1){
+                    if(!Get.isSnackbarOpen){
+                      Get.snackbar('알림', '항목을 선택해주세요.');
+                    }
+                    return;
+                  }
                   if(controller.symptoms.length - 1 != controller.pageIndex.value){
                       controller.pageIndex.value++;
                       controller.selectIndex.value = -1;
                     // controller.score[controller.pageIndex.value] = controller.selectIndex.value;
-
                   }
                   else {
                     for (int i = 0; i < controller.score.length; i++) {

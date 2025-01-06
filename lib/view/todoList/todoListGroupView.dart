@@ -18,7 +18,7 @@ class TodoListGroupView extends GetView<TodoListController> {
     Size size = MediaQuery.of(context).size;
 
     void _onItemReorder(int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) async {
-      print('oldItemIndex : $oldItemIndex, oldListIndex : $oldListIndex, newItemIndex : $newItemIndex, newListIndex : $newListIndex');
+      // print('oldItemIndex : $oldItemIndex, oldListIndex : $oldListIndex, newItemIndex : $newItemIndex, newListIndex : $newListIndex');
       var movedItem = controller.todoListGroup[oldListIndex].todoList.removeAt(oldItemIndex);
       controller.todoListGroup[newListIndex].todoList.insert(newItemIndex, movedItem);
       for(int i = 0; i < controller.todoListGroup[newListIndex].todoList.length; i++){
@@ -61,20 +61,22 @@ class TodoListGroupView extends GetView<TodoListController> {
                 key: ValueKey(controller.todoListGroup[index].content + controller.todoListGroup[index].createAt.toString()),
                 maxSlideThreshold: controller.todoListGroup[index].content == '릴렉스 루틴' || controller.todoListGroup[index].content == '목표 없는 리스트' ? 0.15 : 0.3,
                 onSlideStart: () async {
-                  print('수정중임? ${controller.isGroupEdit.value}');
-                  print('슬라이드 닫힘? ${controller.slidableGroupControllers[index].dismissed}');
-                  print('얘꺼 뭐 됨? ${controller.isGroupDragHandleVisibleList[index]}');
-                  Future.delayed(Duration(milliseconds: 200), () {
+                  // print('수정중임? ${controller.isGroupEdit.value}');
+                  // print('얘꺼 뭐 됨? ${controller.isGroupDragHandleVisibleList[index]}');
+                  // Future.delayed(Duration(milliseconds: 1000), () {
+                  //   print('슬라이드 닫힘? ${controller.slidableGroupControllers[index].dismissed}');
+                  // });
+                  Future.delayed(Duration(milliseconds: 500), () {
                     if(!controller.slidableGroupControllers[index].dismissed){
-                      print('닫힘');
+                      // print('닫힘');
                       controller.isGroupDragHandleVisibleList[index] = false;
                     }
                     else{
-                      print('열림');
+                      // print('열림');
                       controller.isGroupDragHandleVisibleList[index] = true;
                     }
+                    controller.update();
                   });
-                  controller.update();
                 },
                 axis: Axis.horizontal,
                 postActions: [
@@ -95,7 +97,7 @@ class TodoListGroupView extends GetView<TodoListController> {
                   if(controller.todoListGroup[index].content != '릴렉스 루틴' && controller.todoListGroup[index].content != '목표 없는 리스트')
                     GestureDetector(
                       onTap: () {
-                        deleteTodoListGroupDialog(context, controller.todoListGroup[index]);
+                        deleteTodoListGroupDialog(context, controller.todoListGroup[index], index);
                       },
                       child: Container(
                         alignment: Alignment.center,
@@ -160,7 +162,7 @@ class TodoListGroupView extends GetView<TodoListController> {
                                       i.complete.value++;
                                     }
                                     controller.updateComplete(i);
-                                    print(i.complete.value);
+                                    // print(i.complete.value);
                                   },
                                   child: Obx(() => Container(
                                     width: 25,

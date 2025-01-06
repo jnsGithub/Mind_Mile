@@ -48,7 +48,7 @@ class SignUpView extends GetView<SignUpController> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('PW', style: TextStyle(fontSize: 14, color: subColor, fontWeight: FontWeight.w600),),
-                          textFieldComponent(controller.pwController, size.width*0.6308, 34)
+                          textFieldComponent(controller.pwController, size.width*0.6308, 34, isObscure: true.obs)
                         ],
                       ),
                       SizedBox(height: 10,),
@@ -56,7 +56,7 @@ class SignUpView extends GetView<SignUpController> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('PW 확인', style: TextStyle(fontSize: 14, color: subColor, fontWeight: FontWeight.w600),),
-                          textFieldComponent(controller.pwCheckController, size.width*0.6308, 34)
+                          textFieldComponent(controller.pwCheckController, size.width*0.6308, 34, isObscure: true.obs)
                         ],
                       )
                     ],

@@ -1,9 +1,13 @@
+import 'dart:ui' as ui;
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:cupertino_tabbar/cupertino_tabbar.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:mind_mile/component/hornCircle.dart';
 import 'package:mind_mile/component/widgetComponent.dart';
 import 'package:mind_mile/global.dart';
 import 'package:mind_mile/model/todoList.dart';
@@ -15,29 +19,34 @@ import 'package:mind_mile/view/todoList/todoListView.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'todoListController.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TodoListMainView extends GetView<TodoListController> {
-  const TodoListMainView({super.key});
+  TodoListMainView({super.key});
+
+  final Rx<ui.Image?> image = Rx<ui.Image?>(null); // 이미지를 관리할 Rx
+
+  // 이미지 로드 함수
+  Future<void> loadImage(String imagePath) async {
+    final ByteData data = await rootBundle.load(imagePath);
+    final List<int> bytes = data.buffer.asUint8List();
+    final Uint8List uint8List = Uint8List.fromList(bytes);
+
+    // 이미지 디코딩 후 콜백으로 처리
+    ui.decodeImageFromList(uint8List, (ui.Image img) {
+      image.value = img;  // 이미지가 로드되면 Rx 상태를 업데이트
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     Get.lazyPut(() => TodoListController());
     Get.lazyPut(() => GlobalController());
-    DateTime now = DateTime.now();
-    DateTime startTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 11, 0);
-    DateTime endTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 23, 59, 59);
-    bool isVisible = now.isAfter(startTime) && now.isBefore(endTime);
-    int time = 20;
-    if(time > 19){
-      print('case 1');
-    }
-    else if(time < 19 && time > 14){
-      print('case 2');
-    }
-    else if(time < 14){
-      print('case 3');
-    }
+
+    loadImage(wellness != null ? wellness! < 3 ? 'assets/images/score/selectHappy.png'
+        : wellness! < 6 ? 'assets/images/score/selectSoso.png'
+        : 'assets/images/score/selectTT.png' : 'assets/images/score/selectTT.png');
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -61,8 +70,11 @@ class TodoListMainView extends GetView<TodoListController> {
                     children: [
                       // TextButton(
                       //     onPressed: () async {
-                      //       await FirebaseAuth.instance.signOut();
-                      //       Get.offAllNamed('/loginView');
+                      //       SharedPreferences prefs = await SharedPreferences.getInstance();
+                      //       print(prefs.getString('wellness'));
+                      //       print(wellness);
+                      //       // await FirebaseAuth.instance.signOut();
+                      //       // Get.offAllNamed('/loginView');
                       //     }, child: Text('로그아웃')),
                       // TextButton(
                       //     onPressed: () async
@@ -96,25 +108,42 @@ class TodoListMainView extends GetView<TodoListController> {
                                 Container(
                                   width: size.width,
                                   height: 70,
+                                  margin: const EdgeInsets.only(top: 1),
                                   child: Row(
                                     children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(3),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(color: const Color(0xff707070), width: 1),
-                                          borderRadius: BorderRadius.circular(60),
-                                        ),
-                                        child: Container(
-                                          width: size.width * 0.1462,
-                                          height: size.width * 0.1462,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(60),
-                                            image: const DecorationImage(
-                                              image: AssetImage('assets/images/profileex.png'),
-                                              fit: BoxFit.fitWidth,
+                                      Stack(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(3),
+                                            decoration: BoxDecoration(
+                                              border: Border.all(color: const Color(0xff707070), width: 1),
+                                              borderRadius: BorderRadius.circular(60),
+                                            ),
+                                            child: Container(
+                                              width: size.width * 0.1462,
+                                              height: size.width * 0.1462,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(60),
+                                                image: const DecorationImage(
+                                                  image: AssetImage('assets/images/profileex.png'),
+                                                  fit: BoxFit.fitWidth,
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                        ),
+                                          controller.isVisible.value ?
+                                          wellness != null ? Positioned(
+                                            right: -13,
+                                            bottom: -15,
+                                              child: Obx(() {
+                                                if (image.value == null) {
+                                                  return CircularProgressIndicator();  // 이미지 로드 중에는 로딩 인디케이터
+                                                } else {
+                                                  return HornCircleWithImage(imagePath: image.value);
+                                                }
+                                              }),)
+                                              : const SizedBox() : const SizedBox(),
+                                        ],
                                       ),
                                       const SizedBox(width: 10),
                                       Column(
@@ -125,8 +154,13 @@ class TodoListMainView extends GetView<TodoListController> {
                                             '${myName}의 기록',
                                             style: TextStyle(fontSize: 20, color: subColor, fontWeight: FontWeight.w700),
                                           ),
-                                          isVisible ? GestureDetector(
-                                            onTap: (){
+                                          controller.isVisible.value ? GestureDetector(
+                                            onTap: () async {
+                                              await controller.setIsVisible();
+                                              if(controller.isVisible.value == false) {
+                                                Get.snackbar('일기 기록 불가', '일기를 기록 할 수 있는 시간이 아닙니다.');
+                                                return;
+                                              }
                                               controller.diaryDialog(context);
                                             },
                                             child: DottedBorder(
@@ -143,7 +177,7 @@ class TodoListMainView extends GetView<TodoListController> {
                                                 ),
                                                 height: 25,
                                                 child: Text(
-                                                  groupValue == 0 ? '당신의 오늘 하루는 어땠나요?' : '어제 일은 듀디에 기록하고 떨쳐버리자..🍀!!',
+                                                  controller.dailyText.value,
                                                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w400),
                                                 ),
                                               ),
@@ -352,7 +386,11 @@ class TodoListMainView extends GetView<TodoListController> {
                                           for(var i in controller.slidableGroupControllers){
                                             i.dismiss();
                                           }
+                                          for(int i = 0; i < controller.isGroupDragHandleVisibleList.length; i++) {
+                                            controller.isGroupDragHandleVisibleList[i] = true;
+                                          }
                                         }
+
                                         controller.isGroupEdit.value = !controller.isGroupEdit.value;
 
                                       }

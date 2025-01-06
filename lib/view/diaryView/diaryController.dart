@@ -1,15 +1,19 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:mind_mile/model/records.dart';
+import 'package:mind_mile/model/todoListGroup.dart';
 import 'package:mind_mile/util/diary.dart';
 import 'package:mind_mile/util/recordsInfo.dart';
+import 'package:mind_mile/util/todoList.dart';
 
 class DiaryController extends GetxController {
   List<String> diaryList = ['친구', '먹다', '오다', '다투다', '하루',' 일본',' 맛있다', '만나다'];
+  RxList<TodoListGroup> todoListGroup = <TodoListGroup>[].obs;
 
   DiaryInfo diaryInfo = DiaryInfo();
   RecordsInfo recordsInfo = RecordsInfo();
   RxList<Records> records = <Records>[].obs;
+  TodoListInfo todoListInfo = TodoListInfo();
 
   GlobalKey barChart1 = GlobalKey();
   GlobalKey barChart2 = GlobalKey();
@@ -49,10 +53,15 @@ class DiaryController extends GetxController {
   }
 
   init() async {
+    await getTodoListGroup();
     await getRecords();
     await getWeeklyTodoList();
     await getWeeklyFeelingScore();
     await getWeeklyDate();
+  }
+
+  getTodoListGroup() async {
+    todoListGroup.value = await todoListInfo.getTodoListGroup();
   }
 
   getWeeklyTodoList() async {
@@ -63,8 +72,8 @@ class DiaryController extends GetxController {
         maxY.value = weeklyTodoList[0][i];
       }
     }
-    print('maxY : ${maxY.value}');
-    print(maxY.value);
+    // print('maxY : ${maxY.value}');
+    // print(maxY.value);
   }
 
   getRecords() async {

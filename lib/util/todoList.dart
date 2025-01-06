@@ -71,6 +71,7 @@ class TodoListInfo{
       print(e);
     }
   }
+
   Future<void> updateTodoListGroup(String docId, int color) async {
     try{
       await db.collection('users').doc(uid).collection('Goals').doc(docId).update(
@@ -83,6 +84,7 @@ class TodoListInfo{
       print(e);
     }
   }
+
   // 그룹 삭제
   Future<void> deleteTodoListGroup(String groupId) async {
     try{
@@ -162,7 +164,7 @@ class TodoListInfo{
   Future<List<TodoLists>> getTodayTodoList(DateTime selectDate) async {
     try {
       List<TodoLists> todoList = [];
-      QuerySnapshot snapshot = await db.collection('users').doc(uid).collection('TodoLists').orderBy('createAt', descending: false).get();
+      QuerySnapshot snapshot = await db.collection('users').doc(uid).collection('TodoLists').orderBy('date', descending: false).get();
       int i = 0;
       for (QueryDocumentSnapshot document in snapshot.docs) {
         Map<String, dynamic> data = document.data() as Map<String, dynamic>;
@@ -242,6 +244,19 @@ class TodoListInfo{
           'sequence': i.sequence,
         });
       }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  // 그룹 디테일 내에서 순서(날짜) 변경
+  Future<void> updateGroupInItemIndex(String docId, DateTime date) async {
+    try {
+      await db.collection('users').doc(uid).collection('TodoLists').doc(docId).update({
+        'date': date,
+        'alarmAt': null,
+        'alarmTrue': false,
+      });
     } catch (e) {
       print(e);
     }

@@ -244,7 +244,7 @@ class TodoListView extends GetView<TodoListController> {
                             ),
                             SizedBox(width: 2),
                             Text(
-                              '${controller.todoList[index].alarmAt!.hour < 12 ? 'AM' : 'PM'} ${controller.todoList[index].alarmAt!.hour}:${controller.todoList[index].alarmAt!.minute}',
+                              '${controller.todoList[index].alarmAt!.hour < 12 ? 'AM' : 'PM'} ${controller.todoList[index].alarmAt!.hour < 10 ? '0' : ''}${controller.todoList[index].alarmAt!.hour}:${controller.todoList[index].alarmAt!.minute < 10 ? '0' : ''}${controller.todoList[index].alarmAt!.minute}',
                               style: TextStyle(
                                 fontSize: 7,
                                 color: Color(0xff68B64D),

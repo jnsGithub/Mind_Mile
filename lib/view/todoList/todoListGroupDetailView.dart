@@ -14,26 +14,45 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
     Size size = MediaQuery.of(context).size;
     // Get.lazyPut(() => TodoListController());
 
-    print(group.value.content);
-    print(controller.isEmpty.value);
-    List<dynamic> length(){
-      if(!controller.isEmpty.value){
-        List<DateTime> temp = [controller.todoListGroupDetail.value.todoList[0].date];
-        for(int i = 0; i < controller.todoListGroupDetail.value.todoList.length - 1; i++){
-          if(controller.todoListGroupDetail.value.todoList[i].date.year != controller.todoListGroupDetail.value.todoList[i+1].date.year ||
-              controller.todoListGroupDetail.value.todoList[i].date.month != controller.todoListGroupDetail.value.todoList[i+1].date.month ||
-              controller.todoListGroupDetail.value.todoList[i].date.day != controller.todoListGroupDetail.value.todoList[i+1].date.day){
-            temp.add(controller.todoListGroupDetail.value.todoList[i+1].date);
-            // print(temp);
+    // print(group.value.content);
+    // print(controller.isEmpty.value);
+    RxList<dynamic> length() {
+      if (!controller.isEmpty.value) {
+        RxList<DateTime> temp = [
+          DateTime(controller.todoListGroupDetail.value.todoList[0].date.year,
+              controller.todoListGroupDetail.value.todoList[0].date.month,
+              controller.todoListGroupDetail.value.todoList[0].date.day)
+        ].obs;
+
+        for (int i = 1; i < controller.todoListGroupDetail.value.todoList.length; i++) {
+          bool isDuplicate = false;
+          // 현재 todoList의 날짜와 temp의 날짜를 비교
+          for (int j = 0; j < temp.length; j++) {
+            if (controller.todoListGroupDetail.value.todoList[i].date.year == temp[j].year &&
+                controller.todoListGroupDetail.value.todoList[i].date.month == temp[j].month &&
+                controller.todoListGroupDetail.value.todoList[i].date.day == temp[j].day) {
+              isDuplicate = true; // 중복된 날짜를 발견
+              break; // 중복된 날짜가 있으므로 더 이상 비교할 필요 없음
+            }
+          }
+
+          // 중복되지 않으면 temp에 추가
+          if (!isDuplicate) {
+            temp.add(DateTime(
+              controller.todoListGroupDetail.value.todoList[i].date.year,
+              controller.todoListGroupDetail.value.todoList[i].date.month,
+              controller.todoListGroupDetail.value.todoList[i].date.day,
+            ));
           }
         }
+
+        print(temp);
         return temp;
-      }
-      else{
-        return [];
+      } else {
+        return [].obs;
       }
     }
-    print(length());
+    // print(length());
     RxList<DragAndDropList> contents = <DragAndDropList>[].obs;
     contents.value = List.generate(length().length, (index) {
       return DragAndDropList(
@@ -48,47 +67,50 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
         ),
         children: [
           for(var i in controller.todoListGroupDetail.value.todoList) // 날짜 비교해서 삽입해야함.
-            DragAndDropItem(
-                child: length()[index] != i.date ? SizedBox() : Container(
-                      decoration: BoxDecoration(
-                          border: Border(bottom: BorderSide(color: Color(0xff999999), width: 0.5))
-                      ),
-                      alignment: Alignment.centerLeft,
-                      height: 50,
-                      width: size.width,
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: (){
-                              if (i.complete.value == 2) {
-                                i.complete.value = 0;
-                              } else {
-                                i.complete.value++;
-                              }
-                              print(i.complete.value);
-                            },
-                            child: Obx(() => Container(
-                              width: 25,
-                              height: 25,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage(
-                                      i.complete.value == 0 ? 'assets/images/void.png'
-                                          : i.complete.value == 1 ? 'assets/images/half.png'
-                                          : 'assets/images/full.png'
+            if(DateTime(i.date.year, i.date.month, i.date.day) == length()[index])
+              DragAndDropItem(
+                key: ValueKey(i.documentId),
+                  child: Container(
+                        decoration: BoxDecoration(
+                            border: Border(bottom: BorderSide(color: Color(0xff999999), width: 0.5))
+                        ),
+                        alignment: Alignment.centerLeft,
+                        height: 50,
+                        width: size.width,
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: (){
+                                if (i.complete.value == 2) {
+                                  i.complete.value = 0;
+                                } else {
+                                  i.complete.value++;
+                                }
+                                controller.todoListInfo.updateComplete(i.documentId, i.complete.value);
+                                print(i.complete.value);
+                              },
+                              child: Obx(() => Container(
+                                width: 25,
+                                height: 25,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AssetImage(
+                                        i.complete.value == 0 ? 'assets/images/void.png'
+                                            : i.complete.value == 1 ? 'assets/images/half.png'
+                                            : 'assets/images/full.png'
+                                    ),
+                                    fit: BoxFit.cover,
                                   ),
-                                  fit: BoxFit.cover,
                                 ),
                               ),
+                              ),
                             ),
-                            ),
-                          ),
-                          SizedBox(width: 10,),
-                          Text(i.content, style: TextStyle(fontSize: 16, color: subColor, fontWeight: FontWeight.w400),),
-                        ],
-                      )
-                  ),
-            ),
+                            SizedBox(width: 10,),
+                            Text(i.content, style: TextStyle(fontSize: 16, color: subColor, fontWeight: FontWeight.w400),),
+                          ],
+                        )
+                    ),
+              ),
           // DragAndDropItem(
           //   child: Padding(
           //       padding: EdgeInsets.only(left: 30),
@@ -119,9 +141,25 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
     });
 
 
-    _onItemReorder(int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
+    _onItemReorder(int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) async {
+      // print('-----------------');
       var movedItem = contents[oldListIndex].children.removeAt(oldItemIndex);
       contents[newListIndex].children.insert(newItemIndex, movedItem);
+      print('oldItemIndex : $oldItemIndex');
+      print('oldListIndex : $oldListIndex');
+      print('newItemIndex : $newItemIndex');
+      print('newListIndex : $newListIndex');
+      print(controller.todoListGroupDetail.value.todoList[newListIndex].content);
+      print(contents[newListIndex].children[newItemIndex].key);
+      final key = contents[newListIndex].children[newItemIndex].key;
+
+      if (key is ValueKey) {
+        String value = key.value;
+        await controller.todoListInfo.updateGroupInItemIndex(value, length()[newListIndex]);
+      } else {
+        print("The key is not a ValueKey.");
+      }
+      // await controller.todoListInfo.updateGroupInItemIndex(controller.todoListGroupDetail.value.todoList[newItemIndex], length()[newListIndex]);
       contents.refresh(); // 변경 사항을 즉시 반영
     }
 
@@ -137,7 +175,9 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
         centerTitle: false,
         leadingWidth: 20,
         leading: IconButton(
-          onPressed: () {
+          onPressed: () async {
+            await controller.init();
+
             controller.isDetail.value = false;
           },
           icon: Icon(Icons.arrow_back_ios, size: 15,),
