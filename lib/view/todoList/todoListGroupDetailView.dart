@@ -7,8 +7,8 @@ import 'package:mind_mile/view/todoList/todoListController.dart';
 import 'package:intl/intl.dart';
 
 class TodoListGroupDetailView extends GetView<TodoListController> {
-  Rx<TodoListGroup> group;
-  TodoListGroupDetailView(this.group, {super.key});
+  TodoListGroupDetailView({super.key});
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -49,33 +49,35 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
         print(temp);
         return temp;
       } else {
-        return [].obs;
+        return <DateTime>[].obs;
       }
     }
     // print(length());
+
     RxList<DragAndDropList> contents = <DragAndDropList>[].obs;
-    contents.value = List.generate(length().length, (index) {
+    contents.assignAll(RxList.generate(controller.length().length, (index) {
       return DragAndDropList(
         verticalAlignment: CrossAxisAlignment.start,
         canDrag: false,
         header: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${DateFormat.MMMMEEEEd('ko_KR').format(length()[index])}', style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w600),),
-            Divider(color: Color(0xff999999), thickness: 0.5,),
+            Text('${DateFormat.MMMMEEEEd('ko_KR').format(controller.length()[index])}', style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w600),),
+            const Divider(color: Color(0xff999999), thickness: 0.5,),
           ],
         ),
         children: [
           for(var i in controller.todoListGroupDetail.value.todoList) // 날짜 비교해서 삽입해야함.
-            if(DateTime(i.date.year, i.date.month, i.date.day) == length()[index])
+            if(DateTime(i.date.year, i.date.month, i.date.day) == controller.length()[index])
               DragAndDropItem(
-                key: ValueKey(i.documentId),
+                key: ValueKey('${i.documentId} ${controller.length()[index]}'),// + ' ' + DateTime.now().millisecondsSinceEpoch.toString()), //ValueKey(i.documentId),
                   child: Container(
                         decoration: BoxDecoration(
                             border: Border(bottom: BorderSide(color: Color(0xff999999), width: 0.5))
                         ),
                         alignment: Alignment.centerLeft,
-                        height: 50,
+                        // height: 50,
+                      padding: EdgeInsets.symmetric(vertical: 10),
                         width: size.width,
                         child: Row(
                           children: [
@@ -106,7 +108,20 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
                               ),
                             ),
                             SizedBox(width: 10,),
-                            Text(i.content, style: TextStyle(fontSize: 16, color: subColor, fontWeight: FontWeight.w400),),
+                            Container(
+                                width: size.width * 0.7,
+                                child: SingleChildScrollView(
+                                    child: Text(
+                                      i.content,
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          color: subColor,
+                                          fontWeight: FontWeight.w400,
+                                          decoration: i.complete.value == 2 ? TextDecoration.lineThrough : TextDecoration.none,
+                                      ),
+                                      maxLines: 5,)
+                                )
+                            ),
                           ],
                         )
                     ),
@@ -138,7 +153,7 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
           // )
         ],
       );
-    });
+    }));
 
 
     _onItemReorder(int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) async {
@@ -149,16 +164,20 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
       print('oldListIndex : $oldListIndex');
       print('newItemIndex : $newItemIndex');
       print('newListIndex : $newListIndex');
-      print(controller.todoListGroupDetail.value.todoList[newListIndex].content);
-      print(contents[newListIndex].children[newItemIndex].key);
-      final key = contents[newListIndex].children[newItemIndex].key;
 
-      if (key is ValueKey) {
-        String value = key.value;
-        await controller.todoListInfo.updateGroupInItemIndex(value, length()[newListIndex]);
-      } else {
-        print("The key is not a ValueKey.");
-      }
+      // print(controller.todoListGroupDetail.value.todoList[newListIndex].content);
+      // print(contents[newListIndex].children[newItemIndex].key);
+
+      // final key = contents[newListIndex].children[newItemIndex].key;
+
+      // if (key is ValueKey) {
+      //   String value = key.value;
+      //   value = value.split(' ')[0];
+      //   print(value);
+      //   await controller.todoListInfo.updateGroupInItemIndex(value, length()[newListIndex]);
+      // } else {
+      //   print("The key is not a ValueKey.");
+      // }
       // await controller.todoListInfo.updateGroupInItemIndex(controller.todoListGroupDetail.value.todoList[newItemIndex], length()[newListIndex]);
       contents.refresh(); // 변경 사항을 즉시 반영
     }
@@ -191,7 +210,7 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
           ],
         ),
       ),
-      body: controller.isEmpty.value ? Container() : Obx(() => DragAndDropLists(
+      body: Obx(() => DragAndDropLists(
         listDragHandle: DragHandle(child: Icon(Icons.drag_handle, size: 30, color: Color(0xffD9D9D9),)),
             itemDragHandle: DragHandle(child: Icon(Icons.drag_handle, size: 30, color: Color(0xffD9D9D9),)),
             children: contents,

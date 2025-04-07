@@ -8,6 +8,7 @@ class MyInfo{
   final int phqScore;
   final List<int> lastMood;
   final int randomGroup;
+  final String diaryName;
 
   MyInfo({
     required this.documentId,
@@ -19,6 +20,7 @@ class MyInfo{
     required this.phqScore,
     required this.lastMood,
     required this.randomGroup,
+    required this.diaryName,
   });
 
   factory MyInfo.fromMap(Map<String, dynamic> data) {
@@ -32,6 +34,7 @@ class MyInfo{
       phqScore: data['phqScore'],
       lastMood: data['lastMood'],
       randomGroup: data['randomGroup'],
+      diaryName: data['diaryName'],
     );
   }
 

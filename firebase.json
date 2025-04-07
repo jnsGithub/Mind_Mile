@@ -1,1 +1,30 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"mind-mile","appId":"1:540150120260:android:91869a181680013828e111","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"mind-mile","appId":"1:540150120260:ios:4c11a8d32d0333c828e111","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"mind-mile","configurations":{"android":"1:540150120260:android:91869a181680013828e111","ios":"1:540150120260:ios:4c11a8d32d0333c828e111"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "mind-mile",
+          "appId": "1:540150120260:android:91869a181680013828e111",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "mind-mile",
+          "appId": "1:540150120260:ios:4c11a8d32d0333c828e111",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "mind-mile",
+          "configurations": {
+            "android": "1:540150120260:android:91869a181680013828e111",
+            "ios": "1:540150120260:ios:4c11a8d32d0333c828e111"
+          }
+        }
+      }
+    }
+  }
+}

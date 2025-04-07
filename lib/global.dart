@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:mind_mile/main.dart';
 
 Color mainColor = const Color(0xffBFE0FB);
 Color subColor = const Color(0xff133C6B);
@@ -13,6 +14,7 @@ String? myName;
 String? uid;
 int groupValue = 0;
 int? wellness;
+List<String> textList = [];
 Map dailyWords = {
   'bad' : [
     '좋지 않은 하루.. 기록하고 날려버릴까?',
@@ -57,18 +59,29 @@ Map dailyWords = {
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 Future<void> setFcmToken() async {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-  await _db.collection('users').doc(uid).update({
-    'fcmToken': await FirebaseMessaging.instance.getToken() ?? '',
-  });
+  try{
+    final FirebaseFirestore _db = FirebaseFirestore.instance;
+    await _db.collection('users').doc(uid).update({
+      'fcmToken': await FirebaseMessaging.instance.getToken() ?? '',
+    });
+  } catch(e) {
+    print(e);
+  }
 }
 
 Future<void> getMyInfo() async {
   DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('users').doc(auth.FirebaseAuth.instance.currentUser!.uid).get();
   Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-  myName = data['name'];
+  myName = data['diaryName'];
   uid = auth.FirebaseAuth.instance.currentUser!.uid;
   groupValue = data['randomGroup'];
+  if(data['GAD7'] != null){
+    print('설문함');
+    isSurvey = true;
+  }else{
+    print('설문 안함');
+  }
+  await setFcmToken();
 }
 
 void saving(BuildContext context) async {

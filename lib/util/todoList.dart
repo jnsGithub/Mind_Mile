@@ -12,6 +12,7 @@ class TodoListInfo{
     try {
       QuerySnapshot snapshot = await db.collection('users').doc(uid).collection('Goals').orderBy('sequence', descending: false).get();
       QuerySnapshot snapshot2 = await db.collection('users').doc(uid).collection('TodoLists').get();
+      var a = await db.collection('users').doc(uid).collection('TodoLists').count().get();
       for (QueryDocumentSnapshot document in snapshot.docs) {
         Map<String, dynamic> data = document.data() as Map<String, dynamic>;
         data['documentId'] = document.id;
@@ -58,12 +59,18 @@ class TodoListInfo{
   // 그룹 만들기
   Future<void> setTodoListGroup(String content, int color, int sequence) async {
     try{
+      final snapshot = await db.collection('users').doc(uid).collection('Goals').get();
+      for(QueryDocumentSnapshot doc in snapshot.docs){
+        db.collection('users').doc(uid).collection('Goals').doc(doc.id).update({
+          'sequence': doc['sequence'] + 1,
+        });
+      }
       await db.collection('users').doc(uid).collection('Goals').doc().set({
         'content': content,
         'createAt': DateTime.now(),
         'date': DateTime.now(),
         'color': color,
-        'sequence': sequence,
+        'sequence': 0,
         'lasteditAt': DateTime.now(),
       });
     } catch(e){
@@ -124,7 +131,7 @@ class TodoListInfo{
         QuerySnapshot snapshot2 = await db.collection('users').doc(uid).collection('TodoLists').orderBy('date', descending: false).get();
         todoList.todayIndex = snapshot2.docs.length; // TODO: 이거 null로 해야되나?
         todoList.sequence = snapshot.docs.length;
-        await db.collection('users').doc(uid).collection('TodoLists').doc().set(todoList.toMap());
+        await db.collection('users').doc(uid).collection('TodoLists').doc(todoList.documentId).set(todoList.toMap());
       }
 
     } catch(e){
@@ -210,7 +217,7 @@ class TodoListInfo{
     try {
       for (int i = 0; i < list.length; i++) {
         await db.collection('users').doc(uid).collection('Goals').doc(list[i].documentId).update({
-          'sequence': i,
+          'sequence': list[i].sequence,
         });
       }
     } catch (e) {
@@ -292,6 +299,18 @@ class TodoListInfo{
           }
         }
       }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> updateTodoList(TodoLists todo) async {
+    try {
+      print(todo.documentId);
+      print(todo.content);
+      await db.collection('users').doc(uid).collection('TodoLists').doc(todo.documentId).update({
+        'content': todo.content,
+      });
     } catch (e) {
       print(e);
     }

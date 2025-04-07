@@ -144,7 +144,7 @@ class DiaryDetailView extends GetView<DiaryDetailController> {
                             color: Color(0xffEAF6FF),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Text(DateFormat.yMMMd('ko_KR').format(controller.recordsList[index].createAt), style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w600),)),
+                          child: Text('${DateFormat.yMMMd('ko_KR').format(controller.recordsList[index].createAt)} ${DateFormat.E('ko_KR').format(controller.recordsList[index].createAt)}요일', style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w600),)),
                     ],
                   ),
                   Container(

@@ -1,6 +1,4 @@
-import 'dart:ui';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
@@ -16,7 +14,7 @@ class TodoListView extends GetView<TodoListController> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    return Obx(() => controller.todoList.length == 0 && controller.isAdd.value == false
+    return Obx(() => controller.todoList.isEmpty && controller.isAdd.value == false
         ? Container(
       alignment: Alignment.center,
       height: 400,
@@ -55,19 +53,25 @@ class TodoListView extends GetView<TodoListController> {
         ],
       ),
     )
-        : Container(
+        : SizedBox(
       width: size.width,
       // height: 500,
       child: Obx(() => ReorderableListView.builder(
         shrinkWrap: true,
-        physics: ClampingScrollPhysics(),
+        physics: const ClampingScrollPhysics(),
         onReorder: (oldIndex, newIndex) {
           if (oldIndex < newIndex) {
             newIndex -= 1;
           }
-          print(1);
           final item = controller.todoList.removeAt(oldIndex);
+          final item2 = controller.todoListController.removeAt(oldIndex);
+          final item3 = controller.readOnlyList.removeAt(oldIndex);
+          final item4 = controller.focusNodeList.removeAt(oldIndex);
           controller.todoList.insert(newIndex, item);
+          controller.todoListController.insert(newIndex, item2);
+          controller.readOnlyList.insert(newIndex, item3);
+          controller.focusNodeList.insert(newIndex, item4);
+
           for(int i = 0 ; i < controller.todoList.length; i++){
             controller.todoList[i].todayIndex = i;
           }
@@ -82,19 +86,20 @@ class TodoListView extends GetView<TodoListController> {
             key: ValueKey(controller.todoList[index].content + controller.todoList[index].createAt.toString()),
             // controller: controller.slidableController,
             // enabled: false,
+
             endActionPane: ActionPane( // 오른쪽에서 왼쪽으로 드래그 시 액션 표시
               extentRatio: 0.3,
               motion: const StretchMotion(),
               children: [
                 CustomSlidableAction(
                   padding: EdgeInsets.zero,
-                  backgroundColor: Color(0xff56C75B),
+                  backgroundColor: const Color(0xff56C75B),
                   onPressed: (context) {
-                    updateAlarmDialog(context, controller.todoList[index].documentId);
+                    updateAlarmDialog(context, controller.todoList[index].documentId, controller.todoList[index]);
                   },
                   child: Container(
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
                           color: Color(0xffD9D9D9),
@@ -106,7 +111,7 @@ class TodoListView extends GetView<TodoListController> {
                     //   Icons.notifications,
                     //   color: Colors.white,
                     // ),
-                    child: ImageIcon(
+                    child: const ImageIcon(
                       AssetImage('assets/images/bell.png'),
                       color: Colors.white,
                       size: 24,
@@ -115,7 +120,7 @@ class TodoListView extends GetView<TodoListController> {
                 ),
                 CustomSlidableAction(
                   padding: EdgeInsets.zero,
-                  backgroundColor: Color(0xffE44C42),
+                  backgroundColor: const Color(0xffE44C42),
                   onPressed: (context) {
                     // 삭제 버튼 동작
 
@@ -125,7 +130,7 @@ class TodoListView extends GetView<TodoListController> {
                   },
                   child: Container(
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
                           color: Color(0xffD9D9D9),
@@ -137,7 +142,7 @@ class TodoListView extends GetView<TodoListController> {
                     //   Icons.delete,
                     //   color: Colors.white,
                     // ),
-                    child: ImageIcon(
+                    child: const ImageIcon(
                       AssetImage('assets/images/delete.png'),
                       color: Colors.white,
                       size: 24,
@@ -147,14 +152,15 @@ class TodoListView extends GetView<TodoListController> {
               ],
             ),
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: const Color(0xff999999),
+                    color: Color(0xff999999),
                   ),
                 ),
               ),
-              height: 60,
+              // height: 60,
+              padding: const EdgeInsets.symmetric(vertical: 10),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -191,14 +197,43 @@ class TodoListView extends GetView<TodoListController> {
                       const SizedBox(width: 10),
                       Container(
                         width: size.width * 0.6,
-                        child: Text(
-                          controller.todoList[index].content,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          maxLines: 2,
+                        child: Obx(() => TextField(
+                              // controller.todoList[index].content,
+                              controller: controller.todoListController[index],
+                              readOnly: controller.readOnlyList[index].value,
+                              focusNode: controller.focusNodeList[index],
+                              onTap: () {
+                                debugPrint('✅ on tap 실행됨!');
+                                for(int i = 0; i < controller.readOnlyList.length; i++){
+                                  controller.readOnlyList[i].value = true;
+                                }
+                                controller.readOnlyList[index].value = false;
+                                Future.delayed(const Duration(milliseconds: 100), () {
+                                  FocusScope.of(context).requestFocus(controller.focusNodeList[index]);
+                                });
+
+                                print(controller.readOnlyList);
+                              },
+                              onSubmitted: (value) {
+                                    print('✅ onSubmitted 실행됨!');
+                                    controller.todoList[index].content = value;
+                                    controller.updateTodo(controller.todoList[index]);
+                              },
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                              ),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w400,
+                                // TODO: 아래 주석만 해제 하면 됨. - 7번
+                                decoration: controller.todoList[index].complete.value == 2 ? TextDecoration.lineThrough : null,
+                              ),
+
+                              maxLines: null,
+                            ),
                         ),
                       ),
                       Container(
@@ -206,7 +241,7 @@ class TodoListView extends GetView<TodoListController> {
                       ),
                       ReorderableDragStartListener(
                         index: index,
-                        child: Icon(
+                        child: const Icon(
                           Icons.drag_handle,
                           color: Colors.grey,
                           size: 20,
@@ -233,19 +268,19 @@ class TodoListView extends GetView<TodoListController> {
                         // ),
                       ),
                       const SizedBox(width: 30),
-                      controller.todoList[index].alarmAt == null ? SizedBox() : Container(
+                      controller.todoList[index].alarmAt == null ? const SizedBox() : SizedBox(
                         width: size.width * 0.6,
                         child: Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.notifications,
                               color: Color(0xff68B64D),
                               size: 10,
                             ),
-                            SizedBox(width: 2),
+                            const SizedBox(width: 2),
                             Text(
                               '${controller.todoList[index].alarmAt!.hour < 12 ? 'AM' : 'PM'} ${controller.todoList[index].alarmAt!.hour < 10 ? '0' : ''}${controller.todoList[index].alarmAt!.hour}:${controller.todoList[index].alarmAt!.minute < 10 ? '0' : ''}${controller.todoList[index].alarmAt!.minute}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 7,
                                 color: Color(0xff68B64D),
                                 fontWeight: FontWeight.w500,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mind_mile/global.dart';
 import 'package:mind_mile/model/diaryDetail.dart';
 import 'package:mind_mile/model/records.dart';
 import 'package:mind_mile/util/recordsInfo.dart';
@@ -22,7 +23,7 @@ class DiaryDetailController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    init();
+    init(Get.arguments);
   }
 
   @override
@@ -30,10 +31,30 @@ class DiaryDetailController extends GetxController {
     super.onClose();
   }
 
-  init() async {
+  init(bool isPositive) async {
     await getRecords();
-    years.value = getRecordsMaxYear();
-    sortRecords();
+    if(isPositive){
+      print(textList);
+      recordsList.clear();
+      for(int i = 0; i < textList.length; i++){
+        recordsList.addAll(allRecordsList.where((element) => element.content.contains(textList[i])).toList().obs);
+      }
+      // recordsList.retainWhere((record) =>
+      // recordsList.indexWhere((e) => e.documentId == record.documentId) ==
+      //     recordsList.lastIndexWhere((e) => e.documentId == record.documentId));
+      for (int i = recordsList.length - 1; i >= 0; i--) {
+        for (int j = i - 1; j >= 0; j--) {
+          if (recordsList[i].documentId == recordsList[j].documentId) {
+            recordsList.removeAt(i);
+            break; // 중복이 있으면 한 번만 삭제
+          }
+        }
+      }
+      recordsList.sort((a, b) => b.createAt.compareTo(a.createAt));
+    }else{
+      years.value = getRecordsMaxYear();
+      sortRecords();
+    }
   }
 
 

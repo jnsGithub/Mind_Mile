@@ -36,8 +36,8 @@ class TodoListGroupView extends GetView<TodoListController> {
     void _onListReorder(int oldListIndex, int newListIndex) async {
       var movedList = controller.todoListGroup.removeAt(oldListIndex);
       controller.todoListGroup.insert(newListIndex, movedList);
-      for(int i = 0; i < controller.todoListGroup[newListIndex].todoList.length; i++){
-        controller.todoListGroup[newListIndex].sequence = i;
+      for(int i = 0; i < controller.todoListGroup.length; i++){
+        controller.todoListGroup[i].sequence = i;
       }
       await controller.todoListInfo.updateIndexGroup(controller.todoListGroup);
       await controller.init();
@@ -58,7 +58,7 @@ class TodoListGroupView extends GetView<TodoListController> {
                   : SlidablePanel(
                 controller: controller.slidableGroupControllers[index],
                 gestureDisabled: !controller.isGroupEdit.value,
-                key: ValueKey(controller.todoListGroup[index].content + controller.todoListGroup[index].createAt.toString()),
+                // key: ValueKey(controller.todoListGroup[index].content + controller.todoListGroup[index].createAt.toString()),
                 maxSlideThreshold: controller.todoListGroup[index].content == '릴렉스 루틴' || controller.todoListGroup[index].content == '목표 없는 리스트' ? 0.15 : 0.3,
                 onSlideStart: () async {
                   // print('수정중임? ${controller.isGroupEdit.value}');
@@ -66,6 +66,11 @@ class TodoListGroupView extends GetView<TodoListController> {
                   // Future.delayed(Duration(milliseconds: 1000), () {
                   //   print('슬라이드 닫힘? ${controller.slidableGroupControllers[index].dismissed}');
                   // });
+                  for(int i = 0; i < controller.slidableGroupControllers.length; i++){
+                    if(i != index){
+                      controller.slidableGroupControllers[i].dismiss();
+                    }
+                  }
                   Future.delayed(Duration(milliseconds: 500), () {
                     if(!controller.slidableGroupControllers[index].dismissed){
                       // print('닫힘');
@@ -121,7 +126,14 @@ class TodoListGroupView extends GetView<TodoListController> {
                     children: [
                       Icon(Icons.add_circle, size: 20, color: Color(controller.todoListGroup[index].color),),
                       SizedBox(width: 10,),
-                      Text('${controller.todoListGroup[index].content}', style: TextStyle(fontSize: 16, color: subColor, fontWeight: FontWeight.w500),),
+                      Text(
+                        '${controller.todoListGroup[index].content}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: subColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       !controller.isGroupEdit.value ? IconButton(
                         onPressed: (){
                           controller.selectedGroupId = controller.todoListGroup[index].documentId;
@@ -133,6 +145,7 @@ class TodoListGroupView extends GetView<TodoListController> {
                             controller.todoListGroupDetail.value = controller.todoListGroup[index];
                           }
                           controller.isDetail.value = !controller.isDetail.value;
+                          controller.length();
                         },
                         icon: Icon(Icons.arrow_forward_ios, size: 15, color: Color(0xff999999)), splashRadius: 10,) : SizedBox()
                     ],
@@ -142,60 +155,76 @@ class TodoListGroupView extends GetView<TodoListController> {
             ),
             children: [
               for(var i in controller.todoListGroup[index].todoList)
-                DragAndDropItem(
-                    child: Obx(() => controller.isGroupEdit.value ? SizedBox() : Padding(
-                        padding: EdgeInsets.only(left: 30),
-                        child: Container(
-                            decoration: BoxDecoration(
-                                border: Border(bottom: BorderSide(color: Color(0xff999999), width: 0.5))
-                            ),
-                            alignment: Alignment.centerLeft,
-                            height: 50,
-                            width: size.width,
-                            child: Row(
-                              children: [
-                                GestureDetector(
-                                  onTap: (){
-                                    if (i.complete.value == 2) {
-                                      i.complete.value = 0;
-                                    } else {
-                                      i.complete.value++;
-                                    }
-                                    controller.updateComplete(i);
-                                    // print(i.complete.value);
-                                  },
-                                  child: Obx(() => Container(
-                                    width: 25,
-                                    height: 25,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: AssetImage(
-                                            i.complete.value == 0 ? 'assets/images/void.png'
-                                                : i.complete.value == 1 ? 'assets/images/half.png'
-                                                : 'assets/images/full.png'
+                // TODO : 아래 주석만 해제 하면 됨. - 1번
+                if(i.date.year == controller.selectedDate.value.year && i.date.month == controller.selectedDate.value.month && i.date.day == controller.selectedDate.value.day)
+                  DragAndDropItem(
+                      child: Obx(() => controller.isGroupEdit.value ? const SizedBox() : Padding(
+                          padding: const EdgeInsets.only(left: 30),
+                          child: Container(
+                              decoration: const BoxDecoration(
+                                  border: Border(bottom: BorderSide(color: Color(0xff999999), width: 0.5))
+                              ),
+                              alignment: Alignment.centerLeft,
+                              height: 50,
+                              width: size.width,
+                              child: Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: (){
+                                      if (i.complete.value == 2) {
+                                        i.complete.value = 0;
+                                      } else {
+                                        i.complete.value++;
+                                      }
+                                      controller.updateComplete(i);
+                                      // print(i.complete.value);
+                                    },
+                                    child: Obx(() => Container(
+                                      width: 25,
+                                      height: 25,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: AssetImage(
+                                              i.complete.value == 0 ? 'assets/images/void.png'
+                                                  : i.complete.value == 1 ? 'assets/images/half.png'
+                                                  : 'assets/images/full.png'
+                                          ),
+                                          fit: BoxFit.cover,
                                         ),
-                                        fit: BoxFit.cover,
                                       ),
                                     ),
+                                    ),
                                   ),
+                                  SizedBox(width: 10,),
+                                  Container(
+                                      width: size.width * 0.65,
+                                      child: SingleChildScrollView(
+                                          child: Text(
+                                            i.content,
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: subColor,
+                                                fontWeight: FontWeight.w400,
+                                              decoration: i.complete.value == 2 ? TextDecoration.lineThrough : null,
+                                            ),
+                                            maxLines: 5,
+                                          )
+                                      )
                                   ),
-                                ),
-                                SizedBox(width: 10,),
-                                Text(i.content, style: TextStyle(fontSize: 16, color: subColor, fontWeight: FontWeight.w400),),
-                              ],
-                            )
-                        )
-                    ),
-                    )
-                ),
+                                ],
+                              )
+                          )
+                      ),
+                      )
+                  ),
             ],
           );
         });
 
-        return Obx(() => Container(
+        return Obx(() => SizedBox(
             width: size.width,
             height: 500,
-            child: controller.isDetail.value ? TodoListGroupDetailView(controller.todoListGroupDetail)
+            child: controller.isDetail.value ? TodoListGroupDetailView()
                 : DragAndDropLists(
               onListDraggingChanged: (isDragging, bool) {
 

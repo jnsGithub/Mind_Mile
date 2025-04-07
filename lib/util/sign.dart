@@ -34,6 +34,9 @@ class Sign{
     } catch (e) {
       print(e);
       Get.back();
+      if(e.toString().contains('email-already-in-use') && !Get.isSnackbarOpen){
+        Get.snackbar('이미 사용중인 이메일입니다.', '다른 이메일을 사용해주세요.');
+      }
       return false;
     }
   }

@@ -22,6 +22,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
 bool isLogin = false;
+bool isSurvey = false;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,7 +59,9 @@ void main() async {
       }
       else{
         wellness = prefs.getInt('wellness');
-        print('예측값 있음 ${wellness}');
+        textList = prefs.getStringList('wordList') ?? [];
+        print('예측값 wellness ${wellness}');
+        print('예측값 textList ${textList}');
       }
     } else{
       print('그룹값 1 아님');
@@ -68,7 +71,6 @@ void main() async {
   else{
     isLogin = false;
   }
-  print(uid);
   runApp(const MyApp());
 }
 
@@ -95,7 +97,7 @@ class MyApp extends StatelessWidget {
               ), elevation:0
           )
       ),
-      initialRoute: isLogin ? '/todoListView' : '/loginView',
+      initialRoute: isLogin ? !isSurvey ? '/surveyView' : '/todoListView' : '/loginView',
       getPages: [
         GetPage(name: '/loginView', page: () => const LoginView(),),
         GetPage(name: '/signUpView', page: () => const SignUpView(),),

@@ -62,6 +62,9 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
 
   // TodoList 받아오기
   RxList<TodoLists> todoList = <TodoLists>[].obs;
+  RxList<RxBool> readOnlyList = <RxBool>[].obs;
+  List<TextEditingController> todoListController = <TextEditingController>[].obs;
+  List<FocusNode> focusNodeList = <FocusNode>[].obs;
 
   // 오늘 하루 기록
   RecordsInfo recordsInfo = RecordsInfo();
@@ -98,7 +101,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
     await getTodoList();
     await getTodoListGroup();
     await getRecords();
-    setIsVisible();
+    await setIsVisible();
   }
 
   getRecords() async {
@@ -110,15 +113,28 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
     init();
   }
 
+
   // 할일 CRUD
   getTodoList() async {
     todoList.value = await todoListInfo.getTodayTodoList(selectedDate.value);
+    readOnlyList.clear();
+    todoListController.clear();
+    focusNodeList.clear();
+    for(int i = 0; i < todoList.length; i++){
+      readOnlyList.add(true.obs);
+      todoListController.add(TextEditingController(text: todoList[i].content));
+      focusNodeList.add(FocusNode());
+    }
   }
   setTodoList() async {
 
   }
   updateTodoList() async{
     await todoListInfo.updateIndex(todoList);
+  }
+  updateTodo(TodoLists todo) async {
+    await todoListInfo.updateTodoList(todo);
+    await init();
   }
 
   // 그룹 CRUD
@@ -186,10 +202,10 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
     if (_isAutoScrolling) return;
 
     _isAutoScrolling = true;
-    _autoScrollTimer = Timer.periodic(Duration(milliseconds: 50), (timer) {
+    _autoScrollTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
       scrollController.animateTo(
         scrollController.position.pixels + direction,
-        duration: Duration(milliseconds: 50),
+        duration: const Duration(milliseconds: 50),
         curve: Curves.linear,
       );
     });
@@ -207,7 +223,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
         scrollController
             .animateTo(
           offset2.dy,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
           curve: Curves.easeInOut,
         )
             .then((_) => isScrolling = false);
@@ -216,7 +232,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
         scrollController
             .animateTo(
           offset2.dy - scrollController.position.maxScrollExtent,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
           curve: Curves.easeInOut,
         );
       }
@@ -225,7 +241,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
       scrollController
           .animateTo(
         scrollController.position.minScrollExtent,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
         curve: Curves.easeInOut,
       );
     }
@@ -234,7 +250,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
   void scrollBottom() {
     scrollController.animateTo(
       scrollController.position.maxScrollExtent,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
     );
   }
@@ -262,27 +278,27 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
               FocusScope.of(context).unfocus();
             },
             child: AlertDialog(
-              insetPadding: EdgeInsets.symmetric(horizontal: 20),
+              insetPadding: const EdgeInsets.symmetric(horizontal: 20),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20)
               ),
-              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               titlePadding: EdgeInsets.zero,
-              backgroundColor: Color(0xffEAF6FF),
+              backgroundColor: const Color(0xffEAF6FF),
               title: Container(
                   alignment: Alignment.topRight,
                   child: IconButton(
                       onPressed: (){
                         Get.back();
                       },
-                      icon: Icon(Icons.close, color: Color(0xff133C6B),
+                      icon: const Icon(Icons.close, color: Color(0xff133C6B),
                       )
                   )
               ),
               content: SingleChildScrollView(
                 child: Container(
                   alignment: Alignment.center,
-                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   width: size.width * 0.9,
                   height: isGroup1 ? 400 : 480,
                   decoration: BoxDecoration(
@@ -291,7 +307,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                   child: Column(
                     children: [
                       Text(isGroup1 ? '듀디가 어제 하루가 어땠을지 생각해 봤어.\n이렇게 기록해도 괜찮을지 한번 확인해 줘!' : '오늘 하루는 어땠어?', style: TextStyle(fontSize: isGroup1 ? 13 : 15, color: subColor, fontWeight: FontWeight.w600),),
-                      SizedBox(height: 20,),
+                      const SizedBox(height: 20,),
                       Container(
                         width: size.width,
                         height: isGroup1 ? 136 : 97,
@@ -303,7 +319,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text('오늘 하루의 점수를 매겨봐 !', style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w500),),
-                              SizedBox(height: 10,),
+                              const SizedBox(height: 10,),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -317,19 +333,19 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                                   a('assets/images/score/unselectHappy.png',  'assets/images/score/selectHappy.png', selectIndex, selectList[6], size.width*0.1154, 45),
                                 ]
                               ),
-                              isGroup1 ? Icon(Icons.info_outline, color: subColor, size: 10,) : SizedBox(),
+                              isGroup1 ? Icon(Icons.info_outline, color: subColor, size: 10,) : const SizedBox(),
                               SizedBox(height: isGroup1 ? 5 : 0,),
-                              isGroup1 ? Text('듀디가 예측해서 임의로 기록한 점수에요.\n실제 어제 하루와 다르다면 수정해 주세요.',
+                              isGroup1 ? const Text('듀디가 예측해서 임의로 기록한 점수에요.\n실제 어제 하루와 다르다면 수정해 주세요.',
                                 style: TextStyle(
                                   fontSize: 9, color: Color(0xff6F6F6F), fontWeight: FontWeight.w500
-                                ),) : SizedBox(),
+                                ),) : const SizedBox(),
                             ],
                           ),
                         ),
                       ),
-                      SizedBox(height: 20,),
+                      const SizedBox(height: 20,),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         width: size.width,
                         height: isGroup1 ? 140 : 270,
                         decoration: BoxDecoration(
@@ -339,7 +355,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            SizedBox(height: 10,),
+                            const SizedBox(height: 10,),
                             Text('오늘의 일기 쓰기', style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500),),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,7 +371,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                                   child: TextField(
                                     controller: titleController,
                                     style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500),
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                       contentPadding: EdgeInsets.only(left: 5),
                                       hintText: '제목은 한줄 일기가 돼 !',
                                       hintStyle: TextStyle(fontSize: 12, color: Color(0xffD9D9D9), fontWeight: FontWeight.w500),
@@ -365,14 +381,14 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                                 ),
                               ],
                             ),
-                            Container(
+                            SizedBox(
                               height: 60,
                               width: size.width,
                               child: TextField(
                                 controller: contentController,
                                 maxLines: 20,
                                 style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w500),
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   contentPadding: EdgeInsets.zero,
                                   hintText: '일기쓰기...',
                                   hintStyle: TextStyle(fontSize: 12, color: Color(0xffD9D9D9), fontWeight: FontWeight.w500),
@@ -413,12 +429,12 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                           prefs.setInt('lastRecordDate', int.parse(DateFormat('yyyyMMdd').format(DateTime.now())));
                           RecordsInfo recordsInfo = RecordsInfo();
                           saving(context);
-                          await recordsInfo.setRecords(selectIndex.value, moodSort, titleController.text, contentController.text, false);
+                          await recordsInfo.setRecords(selectIndex.value, moodSort, titleController.text, contentController.text, groupValue == 1);
                           await init();
                           Get.back();
                           Get.back();
                           },
-                          child: Text('저장', style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w500),)
+                          child: const Text('저장', style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w500),)
                       )
                     ],
                   ),
@@ -480,5 +496,43 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
       1,
     );
     update();
+  }
+
+
+  RxList<dynamic> length() {
+    if (todoListGroupDetail.value.todoList.isNotEmpty) {
+      RxList<DateTime> temp = [
+        DateTime(todoListGroupDetail.value.todoList[0].date.year,
+            todoListGroupDetail.value.todoList[0].date.month,
+            todoListGroupDetail.value.todoList[0].date.day)
+      ].obs;
+
+      for (int i = 1; i < todoListGroupDetail.value.todoList.length; i++) {
+        bool isDuplicate = false;
+        // 현재 todoList의 날짜와 temp의 날짜를 비교
+        for (int j = 0; j < temp.length; j++) {
+          if (todoListGroupDetail.value.todoList[i].date.year == temp[j].year &&
+              todoListGroupDetail.value.todoList[i].date.month == temp[j].month &&
+              todoListGroupDetail.value.todoList[i].date.day == temp[j].day) {
+            isDuplicate = true; // 중복된 날짜를 발견
+            break; // 중복된 날짜가 있으므로 더 이상 비교할 필요 없음
+          }
+        }
+
+        // 중복되지 않으면 temp에 추가
+        if (!isDuplicate) {
+          temp.add(DateTime(
+            todoListGroupDetail.value.todoList[i].date.year,
+            todoListGroupDetail.value.todoList[i].date.month,
+            todoListGroupDetail.value.todoList[i].date.day,
+          ));
+        }
+      }
+
+      print(temp);
+      return temp;
+    } else {
+      return <DateTime>[].obs;
+    }
   }
 }

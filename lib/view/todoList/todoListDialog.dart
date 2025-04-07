@@ -18,11 +18,11 @@ deleteTodoListDialog(BuildContext context) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-          backgroundColor: Color(0xffEAF6FF),
+          backgroundColor: const Color(0xffEAF6FF),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          contentPadding: EdgeInsets.only(top: 20),
+          contentPadding: const EdgeInsets.only(top: 20),
           content: Container(
             alignment: Alignment.center,
             width: size.width * 0.7795,
@@ -31,32 +31,32 @@ deleteTodoListDialog(BuildContext context) {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('할일을 삭제 하시겠습니까?', style: TextStyle(fontSize: 15, color: subColor, fontWeight: FontWeight.w500),),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     TextButton(
                       style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all(Color(0xffD9D9D9)),
+                        backgroundColor: WidgetStateProperty.all(const Color(0xffD9D9D9)),
                         shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-                        minimumSize: WidgetStateProperty.all(Size(70, 15)),
+                        minimumSize: WidgetStateProperty.all(const Size(70, 15)),
                       ),
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text('아니오', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),),
+                      child: const Text('아니오', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),),
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     TextButton(
                       style: ButtonStyle(
                         backgroundColor: WidgetStateProperty.all(subColor),
                         shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-                        minimumSize: WidgetStateProperty.all(Size(70, 15)),
+                        minimumSize: WidgetStateProperty.all(const Size(70, 15)),
                       ),
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text('네', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),),
+                      child: const Text('네', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),),
                     ),
                   ],
                 )
@@ -68,27 +68,29 @@ deleteTodoListDialog(BuildContext context) {
   );
 }
 
-updateAlarmDialog(BuildContext context, String docId){
+updateAlarmDialog(BuildContext context, String docId, TodoLists todoList){
   showDialog(context: context, builder: (BuildContext context) {
-    TextEditingController hourController = TextEditingController();
-    TextEditingController minController = TextEditingController();
-    RxBool isSwitch = true.obs;
+    RxBool isSwitch = todoList.alarmTrue.obs;
+
+    TextEditingController hourController = TextEditingController(text: isSwitch.value ? (todoList.alarmAt!.hour).toString() : '-');
+    TextEditingController minController = TextEditingController(text: isSwitch.value ? (todoList.alarmAt!.minute).toString() : '-');
+    RxBool isAfterNoon = todoList.alarmTrue ? todoList.alarmAt!.hour > 12 ? true.obs : false.obs : false.obs;
     return AlertDialog(
-      backgroundColor: Color(0xffEAF6FF),
+      backgroundColor: const Color(0xffEAF6FF),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
 
       titlePadding: EdgeInsets.zero,
-      contentPadding: EdgeInsets.symmetric(horizontal: 20),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
       title: Container(alignment: Alignment.topRight,child: IconButton(onPressed: (){Get.back();}, icon: Icon(Icons.close, color: subColor, size: 20))),
-      content: Container(
+      content: SizedBox(
         width: 336,
-        height: 200,
+        height: 220,
         child: Column(
           children: [
-            Text('시간 설정'),
-            SizedBox(height: 20),
+            const Text('시간 설정'),
+            const SizedBox(height: 20),
             Container(
               width: 299,
               height: 79,
@@ -99,18 +101,31 @@ updateAlarmDialog(BuildContext context, String docId){
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
+                  Obx(() => GestureDetector(
+                      onTap: (){
+                        isAfterNoon.value = !isAfterNoon.value;
+                      },
+                      child: Text(isAfterNoon.value ? '오후' : '오전',
+                        style: TextStyle(fontSize: 20, color: subColor, fontWeight: FontWeight.w700),
+                      )
+                  )),
+                  const SizedBox(width: 10,),
+                  SizedBox(
                     width: 50,
                     child: TextField(
                       onChanged: (value) {
                         try{
+                          if(!value.isNumericOnly){
+                            value = '0';
+                            hourController.text = value;
+                          }
                           if (value.length > 2) {
                             // 최대 글자 수를 넘으면 마지막 입력을 제거
                             value = value.substring(1, 2);
                             hourController.text = value;
                           }
-                          if(int.parse(value) > 24){
-                            value = '24';
+                          if(int.parse(value) > 12){
+                            value = '12';
                             hourController.text = value;
                           }
                         } catch(e){
@@ -119,10 +134,10 @@ updateAlarmDialog(BuildContext context, String docId){
                       },
                       style: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
                       controller: hourController,
-                      keyboardType: TextInputType.number,
+                      // keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.only(left: 10),
+                        contentPadding: const EdgeInsets.only(left: 10),
                         hintText: '00',
                         hintStyle: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
                       ),
@@ -145,10 +160,14 @@ updateAlarmDialog(BuildContext context, String docId){
                     ),
                   ),
                   Text(':', style: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),),
-                  Container(
+                  SizedBox(
                     width: 50,
                     child: TextField(
                       onChanged: (value) {
+                        if(!value.isNumericOnly){
+                          value = '0';
+                          minController.text = value;
+                        }
                         try{
                           if (value.length > 2) {
                             // 최대 글자 수를 넘으면 마지막 입력을 제거
@@ -165,41 +184,41 @@ updateAlarmDialog(BuildContext context, String docId){
                       },
                       style: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
                       controller: minController,
-                      keyboardType: TextInputType.number,
+                      // keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.only(left: 10),
+                        contentPadding: const EdgeInsets.only(left: 10),
                         hintText: '00',
                         hintStyle: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
                       ),
-                      onSubmitted: (value) async {
-                        try{
-                          if(hourController.text == ''){
-                            hourController.text = '0';
-                          }
-                          if(minController.text == ''){
-                            minController.text = '0';
-                          }
-                          var controller = Get.find<TodoListController>();
-                          await controller.todoListInfo.updateTodoListAlarm(docId, isSwitch.value, int.parse(hourController.text), int.parse(minController.text));
-                          await controller.init();
-                          Get.back();
-                        } catch(e){
-                          print(e);
-                        }
-                      },
+                      // onSubmitted: (value) async {
+                      //   try{
+                      //     if(hourController.text == ''){
+                      //       hourController.text = '0';
+                      //     }
+                      //     if(minController.text == ''){
+                      //       minController.text = '0';
+                      //     }
+                      //     var controller = Get.find<TodoListController>();
+                      //     await controller.todoListInfo.updateTodoListAlarm(docId, isSwitch.value, int.parse(hourController.text), int.parse(minController.text));
+                      //     await controller.init();
+                      //     Get.back();
+                      //   } catch(e){
+                      //     print(e);
+                      //   }
+                      // },
                     ),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text('PUSH 알람 설정',style: TextStyle(fontSize:10,  color: subColor, fontWeight: FontWeight.w600)),
-                SizedBox(width: 10),
-                Obx(() => Container(
+                const SizedBox(width: 10),
+                Obx(() => SizedBox(
                   height: 20,
                   width: 20,
                   child: Transform.scale(
@@ -208,6 +227,13 @@ updateAlarmDialog(BuildContext context, String docId){
                       value: isSwitch.value,
                       onChanged: (value) {
                         isSwitch.value = value;
+                        if(!isSwitch.value){
+                          hourController.text = '-';
+                          minController.text = '-';
+                        }else{
+                          hourController.text = '00';
+                          minController.text = '00';
+                        }
                         print(isSwitch.value);
                       },
                       activeColor: subColor,
@@ -217,6 +243,63 @@ updateAlarmDialog(BuildContext context, String docId){
                 ),
               ],
             ),
+            const SizedBox(height: 5,),
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: subColor,
+                  maximumSize: const Size(67, 27),
+                  minimumSize: const Size(67, 27),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                onPressed: () async {
+                  try{
+                    int? hour = 0;
+                    int? min = 0;
+
+                    if(!isSwitch.value){
+                      hourController.text = '00';
+                      minController.text = '00';
+                    }
+
+                    if(hourController.text != '' && minController.text != ''){
+                      hour = int.parse(hourController.text);
+                      min = int.parse(minController.text);
+                    }
+                    else{
+                      if(hourController.text == ''){
+                        hour = 0;
+                      }
+                      if(minController.text == ''){
+                        min = 0;
+                      }
+                    }
+                    if(isAfterNoon.value){
+                      if(hour == 12){
+                        hour = 12;
+                      }
+                      else{
+                        hour = hour + 12;
+                      }
+                    }
+                    else{
+                      if(hour == 12){
+                        hour = 0;
+                      }
+                    }
+                    print(isAfterNoon.value);
+                    print(hour);
+                    var controller = Get.find<TodoListController>();
+                    await controller.todoListInfo.updateTodoListAlarm(docId, isSwitch.value, hour, min);
+                    await controller.init();
+                    Get.back();
+                  } catch(e){
+                    print(e);
+                  }
+                },
+                child: const Text('저장', style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w500),)
+            )
           ],
         ),
       ),
@@ -231,11 +314,11 @@ deleteTodoListGroupDialog(BuildContext context, TodoListGroup group, int index) 
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-          backgroundColor: Color(0xffEAF6FF),
+          backgroundColor: const Color(0xffEAF6FF),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          contentPadding: EdgeInsets.only(top: 20),
+          contentPadding: const EdgeInsets.only(top: 20),
           content: Container(
             alignment: Alignment.center,
             width: size.width * 0.7795,
@@ -244,27 +327,27 @@ deleteTodoListGroupDialog(BuildContext context, TodoListGroup group, int index) 
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('그룹을 삭제 하시겠습니까?', style: TextStyle(fontSize: 15, color: subColor, fontWeight: FontWeight.w500),),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     TextButton(
                       style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all(Color(0xffD9D9D9)),
+                        backgroundColor: WidgetStateProperty.all(const Color(0xffD9D9D9)),
                         shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-                        minimumSize: WidgetStateProperty.all(Size(70, 15)),
+                        minimumSize: WidgetStateProperty.all(const Size(70, 15)),
                       ),
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text('아니오', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),),
+                      child: const Text('아니오', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),),
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     TextButton(
                       style: ButtonStyle(
                         backgroundColor: WidgetStateProperty.all(subColor),
                         shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-                        minimumSize: WidgetStateProperty.all(Size(70, 15)),
+                        minimumSize: WidgetStateProperty.all(const Size(70, 15)),
                       ),
                       onPressed: () async {
                         saving(context);
@@ -277,7 +360,7 @@ deleteTodoListGroupDialog(BuildContext context, TodoListGroup group, int index) 
                         Get.back();
                         Get.back();
                       },
-                      child: Text('네', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),),
+                      child: const Text('네', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),),
                     ),
                   ],
                 )
@@ -294,21 +377,21 @@ addTodoListGroup(BuildContext context, bool isEdit, {String? title, TodoListGrou
   int color = 0;
   RxInt selectedColor = 15.obs;
   List<Color> colorList = [
-    Color(0xffEC1712),Color(0xffFF661F),Color(0xffFFC12C),Color(0xff047E43),
-    Color(0xff68B64D),Color(0xff133C6B),Color(0xff32A8EB),Color(0xff684DB6),
-    Color(0xffFEBBC5),Color(0xffFCE2A8),Color(0xffBACD9D),Color(0xff5F8697),
-    Color(0xffA59E90),Color(0xffCBCBE7),Color(0xff999999),Colors.transparent];
+    const Color(0xffEC1712),const Color(0xffFF661F),const Color(0xffFFC12C),const Color(0xff047E43),
+    const Color(0xff68B64D),const Color(0xff133C6B),const Color(0xff32A8EB),const Color(0xff684DB6),
+    const Color(0xffFEBBC5),const Color(0xffFCE2A8),const Color(0xffBACD9D),const Color(0xff5F8697),
+    const Color(0xffA59E90),const Color(0xffCBCBE7),const Color(0xff999999),Colors.transparent];
   TextEditingController titleController = TextEditingController();
   showDialog(
       context: context,
       builder: (context){
         return AlertDialog(
-          backgroundColor: Color(0xffEAF6FF),
+          backgroundColor: const Color(0xffEAF6FF),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
           titlePadding: EdgeInsets.zero,
-          contentPadding: EdgeInsets.symmetric(horizontal: 20),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           title: Container(
             alignment: Alignment.topRight,
             child: IconButton(
@@ -318,13 +401,13 @@ addTodoListGroup(BuildContext context, bool isEdit, {String? title, TodoListGrou
               icon: Icon(Icons.close, color: subColor, size: 20),
             ),
           ),
-          content: Container(
+          content: SizedBox(
             width: size.width,
             height: 270,
             child: Column(
               children: [
                 Text('목표 추가/수정', style: TextStyle(fontSize: 15, color: subColor, fontWeight: FontWeight.w500),),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Container(
                   width: size.width,
                   height: 53,
@@ -337,7 +420,7 @@ addTodoListGroup(BuildContext context, bool isEdit, {String? title, TodoListGrou
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text('목표 이름', style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w500)),
-                      Container(
+                      SizedBox(
                         width: size.width / 2,
                         height: 30,
                         child: TextField(
@@ -355,9 +438,9 @@ addTodoListGroup(BuildContext context, bool isEdit, {String? title, TodoListGrou
                     ],
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 19),
+                  padding: const EdgeInsets.symmetric(horizontal: 19),
                   height: 103,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -366,15 +449,15 @@ addTodoListGroup(BuildContext context, bool isEdit, {String? title, TodoListGrou
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text('그룹 색상', style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w500)),
-                      SizedBox(height: 10),
-                      Container(
+                      const SizedBox(height: 10),
+                      SizedBox(
                           width: size.width,
                           height: 70,
                           child: GridView.builder(
                               itemCount: colorList.length,
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 8,
                                 crossAxisSpacing: 10,
                                 mainAxisSpacing: 10,
@@ -407,7 +490,7 @@ addTodoListGroup(BuildContext context, bool isEdit, {String? title, TodoListGrou
                     style: ButtonStyle(
                       backgroundColor: WidgetStateProperty.all(subColor),
                       shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-                      minimumSize: WidgetStateProperty.all(Size(52, 21)),
+                      minimumSize: WidgetStateProperty.all(const Size(52, 21)),
                     ),
                     onPressed: () async {
                       saving(context);
@@ -428,7 +511,7 @@ addTodoListGroup(BuildContext context, bool isEdit, {String? title, TodoListGrou
                       Get.back();
                       Get.back();
                     },
-                    child: Text('확인')
+                    child: const Text('확인')
                 )
               ],
             ),
@@ -443,14 +526,14 @@ deleteItemDialog(BuildContext context, RxList<TodoLists> todoList, int index, St
       context: context,
       builder: (context) {
         return AlertDialog(
-            backgroundColor: Color(0xffEAF6FF),
+            backgroundColor: const Color(0xffEAF6FF),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
             titlePadding: EdgeInsets.zero,
-            contentPadding: EdgeInsets.symmetric(horizontal: 20),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
             content: Container(
-              padding: EdgeInsets.only(top: 20),
+              padding: const EdgeInsets.only(top: 20),
               width: size.width,
               height: 94,
               child: Column(
@@ -463,30 +546,32 @@ deleteItemDialog(BuildContext context, RxList<TodoLists> todoList, int index, St
                       children: [
                         TextButton(
                           style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all(Color(0xffD9D9D9)),
+                            backgroundColor: WidgetStateProperty.all(const Color(0xffD9D9D9)),
                             shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-                            minimumSize: WidgetStateProperty.all(Size(52, 21)),
+                            minimumSize: WidgetStateProperty.all(const Size(52, 21)),
                           ),
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          child: Text('아니오', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500),),
+                          child: const Text('아니오', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500),),
                         ),
-                        SizedBox(width: 30),
+                        const SizedBox(width: 30),
                         TextButton(
                           style: ButtonStyle(
                             backgroundColor: WidgetStateProperty.all(subColor),
                             shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-                            minimumSize: WidgetStateProperty.all(Size(52, 21)),
+                            minimumSize: WidgetStateProperty.all(const Size(52, 21)),
                           ),
                           onPressed: () async {
+                            saving(context);
                             TodoLists todoLists = todoList[index];
                             todoList.removeAt(index);
                             await TodoListInfo().deleteTodoLists(todoLists.documentId, todoList, todoLists.GroupId);
                             Get.find<TodoListController>().init();
-                            Navigator.pop(context);
+                            Get.back();
+                            Get.back();
                           },
-                          child: Text('네', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500),),
+                          child: const Text('네', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500),),
                         ),
                       ],
                     ),
@@ -502,24 +587,27 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
   Size size = MediaQuery.of(context).size;
   RxBool isCalendar = false.obs;
   RxBool isAlarm = false.obs;
-  TextEditingController hourController = TextEditingController();
-  TextEditingController minController = TextEditingController();
-  RxBool isSwitch = true.obs;
+  TextEditingController contentController = TextEditingController();
+  TextEditingController hourController = TextEditingController(text: '-');
+  TextEditingController minController = TextEditingController(text: '-');
+  RxBool isSwitch = false.obs;
   Rx<DateTime> selectedDate = DateTime.now().obs;
+  Rx<DateTime> focusedDay = DateTime.now().obs;
+  RxBool isAfterNoon = false.obs;
   showDialog(
       context: context,
       builder: (context){
         return Obx(() => AlertDialog(
           alignment: Alignment.bottomCenter,
             contentPadding: EdgeInsets.zero,
-            titlePadding: isCalendar.value ? EdgeInsets.symmetric(horizontal: 20) : EdgeInsets.zero,
+            titlePadding: isCalendar.value ? const EdgeInsets.symmetric(horizontal: 20) : EdgeInsets.zero,
             elevation: 0,
             backgroundColor: Colors.transparent,
             title: isCalendar.value ? Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               width: 260,
               height: 260,
-              margin: EdgeInsets.only(bottom: 17),
+              margin: const EdgeInsets.only(bottom: 17),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
@@ -528,7 +616,7 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 1,
                     blurRadius: 5,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -548,7 +636,7 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                         },
                         firstDay: DateTime.utc(2021, 1, 1),
                         lastDay: DateTime.utc(2030, 12, 31),
-                        focusedDay: selectedDate.value,
+                        focusedDay: focusedDay.value,
                         calendarFormat: CalendarFormat.month,
                           headerStyle: HeaderStyle(
                             formatButtonVisible: false, // 포맷 버튼 숨기기
@@ -557,11 +645,11 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                             titleTextFormatter: (date, locale) =>
                                 DateFormat.yMMMM(locale).format(date),
                           ),
-                        daysOfWeekStyle: DaysOfWeekStyle(
+                        daysOfWeekStyle: const DaysOfWeekStyle(
                           weekdayStyle: TextStyle(fontSize: 13, color: Color(0xffDADADA)),
                           weekendStyle: TextStyle(fontSize: 13, color: Color(0xffDADADA)),
                         ),
-                        calendarStyle: CalendarStyle(
+                        calendarStyle: const CalendarStyle(
                           cellMargin: EdgeInsets.zero,
                           outsideDaysVisible: false,
                           defaultTextStyle: TextStyle(fontSize: 13,),
@@ -592,6 +680,18 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                                       IconButton(
                                         icon: const Icon(Icons.chevron_left, size: 20,),
                                         onPressed: () {
+                                          int month = focusedDay.value.month - 1;
+                                          if(DateTime.now().month > month && DateTime.now().year == focusedDay.value.year) {
+                                            if(!Get.isSnackbarOpen){
+                                              // Get.snackbar('알림', '이전달에는 예약을 할 수 없습니다.');
+                                            }
+                                            return;
+                                          }
+                                          focusedDay.value = DateTime(
+                                            focusedDay.value.year,
+                                            month,
+                                            DateTime.now().month == focusedDay.value.month - 1 ? DateTime.now().day : 1,
+                                          );
                                           // previousMonth();
                                           // controller.update();
                                         }, // 이전 달로 이동
@@ -599,6 +699,17 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                                       IconButton(
                                         icon: const Icon(Icons.chevron_right, size: 20,),
                                         onPressed: () {
+                                          if(DateTime.now().year + 1 == focusedDay.value.year && DateTime.now().month == focusedDay.value.month){
+                                            if(!Get.isSnackbarOpen){
+                                              // Get.snackbar('알림', '예약은 1년 이내로만 가능합니다.');
+                                            }
+                                            return;
+                                          }
+                                          focusedDay.value = DateTime(
+                                            focusedDay.value.year,
+                                            focusedDay.value.month + 1,
+                                            1,
+                                          );
                                           // controller.nextMonth();
                                         }, // 다음 달로 이동
                                       ),
@@ -613,7 +724,7 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                               return Center(
                                 child: Text(
                                   '${day.day}',
-                                  style: TextStyle(fontSize: 13, color: Color(0xffDADADA)), // 원하는 색상으로 변경
+                                  style: const TextStyle(fontSize: 13, color: Color(0xffDADADA)), // 원하는 색상으로 변경
                                 ),
                               );
                             } else {
@@ -621,7 +732,7 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                               return Center(
                                 child: Text(
                                   '${day.day}',
-                                  style: TextStyle(fontSize: 13,), // 기본 색상 설정
+                                  style: const TextStyle(fontSize: 13,), // 기본 색상 설정
                                 ),
                               );
                             }
@@ -634,16 +745,16 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                 : isAlarm.value ? Container(
               width: 336,
               height: 200,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              margin: EdgeInsets.only(bottom: 17),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              margin: const EdgeInsets.only(bottom: 17),
               decoration: BoxDecoration(
-                color: Color(0xffEAF6FF),
+                color: const Color(0xffEAF6FF),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
                 children: [
                   Text('시간 설정', style: TextStyle(fontSize: 15, color: subColor, fontWeight: FontWeight.w500),),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Container(
                     width: 299,
                     height: 79,
@@ -654,10 +765,23 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
+                        Obx(() => GestureDetector(
+                            onTap: (){
+                              isAfterNoon.value = !isAfterNoon.value;
+                            },
+                            child: Text(isAfterNoon.value ? '오후' : '오전',
+                            style: TextStyle(fontSize: 20, color: subColor, fontWeight: FontWeight.w700),
+                              )
+                        )),
+                        const SizedBox(width: 10,),
+                        SizedBox(
                           width: 50,
                           child: TextField(
                             onChanged: (value) {
+                              if(int.parse(value) > 24){
+                                value = '12';
+                                hourController.text = value;
+                              }
                               if (value.length > 2) {
                                 // 최대 글자 수를 넘으면 마지막 입력을 제거
                                 value = value.substring(1, 2);
@@ -666,50 +790,60 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                             },
                             controller: hourController,
                             keyboardType: TextInputType.number,
+                            readOnly: !isSwitch.value,
                             style: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
                             decoration: InputDecoration(
                               border: InputBorder.none,
-                              contentPadding: EdgeInsets.only(left: 10),
-                              hintText: '00',
+                              contentPadding: const EdgeInsets.only(left: 10),
+                              hintText: !isSwitch.value ? '-' : '00',
                               hintStyle: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
                             ),
                           ),
                         ),
                         Text(':', style: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),),
-                        Container(
+                        SizedBox(
                           width: 50,
-                          child: TextField(
-                            onChanged: (value) {
-                              if (value.length > 2) {
-                                // 최대 글자 수를 넘으면 마지막 입력을 제거
-                                value = value.substring(1, 2);
-                                minController.text = value;
-                              }
-                            },
-                            controller: minController,
-                            keyboardType: TextInputType.number,
-                            style: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.only(left: 10),
-                              hintText: '00',
-                              hintStyle: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
-                            ),
-                            onSubmitted: (value) {
+                          child: Obx(() =>TextField(
+                              onChanged: (value) {
+                                if(value.isEmpty){
+                                  return;
+                                }
+                                if(int.parse(value) > 59){
+                                  value = '59';
+                                  minController.text = value;
+                                }
+                                if (value.length > 2) {
+                                  // 최대 글자 수를 넘으면 마지막 입력을 제거
+                                  value = value.substring(1, 2);
+                                  minController.text = value;
+                                }
+                              },
+                              controller: minController,
+                              keyboardType: TextInputType.number,
+                              readOnly: !isSwitch.value,
+                              style: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.only(left: 10),
+                                hintText: !isSwitch.value ? '-' : '00',
+                                hintStyle: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
+                              ),
+                              onSubmitted: (value) {
 
-                            },
+                              },
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('PUSH 알람 설정',style: TextStyle(fontSize:10,  color: subColor, fontWeight: FontWeight.w600)),
-                      SizedBox(width: 10),
-                      Obx(() => Container(
+                      const SizedBox(width: 10),
+                      Obx(() => SizedBox(
                         height: 20,
                         width: 20,
                         child: Transform.scale(
@@ -718,6 +852,13 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                             value: isSwitch.value,
                             onChanged: (value) {
                               isSwitch.value = value;
+                              if(!isSwitch.value){
+                                hourController.text = '-';
+                                minController.text = '-';
+                              }else{
+                                hourController.text = '00';
+                                minController.text = '00';
+                              }
                               print(isSwitch.value);
                             },
                             activeColor: subColor,
@@ -733,10 +874,10 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                 : null,
             content: Container(
               width: size.width,
-              height: 110,
-              padding: EdgeInsets.symmetric(horizontal: 19, vertical: 16),
+              height: 150,
+              padding: const EdgeInsets.only(left: 19, right: 19, top: 19, bottom: 0),//const EdgeInsets.symmetric(horizontal: 19, vertical: 19),
               decoration: BoxDecoration(
-                color: Color(0xffEAF6FF),
+                color: const Color(0xffEAF6FF),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
@@ -749,6 +890,7 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: TextField(
+                      controller: contentController,
                       style: TextStyle(fontSize: 12, color: subColor, fontWeight: FontWeight.w600),
                       decoration: const InputDecoration(
                         contentPadding: EdgeInsets.only(left: 10, bottom: 15, right: 10),
@@ -757,44 +899,48 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                         hintStyle: TextStyle(
                             fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w600),
                       ),
-                      onSubmitted: (value) async {
-                        int? hour = 0;
-                        int? min = 0;
-                        if(hourController.text != '' || minController.text != ''){
-                          hour = int.parse(hourController.text);
-                          min = int.parse(minController.text);
-                        }
-
-                        DateTime pushTime = DateTime(selectedDate.value.year, selectedDate.value.month, selectedDate.value.day, hour, min);
-                        TodoLists temp = TodoLists(
-                          documentId: '',
-                          GroupId: groupId,
-                          completeTime: DateTime.now(),
-                          complete: 0.obs,
-                          createAt: DateTime.now(),
-                          date: selectedDate.value,
-                          todayIndex: 0,
-                          lasteditAt: DateTime.now(),
-                          content: value,
-                          alarmTrue: true,
-                          alarmAt: hourController.text == '' || minController.text == '' ? null : DateTime(selectedDate.value.year, selectedDate.value.month, selectedDate.value.day, int.parse(hourController.text), int.parse(minController.text)),
-                          sequence: 0,
-                        );
-
-                        TodoListInfo().addTodoLists(
-                          isInit: false,
-                          temp,
-                        );
-                        var controller = Get.find<TodoListController>();
-                        controller.todoListGroupDetail.value.todoList.add(temp);
-
-                        Get.back();
-                      },
+                      maxLines: 50,
+                      // onSubmitted: (value) async {
+                      //   int? hour = 0;
+                      //   int? min = 0;
+                      //   if(hourController.text != '' || minController.text != ''){
+                      //     hour = int.parse(hourController.text);
+                      //     min = int.parse(minController.text);
+                      //   }
+                      //
+                      //   DateTime pushTime = DateTime(selectedDate.value.year, selectedDate.value.month, selectedDate.value.day, hour, min);
+                      //   TodoLists temp = TodoLists(
+                      //     documentId: DateTime.now().millisecondsSinceEpoch.toString(),
+                      //     GroupId: groupId,
+                      //     completeTime: DateTime.now(),
+                      //     complete: 0.obs,
+                      //     createAt: DateTime.now(),
+                      //     date: selectedDate.value,
+                      //     todayIndex: 0,
+                      //     lasteditAt: DateTime.now(),
+                      //     content: value,
+                      //     alarmTrue: isSwitch.value,
+                      //     alarmAt: hourController.text == '-' || minController.text == '-' ? null : DateTime(selectedDate.value.year, selectedDate.value.month, selectedDate.value.day, int.parse(hourController.text), int.parse(minController.text)),
+                      //     sequence: 0,
+                      //   );
+                      //
+                      //   TodoListInfo().addTodoLists(
+                      //     isInit: false,
+                      //     temp,
+                      //   );
+                      //   var controller = Get.find<TodoListController>();
+                      //   controller.todoListGroupDetail.value.todoList.add(temp);
+                      //   controller.todoListGroupDetail.refresh();
+                      //   controller.length();
+                      //   // controller.detailContents.refresh();
+                      //
+                      //   Get.back();
+                      // },
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 11),
+                    padding: const EdgeInsets.symmetric(horizontal: 11),
                     height: 34,
                     width: size.width,
                     decoration: BoxDecoration(
@@ -812,11 +958,11 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                                 isCalendar.value = !isCalendar.value;
                               },
                               child: Container(
-                                padding: EdgeInsets.all(4),
+                                padding: const EdgeInsets.all(4),
                                 width: 22,
                                 height: 22,
                                 decoration: BoxDecoration(
-                                  color: !isCalendar.value ? Colors.white : Color(0xff899DB5),
+                                  color: !isCalendar.value ? Colors.white : const Color(0xff899DB5),
                                   borderRadius: BorderRadius.circular(5),
                                   // image: DecorationImage(
                                   //   image: AssetImage(!isCalendar.value ? 'assets/images/calendarIcon.png' : 'assets/images/selectCalendarIcon.png'),
@@ -825,18 +971,18 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                                 child: Image(image: AssetImage(!isCalendar.value ? 'assets/images/calendarIcon.png' : 'assets/images/selectCalendarIcon.png'), width: 18, height: 18),
                               ),
                             ),
-                            SizedBox(width: 11),
+                            const SizedBox(width: 11),
                             GestureDetector(
                               onTap: (){
                                 isCalendar.value = false;
                                 isAlarm.value = !isAlarm.value;
                               },
                               child: Container(
-                                padding: EdgeInsets.all(4),
+                                padding: const EdgeInsets.all(4),
                                 width: 22,
                                 height: 22,
                                 decoration: BoxDecoration(
-                                  color: !isAlarm.value ? Colors.white : Color(0xff899DB5),
+                                  color: !isAlarm.value ? Colors.white : const Color(0xff899DB5),
                                   borderRadius: BorderRadius.circular(5),
                                   // image: DecorationImage(
                                   //   image: AssetImage(!isAlarm.value ? 'assets/images/bellIcon.png' : 'assets/images/selectBellIcon.png'),
@@ -848,9 +994,9 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                             ),
                           ],
                         ),
-                        SizedBox(width: 11),
+                        const SizedBox(width: 11),
                         AnimatedContainer(
-                          duration: Duration(seconds: 1),
+                          duration: const Duration(seconds: 1),
                           curve: Curves.easeInOut,
                           margin: EdgeInsets.only(left: isCalendar.value || isAlarm.value ? size.width*0.55 - 60 : 0),
                           child: GestureDetector(
@@ -866,6 +1012,65 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                         // Text('오늘', style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w600),)
                       ],
                     ),
+                  ),
+                  const SizedBox(height: 5,),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: subColor,
+                      maximumSize: const Size(67, 27),
+                      minimumSize: const Size(67, 27),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                      onPressed: (){
+                        int? hour = 0;
+                        int? min = 0;
+
+                        if(hourController.text.isNumericOnly && minController.text.isNumericOnly){
+                          hour = int.parse(hourController.text);
+                          min = int.parse(minController.text);
+                        }
+                        else{
+                          if(hourController.text == ''){
+                            hour = 0;
+                          }
+                          if(minController.text == ''){
+                            min = 0;
+                          }
+                        }
+                        if(isAfterNoon.value){
+                          hour = hour + 12;
+                        }
+
+                        DateTime pushTime = DateTime(selectedDate.value.year, selectedDate.value.month, selectedDate.value.day, hour!, min!);
+                        TodoLists temp = TodoLists(
+                          documentId: DateTime.now().millisecondsSinceEpoch.toString(),
+                          GroupId: groupId,
+                          completeTime: DateTime.now(),
+                          complete: 0.obs,
+                          createAt: DateTime.now(),
+                          date: selectedDate.value,
+                          todayIndex: 0,
+                          lasteditAt: DateTime.now(),
+                          content: contentController.text,
+                          alarmTrue: isSwitch.value,
+                          alarmAt: hourController.text == '-' && minController.text == '-' ? null : DateTime(selectedDate.value.year, selectedDate.value.month, selectedDate.value.day, hour, min),
+                          sequence: 0,
+                        );
+
+                        TodoListInfo().addTodoLists(
+                          isInit: false,
+                          temp,
+                        );
+                        var controller = Get.find<TodoListController>();
+                        controller.todoListGroupDetail.value.todoList.add(temp);
+                        controller.todoListGroupDetail.refresh();
+                        controller.length();
+                        // controller.detailContents.refresh();
+
+                        Get.back();
+                      }, child: const Text('저장', style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w500),)
                   )
                 ],
               ),

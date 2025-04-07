@@ -127,13 +127,13 @@ class DiaryInfo{
   // 한 주간의 기분점수 n주차 데이터 받아오기
   Future<Map<String, double>> getWeeklyFeelingScore(int num) async {
     Map<String, double> feelingScore = {
-      'sun': -1.toDouble(),
-      'mon': -1.toDouble(),
-      'tue': -1.toDouble(),
-      'wed': -1.toDouble(),
-      'thu': -1.toDouble(),
-      'fri': -1.toDouble(),
-      'sat': -1.toDouble(),
+      'sun': 0.toDouble(),
+      'mon': 0.toDouble(),
+      'tue': 0.toDouble(),
+      'wed': 0.toDouble(),
+      'thu': 0.toDouble(),
+      'fri': 0.toDouble(),
+      'sat': 0.toDouble(),
     };
     try{
       QuerySnapshot<Map> snapshot = await db.collection('users').doc(uid).collection('Records').orderBy('createAt', descending: true).get();

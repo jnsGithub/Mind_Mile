@@ -130,6 +130,7 @@ Widget bottomNavi(BuildContext context, RxInt selected, PageController controlle
          child: Container(
            decoration: BoxDecoration(
              border: Border.all(color: Colors.transparent),
+
            ),
            width: size.width * 0.25,
            height: 70,

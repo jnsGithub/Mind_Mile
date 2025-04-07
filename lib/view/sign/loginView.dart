@@ -133,13 +133,13 @@ class LoginView extends GetView<LoginController> {
                       ],
                     ),
                   ),
-                  TextButton(
-                      onPressed: () async {
-                        // int a = await test().Test1() ?? 0;
-                        // print(a);
-                        PredectedWellness().realTest();
-                      },
-                      child: Text('test'))
+                  // TextButton(
+                  //     onPressed: () async {
+                  //       // int a = await test().Test1() ?? 0;
+                  //       // print(a);
+                  //       PredectedWellness().realTest();
+                  //     },
+                  //     child: Text('test'))
                 ],
               ),
             ),

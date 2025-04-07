@@ -10,7 +10,7 @@ class RecordsInfo{
     try{
       Records records = Records(
         documentId: '',
-        mood: mood,
+        mood: mood + 1,
         moodSort: moodSort,
         title: title,
         content: content,
@@ -33,6 +33,7 @@ class RecordsInfo{
         Map<String, dynamic> data = document.data() as Map<String, dynamic>;
         data['documentId'] = document.id;
         data['createAt'] = (data['createAt'] as Timestamp).toDate();
+        data['mood'] = data['mood'];
         records.add(Records.fromMap(data));
       }
       return records;

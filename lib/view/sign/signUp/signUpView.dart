@@ -294,12 +294,26 @@ class SignUpView extends GetView<SignUpController> {
                         onPressed: () async {
                           // 버튼 클릭 시 동작
                           // Get.toNamed('/surveyStartView');
-                          if(controller.pwController.text !=controller.pwCheckController.text){
-                            Get.snackbar('비밀번호 확인', '비밀번호가 일치하지 않습니다.');
+                          if(!controller.isValidEmail(controller.emailController.text)){
+                            if(!Get.isSnackbarOpen) {
+                              Get.snackbar('이메일 확인', '이메일 형식이 올바르지 않습니다.');
+                            }
+                            return;
+                          }else if(controller.pwController.text !=controller.pwCheckController.text){
+                            if(!Get.isSnackbarOpen) {
+                                Get.snackbar('비밀번호 확인', '비밀번호가 일치하지 않습니다.');
+                              }
                             return;
                           }
                           else if(controller.pwController.text.length < 6){
-                            Get.snackbar('비밀번호 확인', '비밀번호는 6자리 이상이어야 합니다.');
+                            if(!Get.isSnackbarOpen) {
+                              Get.snackbar('비밀번호 확인', '비밀번호는 6자리 이상이어야 합니다.');
+                            }
+                            return;
+                          }else if(controller.isValidPassword(controller.pwController.text) == false){
+                            if(!Get.isSnackbarOpen){
+                              Get.snackbar('비밀번호 확인', '비밀번호는 영문, 숫자, 특수문자를 포함하여 6자리 이상이어야 합니다.');
+                            }
                             return;
                           }
                           else

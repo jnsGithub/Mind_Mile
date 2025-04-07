@@ -9,6 +9,7 @@ import 'package:mind_mile/global.dart';
 import 'package:mind_mile/view/diaryView/diaryController.dart';
 import 'package:super_tooltip/super_tooltip.dart';
 
+
 class DiaryView extends GetView<DiaryController> {
   const DiaryView({super.key});
 
@@ -61,7 +62,7 @@ class DiaryView extends GetView<DiaryController> {
                                       ),
                                     ),
                                     onPressed: (){
-                                      Get.toNamed('/diaryDetailView');
+                                      Get.toNamed('/diaryDetailView', arguments: false);
                                     },
                                     child: Text('전체 기록 보기', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600),))
                               ],
@@ -90,7 +91,7 @@ class DiaryView extends GetView<DiaryController> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 13,),
+                  const SizedBox(height: 13,),
                   GestureDetector(
                     onHorizontalDragEnd: (details){
                       if(details.primaryVelocity! > 0){
@@ -126,37 +127,43 @@ class DiaryView extends GetView<DiaryController> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                             child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                // TODO: 여기 만들어야함.
-                                Icon(Icons.circle, size: 7, color: subColor,),
-                                Text('  한 주간의 나', style: TextStyle(fontSize: 15, color: subColor,fontWeight: FontWeight.w700),),
-                                const SizedBox(width: 3,),
-                                GetBuilder<GlobalController>(
-                                    builder: (globalController){
-                                      return GestureDetector(
-                                        onTap: (){globalController.aa(
-                                            context,_targetKey ,
-                                            '- 일주일 동안의 요일별 내가 계획한 할 일과 수행 완료한 양을 한눈에 볼 수 있어요 !',
-                                            text2 : '- 일주일 동안의 요일별 나의 점수 (기분) 변화를 한눈에 볼 수 있어요 !');
-                                        },
-                                        child: Icon(
-                                          key: _targetKey,
-                                          Icons.info_outline,
-                                          color: subColor,
-                                          size: 14,
-                                        ),
-                                      );
-                                    }
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    // TODO: 여기 만들어야함.
+                                    Icon(Icons.circle, size: 7, color: subColor,),
+                                    Text('  한 주간의 나', style: TextStyle(fontSize: 15, color: subColor,fontWeight: FontWeight.w700),),
+                                    const SizedBox(width: 3,),
+                                    GetBuilder<GlobalController>(
+                                        builder: (globalController){
+                                          return GestureDetector(
+                                            onTap: (){globalController.aa(
+                                                context,_targetKey ,
+                                                '- 일주일 동안의 요일별 내가 계획한 할 일과 수행 완료한 양을 한눈에 볼 수 있어요 !',
+                                                text2 : '- 일주일 동안의 요일별 나의 점수 (기분) 변화를 한눈에 볼 수 있어요 !');
+                                            },
+                                            child: Icon(
+                                              key: _targetKey,
+                                              Icons.info_outline,
+                                              color: subColor,
+                                              size: 14,
+                                            ),
+                                          );
+                                        }
+                                    ),
+                                  ],
+                                ),
+                                Obx(() => Container(alignment: Alignment.centerRight,child: Text(
+                                  '${controller.weeklyDate['sun']}~${controller.weeklyDate['sat']}'
+                                  , style: const TextStyle(fontSize: 8.5, color: Color(0xff767676), fontWeight: FontWeight.w500),)),
                                 ),
                               ],
                             ),
                           ),
                           const SizedBox(height: 10),
-                          Obx(() => Container(alignment: Alignment.centerRight,child: Text(
-                              '${controller.weeklyDate['sun']}~${controller.weeklyDate['sat']}'
-                              , style: TextStyle(fontSize: 7, color: Color(0xff767676), fontWeight: FontWeight.w500),)),
-                          ),
+
                           Container(
                             height: 170,
                             child: Obx(() => BarChart(
@@ -323,6 +330,7 @@ class DiaryView extends GetView<DiaryController> {
                           ),
                           Container(
                             height: 20,
+                            padding: EdgeInsets.only(left: 30),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -345,10 +353,10 @@ class DiaryView extends GetView<DiaryController> {
                                       ),
                                     ),
                                     SizedBox(width: 5,),
-                                    Text('끝낸 일', style: TextStyle(fontSize: 7, fontWeight: FontWeight.w600),)
+                                    Text('완료', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w600),)
                                   ],
                                 ),
-                                SizedBox(width: 10,),
+                                SizedBox(width: 30,),
                                 Row(
                                   children: [
                                     Container(
@@ -360,7 +368,7 @@ class DiaryView extends GetView<DiaryController> {
                                       ),
                                     ),
                                     SizedBox(width: 5,),
-                                    Text('미룬 일', style: TextStyle(fontSize: 7, fontWeight: FontWeight.w600),)
+                                    Text('미완료', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w600),)
                                   ],
                                 )
                               ],
@@ -388,10 +396,26 @@ class DiaryView extends GetView<DiaryController> {
                                 Obx(() => LineChart(
 
                                     LineChartData(
+                                      lineTouchData: LineTouchData(
+                                        touchTooltipData: LineTouchTooltipData(
+                                          getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                                            return touchedBarSpots.map((barSpot) {
+                                              final flSpot = barSpot;
+                                              if(flSpot.y == -1){
+                                                return LineTooltipItem('none', const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),);
+                                              }
+                                                return LineTooltipItem(
+                                                  '${flSpot.y.toInt()}',
+                                                  const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                                );
+                                            }).toList();
+                                          },
+                                        ),
+                                      ),
                                       minX: -0.5,  // X 축의 최소값을 낮춰 패딩 효과 추가
                                       maxX: 6.5,   // X 축의 최대값을 높여 패딩 효과 추가
-                                      minY: -1,    // Y 축의 최소값을 낮춰 패딩 효과 추가
-                                      maxY: 6.5,     // Y 축의 최대값을 높여 패딩 효과 추가
+                                      minY: 0,    // Y 축의 최소값을 낮춰 패딩 효과 추가
+                                      maxY: 7.5,     // Y 축의 최대값을 높여 패딩 효과 추가
                                       // minX: 0,
                                       // maxX: 6,
                                       // minY: 0,
@@ -432,11 +456,11 @@ class DiaryView extends GetView<DiaryController> {
                                                       fontSize: 14,
                                                     );
                                                     switch (value) {
-                                                      case 0:
+                                                      case 1:
                                                         return Image(image: AssetImage('assets/images/score/selectTT.png'), width: 30, height: 30, fit: BoxFit.fitWidth,);
-                                                      case 3:
+                                                      case 4:
                                                         return Image(image: AssetImage('assets/images/score/selectSoso.png'), width: 30, height: 30, fit: BoxFit.fitWidth,);
-                                                      case 6:
+                                                      case 7:
                                                         return Image(image: AssetImage('assets/images/score/selectHappy.png'), width: 30, height: 30, fit: BoxFit.fitWidth,);
                                                       default:
                                                         return Column(
@@ -512,20 +536,19 @@ class DiaryView extends GetView<DiaryController> {
 
                                       lineBarsData: [
                                         LineChartBarData(
-
                                           spots: [
-                                            FlSpot(0, controller.weeklyFeelingScore['sun']!),
-                                            FlSpot(1, controller.weeklyFeelingScore['mon']!),
-                                            FlSpot(2, controller.weeklyFeelingScore['tue']!),
-                                            FlSpot(3, controller.weeklyFeelingScore['wed']!),
-                                            FlSpot(4, controller.weeklyFeelingScore['thu']!),
-                                            FlSpot(5, controller.weeklyFeelingScore['fri']!),
-                                            FlSpot(6, controller.weeklyFeelingScore['sat']!),
+                                            if(controller.weeklyFeelingScore['sun'] != 0) FlSpot(0, controller.weeklyFeelingScore['sun']!),
+                                            if(controller.weeklyFeelingScore['mon'] != 0) FlSpot(1, controller.weeklyFeelingScore['mon']!),
+                                            if(controller.weeklyFeelingScore['tue'] != 0) FlSpot(2, controller.weeklyFeelingScore['tue']!),
+                                            if(controller.weeklyFeelingScore['wed'] != 0) FlSpot(3, controller.weeklyFeelingScore['wed']!),
+                                            if(controller.weeklyFeelingScore['thu'] != 0) FlSpot(4, controller.weeklyFeelingScore['thu']!),
+                                            if(controller.weeklyFeelingScore['fri'] != 0) FlSpot(5, controller.weeklyFeelingScore['fri']!),
+                                            if(controller.weeklyFeelingScore['sat'] != 0) FlSpot(6, controller.weeklyFeelingScore['sat']!),
                                           ],
-                                          // gradient: LinearGradient(
-                                          //   colors: [Color(0xffC4C3BA), Color(0xff8DCECA), Color(0xff57B7FF)],
-                                          //   stops: [0.35, 1, 1],
-                                          // ),
+                                          gradient: LinearGradient(
+                                            colors: [Color(0xffC4C3BA), Color(0xff8DCECA), Color(0xff57B7FF)],
+                                            stops: [0.35, 1, 1],
+                                          ),
                                           isCurved: false,
                                           color: Color(0xff49A09F),
                                           barWidth: 1,
@@ -538,13 +561,13 @@ class DiaryView extends GetView<DiaryController> {
                                               getDotPainter: (spot, percent, barData, index) {
                                                 return FlDotCirclePainter(
                                                   radius: 6,
-                                                  color: spot.y == 0 ? const Color(0xffC4C3BA)
-                                                      : spot.y == 1 ? const Color(0xffB5C7BF)
-                                                      : spot.y == 2 ? const Color(0xffA1CBC5)
-                                                      : spot.y == 3 ? const Color(0xff94CEC9)
-                                                      : spot.y == 4 ? const Color(0xff80C9D8)
-                                                      : spot.y == 5 ? const Color(0xff6FC2E9)
-                                                      : spot.y == 6 ? const Color(0xff57B7FF)
+                                                  color: spot.y == 1 ? const Color(0xffC4C3BA)
+                                                      : spot.y == 2 ? const Color(0xffB5C7BF)
+                                                      : spot.y == 3 ? const Color(0xffA1CBC5)
+                                                      : spot.y == 4 ? const Color(0xff94CEC9)
+                                                      : spot.y == 5 ? const Color(0xff80C9D8)
+                                                      : spot.y == 6 ? const Color(0xff6FC2E9)
+                                                      : spot.y == 7 ? const Color(0xff57B7FF)
                                                       : Colors.transparent,
                                                   strokeWidth: 0,
                                                   strokeColor: Colors.white,
@@ -767,7 +790,7 @@ class DiaryView extends GetView<DiaryController> {
                                       ),
                                     ),
                                     onPressed: (){
-
+                                      Get.toNamed('/diaryDetailView', arguments: true);
                                     },
                                     child: Text('긍정 일기 보기', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w500),))
                               ],
@@ -782,7 +805,7 @@ class DiaryView extends GetView<DiaryController> {
                                   childAspectRatio: 2.5,
                                 ),
                                 children: [
-                                  for(int i = 0; i < controller.diaryList.length; i++)
+                                  for(int i = 0; i < textList.length; i++)
                                     Container(
                                       alignment: Alignment.center,
                                       decoration: BoxDecoration(
@@ -798,7 +821,7 @@ class DiaryView extends GetView<DiaryController> {
                                         color: subColor,
                                         radius: const Radius.circular(60),
                                         child: Center(
-                                          child: Text(controller.diaryList[i], style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w600),),
+                                          child: Text(textList[i], style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w600),),
                                         ),
                                       ),
                                     )
@@ -834,6 +857,7 @@ class DiaryView extends GetView<DiaryController> {
               BarChartData(
                 alignment: BarChartAlignment.spaceAround,
                 maxY: 100,
+                barTouchData: BarTouchData(enabled: false),
                 titlesData: FlTitlesData(
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(

@@ -23,13 +23,13 @@ class DiaryController extends GetxController {
 
   RxList<List<double>> weeklyTodoList = <List<double>>[[0, 0, 0, 0, 0 ,0, 0], [0, 0, 0, 0, 0 ,0, 0]].obs;
   RxMap<String, double> weeklyFeelingScore = {
-    'sun': -1.toDouble(),
-    'mon': -1.toDouble(),
-    'tue': -1.toDouble(),
-    'wed': -1.toDouble(),
-    'thu': -1.toDouble(),
-    'fri': -1.toDouble(),
-    'sat': -1.toDouble(),
+    'sun': 0.toDouble(),
+    'mon': 0.toDouble(),
+    'tue': 0.toDouble(),
+    'wed': 0.toDouble(),
+    'thu': 0.toDouble(),
+    'fri': 0.toDouble(),
+    'sat': 0.toDouble(),
   }.obs;
   RxMap<String, String> weeklyDate = {
     'sun': '',
