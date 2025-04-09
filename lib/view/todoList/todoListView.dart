@@ -167,8 +167,16 @@ class TodoListView extends GetView<TodoListController> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Obx(() => GestureDetector(
-                        onTap: () {
+                      Obx(() => ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: const Size(30, 29),
+                          maximumSize: const Size(30, 29),
+                          elevation: 100,
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                        ),
+                        onPressed: () {
                           if (controller.todoList[index].complete.value == 2) {
                             controller.todoList[index].complete.value = 0;
                           } else {
@@ -177,8 +185,8 @@ class TodoListView extends GetView<TodoListController> {
                           controller.updateComplete(controller.todoList[index]);
                         },
                         child: Container(
-                          width: 30,
-                          height: 29,
+                          // width: 50,
+                          // height: 50,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(60),
                             image: DecorationImage(
@@ -281,7 +289,7 @@ class TodoListView extends GetView<TodoListController> {
                             Text(
                               '${controller.todoList[index].alarmAt!.hour < 12 ? 'AM' : 'PM'} ${controller.todoList[index].alarmAt!.hour < 10 ? '0' : ''}${controller.todoList[index].alarmAt!.hour}:${controller.todoList[index].alarmAt!.minute < 10 ? '0' : ''}${controller.todoList[index].alarmAt!.minute}',
                               style: const TextStyle(
-                                fontSize: 7,
+                                fontSize: 9.5,
                                 color: Color(0xff68B64D),
                                 fontWeight: FontWeight.w500,
                               ),

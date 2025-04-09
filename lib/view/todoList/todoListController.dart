@@ -11,6 +11,7 @@ import 'package:mind_mile/model/records.dart';
 import 'package:mind_mile/model/todoList.dart';
 import 'package:mind_mile/model/todoListGroup.dart';
 import 'package:mind_mile/util/recordsInfo.dart';
+import 'package:mind_mile/util/test.dart';
 import 'package:mind_mile/util/todoList.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -56,6 +57,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
   RxList<DragAndDropList> contents = <DragAndDropList>[].obs;
   RxList<DragAndDropList> detailContents = <DragAndDropList>[].obs;
   RxList<SlideController> slidableGroupControllers = <SlideController>[].obs;
+  RxList<SlideController> slidableGroupDetailControllers = <SlideController>[].obs;
   RxList<bool> isGroupDragHandleVisibleList = <bool>[].obs;
   // RxBool isPress = false.obs;
   RxList<TodoListGroup> todoListGroup = <TodoListGroup>[].obs;
@@ -93,6 +95,12 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
     for (int i = 0; i < todoListGroup.length; i++) {
       slidableGroupControllers.add(SlideController(usePostActionController: true, usePreActionController: true));
       isGroupDragHandleVisibleList.add(true);
+    }
+  }
+
+  void setSliderGroupDetailController(){
+    for(int i = 0; i < todoListGroupDetail.value.todoList.length; i++){
+      slidableGroupDetailControllers.add(SlideController(usePostActionController: true, usePreActionController: true));
     }
   }
 
@@ -159,7 +167,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
     // bool isVisible = now.isAfter(startTime) && now.isBefore(endTime);
     if(now.hour >= 19){
       print('case 1');
-      if(prefs.getInt('lastRecordDate') == int.parse(DateFormat('yyyyMMdd').format(DateTime.now()))){
+      if(prefs.getInt('lastRequestDate') == int.parse(DateFormat('yyyyMMdd').format(DateTime.now()))){
         isVisible.value = false;
       }
       else{
@@ -173,17 +181,18 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
     }
     else if(now.hour <= 14){
       print('case 3');
+      print(prefs.getInt('lastRecordDate'));
       if((prefs.getInt('lastRecordDate') ?? int.parse(DateFormat('yyyyMMdd').format(DateTime.now())) - 1) <= int.parse(DateFormat('yyyyMMdd').format(DateTime.now())) - 1){
         print(prefs.getInt('lastRecordDate'));
         isVisible.value = true;
-        if(groupValue == 0){
+        if(groupValue == 1){
           dailyText.value = '어제의 하루는 어땠나요?';
         }
         else{
-          if(wellness! < 3){
+          if(wellness! < 3 && wellness! > 0){
             dailyText.value = dailyWords['bad'][Random().nextInt(dailyWords['bad'].length)];
           }
-          else if(wellness! < 5){
+          else if(wellness! < 5 && wellness! > 0){
             dailyText.value = dailyWords['well'][Random().nextInt(dailyWords['well'].length)];
           }
           else{
@@ -263,7 +272,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
   diaryDialog(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     RxInt selectIndex = (-1).obs;
-    bool isGroup1 = groupValue == 1;
+    bool isGroup1 = groupValue == 2;
     if(isGroup1){
       selectIndex.value = wellness ?? -1;
     }
@@ -426,10 +435,11 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                             moodSort = 1;
                           }
                           final SharedPreferences prefs = await SharedPreferences.getInstance();
-                          prefs.setInt('lastRecordDate', int.parse(DateFormat('yyyyMMdd').format(DateTime.now())));
+                          prefs.setInt('lastRequestDate', int.parse(DateFormat('yyyyMMdd').format(DateTime.now())));
                           RecordsInfo recordsInfo = RecordsInfo();
                           saving(context);
                           await recordsInfo.setRecords(selectIndex.value, moodSort, titleController.text, contentController.text, groupValue == 1);
+                          // wellness = await PredectedWellness().requestWellness(uid!);
                           await init();
                           Get.back();
                           Get.back();
@@ -499,15 +509,36 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
   }
 
 
-  RxList<dynamic> length() {
+  RxList<DateTime> length() {
     if (todoListGroupDetail.value.todoList.isNotEmpty) {
-      RxList<DateTime> temp = [
-        DateTime(todoListGroupDetail.value.todoList[0].date.year,
-            todoListGroupDetail.value.todoList[0].date.month,
-            todoListGroupDetail.value.todoList[0].date.day)
-      ].obs;
+      RxList<DateTime> temp = <DateTime>[].obs;
 
-      for (int i = 1; i < todoListGroupDetail.value.todoList.length; i++) {
+      for(int i = 0; i < todoListGroupDetail.value.todoList.length; i++){
+        if(DateTime(todoListGroupDetail.value.todoList[i].date.year,todoListGroupDetail.value.todoList[i].date.month,todoListGroupDetail.value.todoList[i].date.day) == DateTime(DateTime.now().year,
+            DateTime.now().month,
+            DateTime.now().day)){
+          print(222);
+          temp.add(DateTime(DateTime.now().year,
+              DateTime.now().month,
+              DateTime.now().day),);
+          break;
+        }
+      }
+
+      for(int i = 0; i < todoListGroupDetail.value.todoList.length; i++){
+        if(todoListGroupDetail.value.todoList[i].date.year == 2021){
+          temp.add(DateTime(2021,1,1));
+          break;
+        }
+      }
+      todoListGroupDetail.value.todoList.sort((a, b) => b.date.compareTo(a.date));
+      // temp.add(DateTime(
+      //   todoListGroupDetail.value.todoList[0].date.year,
+      //   todoListGroupDetail.value.todoList[0].date.month,
+      //   todoListGroupDetail.value.todoList[0].date.day,
+      // ));
+
+      for (int i = 0; i < todoListGroupDetail.value.todoList.length; i++) {
         bool isDuplicate = false;
         // 현재 todoList의 날짜와 temp의 날짜를 비교
         for (int j = 0; j < temp.length; j++) {

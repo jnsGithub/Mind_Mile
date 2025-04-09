@@ -30,6 +30,7 @@ class Sign{
       });
       myName = nickName;
       uid = userCredential.user!.uid;
+      setFcmToken();
       return true;
     } catch (e) {
       print(e);

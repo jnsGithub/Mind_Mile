@@ -12,16 +12,18 @@ class TodoListInfo{
     try {
       QuerySnapshot snapshot = await db.collection('users').doc(uid).collection('Goals').orderBy('sequence', descending: false).get();
       QuerySnapshot snapshot2 = await db.collection('users').doc(uid).collection('TodoLists').get();
-      var a = await db.collection('users').doc(uid).collection('TodoLists').count().get();
       for (QueryDocumentSnapshot document in snapshot.docs) {
         Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
         data['documentId'] = document.id;
         data['createAt'] = (data['createAt'] as Timestamp).toDate();
         data['lasteditAt'] = (data['lasteditAt'] as Timestamp).toDate();
         data['todoList'] = <TodoLists>[];
+
         for(QueryDocumentSnapshot doc in snapshot2.docs){
           if(doc['GroupId'] == document.id){
             Map<String, dynamic> data2 = doc.data() as Map<String, dynamic>;
+
             data2['documentId'] = doc.id;
             data2['createAt'] = (data2['createAt'] as Timestamp).toDate();
             data2['completeTime'] = (data2['completeTime'] as Timestamp).toDate();
@@ -143,24 +145,28 @@ class TodoListInfo{
   Future<void> deleteTodoLists(String documentId, List<TodoLists> list, String groupId) async {
     try{
       await db.collection('users').doc(uid).collection('TodoLists').doc(documentId).delete();
-      // QuerySnapshot snapshot = await db.collection('users').doc(uid).collection('TodoLists').orderBy('todayIndex', descending: false).get();
-      QuerySnapshot snapshot2 = await db.collection('users').doc(uid).collection('TodoLists').where('GroupId', isEqualTo: groupId).orderBy('sequence', descending: false).get();
+      QuerySnapshot snapshot2 = await db.collection('users')
+          .doc(uid)
+          .collection('TodoLists')
+          .where('GroupId', isEqualTo: groupId)
+          .orderBy('sequence', descending: false)
+          .get();
+
       for (int i = 0; i < list.length; i++) {
-        if(list[i].date.year == DateTime.now().year && list[i].date.month == DateTime.now().month && list[i].date.day == DateTime.now().day){
+        if(list[i].date!.year == DateTime.now().year
+            && list[i].date!.month == DateTime.now().month
+            && list[i].date!.day == DateTime.now().day){
           await db.collection('users').doc(uid).collection('TodoLists').doc(list[i].documentId).update({
             'todayIndex': i,
           });
         }
-        // await db.collection('users').doc(uid).collection('TodoLists').doc(snapshot.docs[i].id).update({
-        //   'todayIndex': i,
-        // });
       }
+
       for (int i = 0; i < snapshot2.docs.length; i++) {
         await db.collection('users').doc(uid).collection('TodoLists').doc(snapshot2.docs[i].id).update({
           'sequence': i,
         });
       }
-      
     } catch(e){
       print('할일 삭제 할때 걸림');
       print(e);

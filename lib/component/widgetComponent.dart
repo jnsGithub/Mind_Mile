@@ -78,6 +78,16 @@ Widget buttonComponent(double width, double height, String text, RxInt selectInd
           } else {
             score[a.value] = index;
           }
+          if(a == score.length){
+            Get.toNamed('/surveyEndView');
+            print('다음화면 넘어가야함.');
+          }
+          else{
+            a++;
+          }
+          print(a);
+          print(score.length);
+          print(score);
         },
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(

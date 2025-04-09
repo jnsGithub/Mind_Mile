@@ -112,101 +112,105 @@ updateAlarmDialog(BuildContext context, String docId, TodoLists todoList){
                   const SizedBox(width: 10,),
                   SizedBox(
                     width: 50,
-                    child: TextField(
-                      onChanged: (value) {
-                        try{
-                          if(!value.isNumericOnly){
-                            value = '0';
-                            hourController.text = value;
+                    child: Obx(() => TextField(
+                        readOnly: !isSwitch.value,
+                        onChanged: (value) {
+                          try{
+                            if(!value.isNumericOnly){
+                              value = '0';
+                              hourController.text = value;
+                            }
+                            if (value.length > 2) {
+                              // 최대 글자 수를 넘으면 마지막 입력을 제거
+                              value = value.substring(1, 2);
+                              hourController.text = value;
+                            }
+                            if(int.parse(value) > 12){
+                              value = '12';
+                              hourController.text = value;
+                            }
+                          } catch(e){
+                            print(e);
                           }
-                          if (value.length > 2) {
-                            // 최대 글자 수를 넘으면 마지막 입력을 제거
-                            value = value.substring(1, 2);
-                            hourController.text = value;
-                          }
-                          if(int.parse(value) > 12){
-                            value = '12';
-                            hourController.text = value;
-                          }
-                        } catch(e){
-                          print(e);
-                        }
-                      },
-                      style: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
-                      controller: hourController,
-                      // keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.only(left: 10),
-                        hintText: '00',
-                        hintStyle: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
+                        },
+                        style: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
+                        controller: hourController,
+                        // keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.only(left: 10),
+                          hintText: '00',
+                          hintStyle: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
+                        ),
+                        // onSubmitted: (value) async{
+                        //   try{
+                        //     if(hourController.text == ''){
+                        //       hourController.text = '0';
+                        //     }
+                        //     if(minController.text == ''){
+                        //       minController.text = '0';
+                        //     }
+                        //     var controller = Get.find<TodoListController>();
+                        //     await controller.todoListInfo.updateTodoListAlarm(docId, isSwitch.value, int.parse(hourController.text), int.parse(minController.text));
+                        //     await controller.init();
+                        //     Get.back();
+                        //   } catch(e){
+                        //     print(e);
+                        //   }
+                        // },
                       ),
-                      onSubmitted: (value) async{
-                        try{
-                          if(hourController.text == ''){
-                            hourController.text = '0';
-                          }
-                          if(minController.text == ''){
-                            minController.text = '0';
-                          }
-                          var controller = Get.find<TodoListController>();
-                          await controller.todoListInfo.updateTodoListAlarm(docId, isSwitch.value, int.parse(hourController.text), int.parse(minController.text));
-                          await controller.init();
-                          Get.back();
-                        } catch(e){
-                          print(e);
-                        }
-                      },
                     ),
                   ),
                   Text(':', style: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),),
                   SizedBox(
                     width: 50,
-                    child: TextField(
-                      onChanged: (value) {
-                        if(!value.isNumericOnly){
-                          value = '0';
-                          minController.text = value;
-                        }
-                        try{
-                          if (value.length > 2) {
-                            // 최대 글자 수를 넘으면 마지막 입력을 제거
-                            value = value.substring(1, 2);
+                    child: Obx(() => TextField(
+                        readOnly: !isSwitch.value,
+                        onChanged: (value) {
+                          if(!value.isNumericOnly){
+                            value = '0';
                             minController.text = value;
                           }
-                          if(int.parse(value) > 59){
-                            value = '59';
-                            minController.text = value;
+                          try{
+                            if (value.length > 2) {
+                              // 최대 글자 수를 넘으면 마지막 입력을 제거
+                              value = value.substring(1, 2);
+                              minController.text = value;
+                            }
+                            if(int.parse(value) > 59){
+                              value = '59';
+                              minController.text = value;
+                            }
+                          } catch(e){
+                            print(e);
                           }
-                        } catch(e){
-                          print(e);
-                        }
-                      },
-                      style: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
-                      controller: minController,
-                      // keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.only(left: 10),
-                        hintText: '00',
-                        hintStyle: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
+                        },
+                        style: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
+                        controller: minController,
+                        // keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.only(left: 10),
+                          hintText: '00',
+                          hintStyle: TextStyle(fontSize: 30, color: subColor, fontWeight: FontWeight.w600),
+                        ),
+                        // onSubmitted: (value) async {
+                        //   try{
+                        //     if(hourController.text == ''){
+                        //       hourController.text = '0';
+                        //     }
+                        //     if(minController.text == ''){
+                        //       minController.text = '0';
+                        //     }
+                        //     var controller = Get.find<TodoListController>();
+                        //     await controller.todoListInfo.updateTodoListAlarm(docId, isSwitch.value, int.parse(hourController.text), int.parse(minController.text));
+                        //     await controller.init();
+                        //     Get.back();
+                        //   } catch(e){
+                        //     print(e);
+                        //   }
+                        // },
                       ),
-                      // onSubmitted: (value) async {
-                      //   try{
-                      //     if(hourController.text == ''){
-                      //       hourController.text = '0';
-                      //     }
-                      //     if(minController.text == ''){
-                      //       minController.text = '0';
-                      //     }
-                      //     var controller = Get.find<TodoListController>();
-                      //     await controller.todoListInfo.updateTodoListAlarm(docId, isSwitch.value, int.parse(hourController.text), int.parse(minController.text));
-                      //     await controller.init();
-                      //     Get.back();
-                      //   } catch(e){
-                      //     print(e);
-                      //   }
-                      // },
                     ),
                   ),
                 ],
@@ -216,7 +220,19 @@ updateAlarmDialog(BuildContext context, String docId, TodoLists todoList){
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text('PUSH 알람 설정',style: TextStyle(fontSize:10,  color: subColor, fontWeight: FontWeight.w600)),
+                GestureDetector(
+                    onTap: (){
+                      isSwitch.value = !isSwitch.value;
+                      if(!isSwitch.value){
+                        hourController.text = '-';
+                        minController.text = '-';
+                      }else{
+                        hourController.text = '00';
+                        minController.text = '00';
+                      }
+                      print(isSwitch.value);
+                    },
+                    child: Text('PUSH 알람 설정',style: TextStyle(fontSize:10,  color: subColor, fontWeight: FontWeight.w600))),
                 const SizedBox(width: 10),
                 Obx(() => SizedBox(
                   height: 20,
@@ -520,7 +536,7 @@ addTodoListGroup(BuildContext context, bool isEdit, {String? title, TodoListGrou
       });
 }
 
-deleteItemDialog(BuildContext context, RxList<TodoLists> todoList, int index, String docId){
+deleteItemDialog(BuildContext context, RxList<TodoLists> todoList, int index, String docId,{bool? isDetail, String? groupId}){
   Size size = MediaQuery.of(context).size;
   showDialog(
       context: context,
@@ -564,6 +580,16 @@ deleteItemDialog(BuildContext context, RxList<TodoLists> todoList, int index, St
                           ),
                           onPressed: () async {
                             saving(context);
+                            if(isDetail ?? false){
+                              await TodoListInfo().deleteTodoLists(docId, todoList, groupId!);
+                              Get.find<TodoListController>().init();
+                              Get.find<TodoListController>().slidableGroupDetailControllers.removeAt(index);
+                              Get.find<TodoListController>().todoListGroupDetail.value.todoList.removeAt(index);
+                              Get.back();
+                              Get.back();
+
+                              return;
+                            }
                             TodoLists todoLists = todoList[index];
                             todoList.removeAt(index);
                             await TodoListInfo().deleteTodoLists(todoLists.documentId, todoList, todoLists.GroupId);
@@ -591,7 +617,7 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
   TextEditingController hourController = TextEditingController(text: '-');
   TextEditingController minController = TextEditingController(text: '-');
   RxBool isSwitch = false.obs;
-  Rx<DateTime> selectedDate = DateTime.now().obs;
+  Rx<DateTime> selectedDate = DateTime(2021,01,01).obs;
   Rx<DateTime> focusedDay = DateTime.now().obs;
   RxBool isAfterNoon = false.obs;
   showDialog(
@@ -627,8 +653,9 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                         // selectedDayPredicate: (day) {
                         //   return isSameDay(selectedDate.value, day);
                         // },
-                        onDaySelected: (selectedDay, focusedDay) {
+                        onDaySelected: (selectedDay, focusedDay1) {
                           selectedDate.value = selectedDay;
+                          focusedDay.value = focusedDay1;
                           print(selectedDate.value);
                         },
                         selectedDayPredicate: (day) {
@@ -649,21 +676,22 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                           weekdayStyle: TextStyle(fontSize: 13, color: Color(0xffDADADA)),
                           weekendStyle: TextStyle(fontSize: 13, color: Color(0xffDADADA)),
                         ),
-                        calendarStyle: const CalendarStyle(
-                          cellMargin: EdgeInsets.zero,
+                        calendarStyle: CalendarStyle(
+                          cellMargin: const EdgeInsets.all(3),
                           outsideDaysVisible: false,
-                          defaultTextStyle: TextStyle(fontSize: 13,),
-                          weekendTextStyle: TextStyle(fontSize: 13,),
-                          holidayTextStyle: TextStyle(fontSize: 13,),
-                          todayDecoration: BoxDecoration(
-                            color: Color(0xff008BE4),
+                          defaultTextStyle: const TextStyle(fontSize: 13,),
+                          weekendTextStyle: const TextStyle(fontSize: 13,),
+                          holidayTextStyle: const TextStyle(fontSize: 13,),
+                          todayDecoration: const BoxDecoration(
+                            color: Colors.transparent,
                             shape: BoxShape.circle,
                           ),
                           selectedDecoration: BoxDecoration(
-                            color: Color(0xff008BE4),
+                            color: subColor,
                             shape: BoxShape.circle,
                           ),
-                          selectedTextStyle: TextStyle(color: Colors.white),
+                          todayTextStyle: const TextStyle(fontSize: 13, color: Colors.black),
+                          selectedTextStyle: const TextStyle(fontSize: 13, color: Colors.white),
                         ),
                         calendarBuilders: CalendarBuilders(
                             headerTitleBuilder: (context, date) {
@@ -958,9 +986,9 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                                 isCalendar.value = !isCalendar.value;
                               },
                               child: Container(
-                                padding: const EdgeInsets.all(4),
-                                width: 22,
-                                height: 22,
+                                padding: const EdgeInsets.all(0),
+                                width: 24,
+                                height: 24,
                                 decoration: BoxDecoration(
                                   color: !isCalendar.value ? Colors.white : const Color(0xff899DB5),
                                   borderRadius: BorderRadius.circular(5),
@@ -968,7 +996,7 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                                   //   image: AssetImage(!isCalendar.value ? 'assets/images/calendarIcon.png' : 'assets/images/selectCalendarIcon.png'),
                                   //   fit: BoxFit.cover,)
                                 ),
-                                child: Image(image: AssetImage(!isCalendar.value ? 'assets/images/calendarIcon.png' : 'assets/images/selectCalendarIcon.png'), width: 18, height: 18),
+                                child: Image(image: AssetImage(!isCalendar.value ? 'assets/images/calendarIcon.png' : 'assets/images/selectCalendarIcon.png'), width: 20, height: 20),
                               ),
                             ),
                             const SizedBox(width: 11),
@@ -978,9 +1006,9 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                                 isAlarm.value = !isAlarm.value;
                               },
                               child: Container(
-                                padding: const EdgeInsets.all(4),
-                                width: 22,
-                                height: 22,
+                                padding: const EdgeInsets.all(0),
+                                width: 24,
+                                height: 24,
                                 decoration: BoxDecoration(
                                   color: !isAlarm.value ? Colors.white : const Color(0xff899DB5),
                                   borderRadius: BorderRadius.circular(5),
@@ -989,7 +1017,7 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                                   //   fit: BoxFit.fill,
                                   // ),
                                 ),
-                                child: Image(image: AssetImage(!isAlarm.value ? 'assets/images/bellIcon.png' : 'assets/images/selectBellIcon.png'), width: 18, height: 18),
+                                child: Image(image: AssetImage(!isAlarm.value ? 'assets/images/bellIcon.png' : 'assets/images/selectBellIcon.png'), width: 20, height: 20),
                               ),
                             ),
                           ],
@@ -1002,6 +1030,7 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                           child: GestureDetector(
                             onTap: () {
                               selectedDate.value = DateTime.now();
+                              focusedDay.value = DateTime.now();
                             },
                             child: Text(
                               '오늘',

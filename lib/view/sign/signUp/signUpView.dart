@@ -1,10 +1,15 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mind_mile/component/widgetComponent.dart';
 import 'package:mind_mile/global.dart';
 import 'package:mind_mile/model/todoList.dart';
+import 'package:mind_mile/util/test.dart';
 import 'package:mind_mile/view/sign/signUp/signUpController.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class SignUpView extends GetView<SignUpController> {
   const SignUpView({super.key});
@@ -310,7 +315,8 @@ class SignUpView extends GetView<SignUpController> {
                               Get.snackbar('비밀번호 확인', '비밀번호는 6자리 이상이어야 합니다.');
                             }
                             return;
-                          }else if(controller.isValidPassword(controller.pwController.text) == false){
+                          }
+                          else if(controller.isValidPassword(controller.pwController.text) == false){
                             if(!Get.isSnackbarOpen){
                               Get.snackbar('비밀번호 확인', '비밀번호는 영문, 숫자, 특수문자를 포함하여 6자리 이상이어야 합니다.');
                             }
@@ -345,6 +351,7 @@ class SignUpView extends GetView<SignUpController> {
                                     sequence: i,
                                     lasteditAt: DateTime.now(),
                                 ),);
+
                                   //title.docs[0].id, title.docs[0].data()['content'].toString(), controller.todoList[i].content, false, null, i, todayIndex: i);
                             }
                             groupValue = controller.selectGroupValue.value;

@@ -34,7 +34,7 @@ class SurveyView extends GetView<SurveyController> {
                 SizedBox(height: 34,),
                 buttonComponent(size.width*0.7103, 55, '며칠 방해받지 않았다', controller.selectIndex, 1, controller.pageIndex, controller.score),
                 SizedBox(height: 34,),
-                buttonComponent(size.width*0.7103, 55, '2주중 절반 이상 방해받았다', controller.selectIndex, 2, controller.pageIndex, controller.score),
+                buttonComponent(size.width*0.7103, 55, '2주중 7일 이상 방해받았다', controller.selectIndex, 2, controller.pageIndex, controller.score),
                 SizedBox(height: 34,),
                 buttonComponent(size.width*0.7103, 55, '거의 매일 방해받았다', controller.selectIndex, 3, controller.pageIndex, controller.score),
                 SizedBox(height: 129,),

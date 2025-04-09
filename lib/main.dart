@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -47,18 +48,20 @@ void main() async {
     if(Platform.isAndroid) {
       setFirebaseMessaging();
     }
-    if(groupValue == 1){ // TODO : 그룹값이 1이면
-      print('그룹값 1');
+    if(groupValue == 2){ // TODO : 그룹값이 1이면
+      print('그룹값 2');
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       PredectedWellness predectedWellness = PredectedWellness();
       int? lastRequestDate = prefs.getInt('lastRequestDate');
       print(lastRequestDate);
       if(lastRequestDate == null || lastRequestDate < int.parse(DateFormat('yyyyMMdd').format(DateTime.now()))){
         // 예측값 받아와야함
-        wellness = await predectedWellness.requestWellness(uid!);
+        log(name: 'INFO', '데이터 없거나 오늘 날짜보다 작음 - 예측 데이터를 받아옵니다.');
+        wellness = await predectedWellness.requestWellness(uid!) ?? 3;
       }
       else{
-        wellness = prefs.getInt('wellness');
+        log(name: 'INFO', '예측값이 있음 - 기존 데이터를 받아옵니다.');
+        wellness = prefs.getInt('wellness') ?? 3;
         textList = prefs.getStringList('wordList') ?? [];
         print('예측값 wellness ${wellness}');
         print('예측값 textList ${textList}');

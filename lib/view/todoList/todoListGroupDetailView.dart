@@ -1,10 +1,13 @@
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_slidable_panel/widgets/slidable_panel.dart';
 import 'package:get/get.dart';
 import 'package:mind_mile/global.dart';
 import 'package:mind_mile/model/todoListGroup.dart';
 import 'package:mind_mile/view/todoList/todoListController.dart';
 import 'package:intl/intl.dart';
+import 'package:mind_mile/view/todoList/todoListDialog.dart';
 
 class TodoListGroupDetailView extends GetView<TodoListController> {
   TodoListGroupDetailView({super.key});
@@ -53,78 +56,144 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
       }
     }
     // print(length());
-
+    controller.setSliderGroupDetailController();
     RxList<DragAndDropList> contents = <DragAndDropList>[].obs;
     contents.assignAll(RxList.generate(controller.length().length, (index) {
+      bool isNotSelectedDate = controller.length()[index].year == 2021;
       return DragAndDropList(
         verticalAlignment: CrossAxisAlignment.start,
         canDrag: false,
         header: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${DateFormat.MMMMEEEEd('ko_KR').format(controller.length()[index])}', style: TextStyle(fontSize: 10, color: subColor, fontWeight: FontWeight.w600),),
+            Text('${isNotSelectedDate ? '날짜 미정' : DateFormat.MMMMEEEEd('ko_KR').format(controller.length()[index])}', style: TextStyle(fontSize: 10, color: isNotSelectedDate ? Color(0xff6f6f6f) : subColor, fontWeight: FontWeight.w600),),
             const Divider(color: Color(0xff999999), thickness: 0.5,),
           ],
         ),
         children: [
-          for(var i in controller.todoListGroupDetail.value.todoList) // 날짜 비교해서 삽입해야함.
-            if(DateTime(i.date.year, i.date.month, i.date.day) == controller.length()[index])
+          for(int i = 0; i < controller.todoListGroupDetail.value.todoList.length; i++) // 날짜 비교해서 삽입해야함.
+            if(DateTime(controller.todoListGroupDetail.value.todoList[i].date.year, controller.todoListGroupDetail.value.todoList[i].date.month, controller.todoListGroupDetail.value.todoList[i].date.day) == controller.length()[index])
               DragAndDropItem(
-                key: ValueKey('${i.documentId} ${controller.length()[index]}'),// + ' ' + DateTime.now().millisecondsSinceEpoch.toString()), //ValueKey(i.documentId),
-                  child: Container(
-                        decoration: BoxDecoration(
-                            border: Border(bottom: BorderSide(color: Color(0xff999999), width: 0.5))
-                        ),
-                        alignment: Alignment.centerLeft,
-                        // height: 50,
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                        width: size.width,
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: (){
-                                if (i.complete.value == 2) {
-                                  i.complete.value = 0;
-                                } else {
-                                  i.complete.value++;
-                                }
-                                controller.todoListInfo.updateComplete(i.documentId, i.complete.value);
-                                print(i.complete.value);
-                              },
-                              child: Obx(() => Container(
-                                width: 25,
-                                height: 25,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: AssetImage(
-                                        i.complete.value == 0 ? 'assets/images/void.png'
-                                            : i.complete.value == 1 ? 'assets/images/half.png'
-                                            : 'assets/images/full.png'
-                                    ),
-                                    fit: BoxFit.cover,
-                                  ),
+                key: ValueKey('${controller.todoListGroupDetail.value.todoList[i].documentId} ${controller.length()[index]}'),// + ' ' + DateTime.now().millisecondsSinceEpoch.toString()), //ValueKey(i.documentId),
+                  child: Slidable(
+                    endActionPane: ActionPane( // 오른쪽에서 왼쪽으로 드래그 시 액션 표시
+                      extentRatio: 0.3,
+                      motion: const StretchMotion(),
+                      children: [
+                        CustomSlidableAction(
+                          padding: EdgeInsets.zero,
+                          backgroundColor: const Color(0xff56C75B),
+                          onPressed: (context) {
+                            updateAlarmDialog(context, controller.todoListGroupDetail.value.todoList[i].documentId, controller.todoListGroupDetail.value.todoList[i]);
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: Color(0xffD9D9D9),
+                                  width: 1,
                                 ),
                               ),
+                            ),
+                            // child: Icon(
+                            //   Icons.notifications,
+                            //   color: Colors.white,
+                            // ),
+                            child: const ImageIcon(
+                              AssetImage('assets/images/bell.png'),
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                        CustomSlidableAction(
+                          padding: EdgeInsets.zero,
+                          backgroundColor: const Color(0xffE44C42),
+                          onPressed: (context) {
+                            // 삭제 버튼 동작
+                            deleteItemDialog(context, controller.todoList, i, controller.todoListGroupDetail.value.todoList[i].documentId, isDetail: true, groupId: controller.todoListGroupDetail.value.todoList[i].GroupId);
+                            // controller.todoList.removeAt(index);
+                            // controller.todoList.refresh();
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: Color(0xffD9D9D9),
+                                  width: 1,
+                                ),
                               ),
                             ),
-                            SizedBox(width: 10,),
-                            Container(
-                                width: size.width * 0.7,
-                                child: SingleChildScrollView(
-                                    child: Text(
-                                      i.content,
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: subColor,
-                                          fontWeight: FontWeight.w400,
-                                          decoration: i.complete.value == 2 ? TextDecoration.lineThrough : TextDecoration.none,
-                                      ),
-                                      maxLines: 5,)
-                                )
+                            // child: Icon(
+                            //   Icons.delete,
+                            //   color: Colors.white,
+                            // ),
+                            child: const ImageIcon(
+                              AssetImage('assets/images/delete.png'),
+                              color: Colors.white,
+                              size: 24,
                             ),
-                          ],
-                        )
+                          ),
+                        ),
+                      ],
                     ),
+                    child: Container(
+                          decoration: BoxDecoration(
+                              border: Border(bottom: BorderSide(color: Color(0xff999999), width: 0.5))
+                          ),
+                          alignment: Alignment.centerLeft,
+                          // height: 50,
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                          width: size.width,
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: (){
+                                  if (controller.todoListGroupDetail.value.todoList[i].complete.value == 2) {
+                                    controller.todoListGroupDetail.value.todoList[i].complete.value = 0;
+                                  } else {
+                                    controller.todoListGroupDetail.value.todoList[i].complete.value++;
+                                  }
+                                  controller.todoListInfo.updateComplete(controller.todoListGroupDetail.value.todoList[i].documentId, controller.todoListGroupDetail.value.todoList[i].complete.value);
+                                  print(controller.todoListGroupDetail.value.todoList[i].complete.value);
+                                },
+                                child: Obx(() => Container(
+                                  width: 25,
+                                  height: 25,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: AssetImage(
+                                        controller.todoListGroupDetail.value.todoList[i].complete.value == 0 ? 'assets/images/void.png'
+                                              : controller.todoListGroupDetail.value.todoList[i].complete.value == 1 ? 'assets/images/half.png'
+                                              : 'assets/images/full.png',
+                                      ),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                ),
+                              ),
+                              SizedBox(width: 10,),
+                              Container(
+                                  width: size.width * 0.7,
+                                  child: SingleChildScrollView(
+                                      child: Text(
+                                        controller.todoListGroupDetail.value.todoList[i].content,
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: isNotSelectedDate ? Color(0xff6f6f6f) : subColor,
+                                            fontWeight: FontWeight.w400,
+                                            decoration: controller.todoListGroupDetail.value.todoList[i].complete.value == 2 ? TextDecoration.lineThrough : TextDecoration.none,
+                                        ),
+                                        maxLines: 5,)
+                                  )
+                              ),
+                            ],
+                          )
+                      ),
+                  ),
               ),
           // DragAndDropItem(
           //   child: Padding(

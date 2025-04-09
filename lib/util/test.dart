@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mind_mile/global.dart';
@@ -23,6 +24,10 @@ class PredectedWellness{
   Future<int?> requestWellness(String uid) async {
     try{
       final snapshot = await db.collection('users').doc(uid).collection('Records').orderBy('createAt', descending: true).limit(7).get();
+      if(snapshot.docs.isEmpty){
+        print('기록이 없습니다.');
+        return 3;
+      }
       final SharedPreferences prefs = await SharedPreferences.getInstance();
 
       DateTime currentDate = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0, 0);
@@ -60,10 +65,13 @@ class PredectedWellness{
           return response.data['predected_wellness'];
         }
         else{
+          print('status code : ${response.statusCode}');
           return prefs.getInt('wellness');
         }
       }
       else {
+        log(name: 'INFO','마지막 데이터가 오늘 날짜보다 큼 - 기존 데이터를 받아옵니다.');
+        log(name: 'INFO','예측값 wellness :  ${prefs.getInt('wellness')}');
         return prefs.getInt('wellness');
       }
     } catch (e) {

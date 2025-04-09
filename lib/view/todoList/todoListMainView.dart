@@ -44,9 +44,14 @@ class TodoListMainView extends GetView<TodoListController> {
     Get.lazyPut(() => TodoListController());
     Get.lazyPut(() => GlobalController());
 
-    loadImage(wellness != null ? wellness! < 3 ? 'assets/images/score/selectHappy.png'
-        : wellness! < 6 ? 'assets/images/score/selectSoso.png'
-        : 'assets/images/score/selectTT.png' : 'assets/images/score/selectTT.png');
+    loadImage(wellness != null
+        ? wellness! < 3
+        ? 'assets/images/score/selectTT.png'
+        : wellness! < 6
+        ? 'assets/images/score/selectSoso.png'
+        : 'assets/images/score/selectHappy.png'
+        : 'assets/images/score/selectTT.png'
+    );
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool, dynamic) {
@@ -104,6 +109,8 @@ class TodoListMainView extends GetView<TodoListController> {
                         //       // print(prefs.getString('wellness'));
                         //       // print(wellness);
                         //       await FirebaseAuth.instance.signOut();
+                        //       SharedPreferences prefs = await SharedPreferences.getInstance();
+                        //       prefs.clear();
                         //       Get.offAllNamed('/loginView');
                         //     }, child: Text('로그아웃')),
                         // TextButton(
