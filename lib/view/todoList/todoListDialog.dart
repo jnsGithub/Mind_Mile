@@ -587,7 +587,6 @@ deleteItemDialog(BuildContext context, RxList<TodoLists> todoList, int index, St
                               Get.find<TodoListController>().todoListGroupDetail.value.todoList.removeAt(index);
                               Get.back();
                               Get.back();
-
                               return;
                             }
                             TodoLists todoLists = todoList[index];
@@ -614,9 +613,9 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
   RxBool isCalendar = false.obs;
   RxBool isAlarm = false.obs;
   TextEditingController contentController = TextEditingController();
-  TextEditingController hourController = TextEditingController(text: '-');
-  TextEditingController minController = TextEditingController(text: '-');
-  RxBool isSwitch = false.obs;
+  TextEditingController hourController = TextEditingController(text: '00');
+  TextEditingController minController = TextEditingController(text: '00');
+  RxBool isSwitch = true.obs;
   Rx<DateTime> selectedDate = DateTime(2021,01,01).obs;
   Rx<DateTime> focusedDay = DateTime.now().obs;
   RxBool isAfterNoon = false.obs;
@@ -869,7 +868,19 @@ addGroupDetailItemDialog(BuildContext context, RxBool isCalendar1, RxBool isAlar
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('PUSH 알람 설정',style: TextStyle(fontSize:10,  color: subColor, fontWeight: FontWeight.w600)),
+                      GestureDetector(
+                        onTap: (){
+                          isSwitch.value = !isSwitch.value;
+                          if(!isSwitch.value){
+                            hourController.text = '-';
+                            minController.text = '-';
+                          }else{
+                            hourController.text = '00';
+                            minController.text = '00';
+                          }
+                          print(isSwitch.value);
+                        },
+                          child: Text('PUSH 알람 설정',style: TextStyle(fontSize:10,  color: subColor, fontWeight: FontWeight.w600))),
                       const SizedBox(width: 10),
                       Obx(() => SizedBox(
                         height: 20,

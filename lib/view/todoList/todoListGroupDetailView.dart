@@ -77,7 +77,7 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
                 key: ValueKey('${controller.todoListGroupDetail.value.todoList[i].documentId} ${controller.length()[index]}'),// + ' ' + DateTime.now().millisecondsSinceEpoch.toString()), //ValueKey(i.documentId),
                   child: Slidable(
                     endActionPane: ActionPane( // 오른쪽에서 왼쪽으로 드래그 시 액션 표시
-                      extentRatio: 0.3,
+                      extentRatio: 0.4,
                       motion: const StretchMotion(),
                       children: [
                         CustomSlidableAction(
@@ -281,7 +281,7 @@ class TodoListGroupDetailView extends GetView<TodoListController> {
       ),
       body: Obx(() => DragAndDropLists(
         listDragHandle: DragHandle(child: Icon(Icons.drag_handle, size: 30, color: Color(0xffD9D9D9),)),
-            itemDragHandle: DragHandle(child: Icon(Icons.drag_handle, size: 30, color: Color(0xffD9D9D9),)),
+            itemDragHandle: DragHandle(child: Icon(Icons.drag_handle, size: 20, color: Color(0xffD9D9D9),)),
             children: contents,
             onItemReorder: _onItemReorder,
             onListReorder: _onListReorder

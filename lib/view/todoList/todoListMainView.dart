@@ -103,24 +103,21 @@ class TodoListMainView extends GetView<TodoListController> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        // TextButton(
-                        //     onPressed: () async {
-                        //       // SharedPreferences prefs = await SharedPreferences.getInstance();
-                        //       // print(prefs.getString('wellness'));
-                        //       // print(wellness);
-                        //       await FirebaseAuth.instance.signOut();
-                        //       SharedPreferences prefs = await SharedPreferences.getInstance();
-                        //       prefs.clear();
-                        //       Get.offAllNamed('/loginView');
-                        //     }, child: Text('로그아웃')),
+                        TextButton(
+                            onPressed: () async {
+                              // SharedPreferences prefs = await SharedPreferences.getInstance();
+                              // print(prefs.getString('wellness'));
+                              // print(wellness);
+                              await FirebaseAuth.instance.signOut();
+                              SharedPreferences prefs = await SharedPreferences.getInstance();
+                              prefs.clear();
+                              Get.offAllNamed('/loginView');
+                            }, child: Text('로그아웃')),
                         // TextButton(
                         //     onPressed: () async
                         //     {
-                        //       DiaryInfo diaryInfo = DiaryInfo();
-                        //       diaryInfo.getWeeklyDate(2);
-                        //       // DateTime startOfWeek = DateTime.now().subtract(Duration(days: DateTime.now().weekday + 7));
-                        //       // DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
-                        //       // print('${DateFormat.yMd('ko_KR').format(startOfWeek)} - ${DateFormat.yMd('ko_KR').format(endOfWeek)}');
+                        //       SharedPreferences prefs = await SharedPreferences.getInstance();
+                        //       prefs.clear();
                         //     },
                         //     child: Text('TestButton')
                         // ),
@@ -540,7 +537,7 @@ class TodoListMainView extends GetView<TodoListController> {
                 ) : const DiaryView(),
               ),
               bottomNavigationBar: Obx(() => bottomNavi(context, controller.selectTap, controller.pageController),),
-              floatingActionButton: Obx(() => controller.selectTap.value != 3
+              floatingActionButton: Obx(() => controller.selectTap.value != 3 && (controller.cupertinoTabBarIValue.value == 0 || controller.isDetail.value || controller.isGroupEdit.value == true)
                   ? FloatingActionButton(
                 backgroundColor: subColor,
                 onPressed: () async {

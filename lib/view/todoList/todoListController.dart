@@ -88,6 +88,8 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
   onInit() async {
     super.onInit();
     await init();
+    await setIsVisible(textChange: true);
+
     focusNode = FocusNode();
     focusNode.addListener(() {
       hasFocus.value = focusNode.hasFocus;
@@ -109,7 +111,6 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
     await getTodoList();
     await getTodoListGroup();
     await getRecords();
-    await setIsVisible();
   }
 
   getRecords() async {
@@ -159,7 +160,7 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
     await todoListInfo.updateIndexGroupInItem(newGroup, oldGroup, newTodoList, oldTodoList);
   }
 
-  setIsVisible() async {
+  setIsVisible({bool textChange = false}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     DateTime now = DateTime.now();
     DateTime startTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 11, 0);
@@ -167,39 +168,40 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
     // bool isVisible = now.isAfter(startTime) && now.isBefore(endTime);
     if(now.hour >= 19){
       print('case 1');
-      if(prefs.getInt('lastRequestDate') == int.parse(DateFormat('yyyyMMdd').format(DateTime.now()))){
+      if(prefs.getInt('lastRecordDate') == int.parse(DateFormat('yyyyMMdd').format(DateTime.now()))){
         isVisible.value = false;
       }
       else{
         isVisible.value = true;
-        dailyText.value = '오늘 하루는 어땠나요??';
+        dailyText.value = '오늘 하루는 어땠나요?';
       }
     }
-    else if(now.hour < 19 && now.hour > 14){
+    else if(now.hour < 19 && now.hour >= 14){
       print('case 2');
       isVisible.value = false;
     }
-    else if(now.hour <= 14){
+    else if(now.hour < 14){
       print('case 3');
       print(prefs.getInt('lastRecordDate'));
-      if((prefs.getInt('lastRecordDate') ?? int.parse(DateFormat('yyyyMMdd').format(DateTime.now())) - 1) <= int.parse(DateFormat('yyyyMMdd').format(DateTime.now())) - 1){
+      if((prefs.getInt('lastRecordDate') ?? await RecordsInfo().getVisibleRecords()) < int.parse(DateFormat('yyyyMMdd').format(DateTime.now())) - 1){
         print(prefs.getInt('lastRecordDate'));
         isVisible.value = true;
         if(groupValue == 1){
           dailyText.value = '어제의 하루는 어땠나요?';
         }
         else{
-          if(wellness! < 3 && wellness! > 0){
-            dailyText.value = dailyWords['bad'][Random().nextInt(dailyWords['bad'].length)];
-          }
-          else if(wellness! < 5 && wellness! > 0){
-            dailyText.value = dailyWords['well'][Random().nextInt(dailyWords['well'].length)];
-          }
-          else{
-            dailyText.value = dailyWords['good'][Random().nextInt(dailyWords['good'].length)];
+          if(textChange){
+            if(wellness! < 3 && wellness! > 0){
+              dailyText.value = dailyWords['bad'][Random().nextInt(dailyWords['bad'].length)];
+            }
+            else if(wellness! < 5 && wellness! > 0){
+              dailyText.value = dailyWords['well'][Random().nextInt(dailyWords['well'].length)];
+            }
+            else{
+              dailyText.value = dailyWords['good'][Random().nextInt(dailyWords['good'].length)];
+            }
           }
         }
-
       }
       else{
         isVisible.value = false;
@@ -435,12 +437,19 @@ class TodoListController extends GetxController with SingleGetTickerProviderMixi
                             moodSort = 1;
                           }
                           final SharedPreferences prefs = await SharedPreferences.getInstance();
-                          prefs.setInt('lastRequestDate', int.parse(DateFormat('yyyyMMdd').format(DateTime.now())));
+                          DateTime now = DateTime.now();
+                          if(now.hour < 14){
+                            prefs.setInt('lastRecordDate', int.parse(DateFormat('yyyyMMdd').format(DateTime.now().add(const Duration(days: -1)))));
+                          }
+                          else{
+                            prefs.setInt('lastRecordDate', int.parse(DateFormat('yyyyMMdd').format(DateTime.now())));
+                          }
                           RecordsInfo recordsInfo = RecordsInfo();
                           saving(context);
                           await recordsInfo.setRecords(selectIndex.value, moodSort, titleController.text, contentController.text, groupValue == 1);
                           // wellness = await PredectedWellness().requestWellness(uid!);
                           await init();
+                          setIsVisible();
                           Get.back();
                           Get.back();
                           },

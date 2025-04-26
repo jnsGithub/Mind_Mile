@@ -1,0 +1,2 @@
+/Users/hoon/Documents/project/jns/mind_mile/android/app/.cxx/Debug/6c5k5s61/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/hoon/Documents/project/jns/mind_mile/android/app/.cxx/Debug/6c5k5s61/armeabi-v7a/CMakeFiles/rebuild_cache.dir
